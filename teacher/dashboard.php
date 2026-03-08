@@ -18,13 +18,13 @@ require_auth('teacher');
     <div class="grid-2">
         <div class="stat-box">
             <div class="label">QR Attendance</div>
-            <p>QR scanner ഉപയോഗിച്ച് attendance mark ചെയ്യാം.</p>
+            <p>സാധാരണ attendance-യ്ക്ക് QR scanner ഉപയോഗിക്കുക.</p>
             <a href="<?= htmlspecialchars(app_url('teacher/take_attendance.php')) ?>"><button type="button">Open QR Scanner</button></a>
         </div>
         <div class="stat-box">
-            <div class="label">Face Attendance</div>
-            <p>Camera + face-api.js ഉപയോഗിച്ച് attendance mark ചെയ്യാം.</p>
-            <a href="<?= htmlspecialchars(app_url('teacher/face_attendance.php')) ?>"><button type="button">Open Face Attendance</button></a>
+            <div class="label">Secure Flow (QR → Face)</div>
+            <p>ആദ്യം QR scan, ശേഷം മുഖം detect ചെയ്തു face attendance mark ചെയ്യാം.</p>
+            <a href="<?= htmlspecialchars(app_url('teacher/face_attendance.php')) ?>"><button type="button">Open QR + Face</button></a>
         </div>
     </div>
 </div>

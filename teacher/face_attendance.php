@@ -3,109 +3,180 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config/auth.php';
-require_once __DIR__ . '/../config/db.php';
 require_auth('teacher');
-
-$students = $pdo->query('SELECT id, name, register_no FROM students ORDER BY name')->fetchAll();
 ?>
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Face Attendance</title>
+    <title>Face Attendance (QR + Face)</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+    <style>
+        .step-box { border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+        .status-text { font-weight: 700; margin-bottom: 8px; }
+    </style>
 </head>
 <body>
 <?php require __DIR__ . '/../includes/header.php'; ?>
 <div class="container">
-    <h2>Face Recognition Attendance</h2>
-    <p>Student തിരഞ്ഞെടുക്കുക. മുഖം detect ആകുമ്പോൾ attendance mark ചെയ്യും (duplicate same-day തടയും).</p>
+    <h2>Face Attendance (Step-by-Step)</h2>
+    <p>Step 1: QR scan ചെയ്യുക → Step 2: മുഖം detect ആകുമ്പോൾ attendance save ചെയ്യും.</p>
 
     <div class="grid-2">
         <div>
-            <label for="student_id">Student</label>
-            <select id="student_id" required>
-                <option value="">-- Select Student --</option>
-                <?php foreach ($students as $student): ?>
-                    <option value="<?= (int) $student['id'] ?>">
-                        <?= htmlspecialchars($student['name'] . ' (' . $student['register_no'] . ')') ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+            <div class="step-box">
+                <h3>Step 1 — QR Scan</h3>
+                <div id="reader" style="width: 320px; max-width: 100%;"></div>
+                <p><strong>Scanned Register:</strong> <span id="scannedRegister">-</span></p>
+                <p><strong>Matched Student:</strong> <span id="studentName">-</span></p>
+            </div>
 
-            <div id="status" class="alert" style="display:none;"></div>
-            <button id="startBtn" type="button">Start Face Detection</button>
+            <div class="step-box">
+                <h3>System Status</h3>
+                <p id="status" class="status-text">Waiting for QR scan...</p>
+                <div id="message" class="alert" style="display:none;"></div>
+            </div>
         </div>
 
         <div>
-            <div class="video-wrap">
-                <video id="video" width="420" height="320" autoplay muted></video>
+            <div class="step-box">
+                <h3>Step 2 — Face Detection</h3>
+                <div class="video-wrap">
+                    <video id="video" width="420" height="320" autoplay muted></video>
+                </div>
+                <p style="margin-top:8px;">QR scan complete ആകുന്നതിന് ശേഷം camera + model start ചെയ്യും.</p>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+const statusEl = document.getElementById('status');
+const messageEl = document.getElementById('message');
+const scannedRegisterEl = document.getElementById('scannedRegister');
+const studentNameEl = document.getElementById('studentName');
 const video = document.getElementById('video');
-const statusBox = document.getElementById('status');
-const startBtn = document.getElementById('startBtn');
+
+let selectedStudentId = null;
+let selectedRegister = null;
+let detectionStarted = false;
 let lastMarkedAt = 0;
 
-function showStatus(message, type = 'alert') {
-    statusBox.style.display = 'block';
-    statusBox.className = type;
-    statusBox.textContent = message;
+function setStatus(text) {
+    statusEl.textContent = text;
 }
 
-async function openCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-    video.srcObject = stream;
+function showMessage(text, ok = false) {
+    messageEl.style.display = 'block';
+    messageEl.className = ok ? 'success' : 'alert';
+    messageEl.textContent = text;
 }
 
-async function loadModels() {
-    await faceapi.nets.tinyFaceDetector.loadFromUri('../models');
-}
-
-function markAttendance(studentId) {
-    return fetch('../api/face_mark.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'student_id=' + encodeURIComponent(studentId)
-    })
-    .then(res => res.json())
-    .then(data => {
-        showStatus(data.message, data.ok ? 'success' : 'alert');
-    })
-    .catch(() => showStatus('Face attendance API failed', 'alert'));
-}
-
-async function startDetection() {
-    const studentId = document.getElementById('student_id').value;
-    if (!studentId) {
-        showStatus('Please select a student first', 'alert');
+async function ensureModelAvailable() {
+    setStatus('Loading AI model...');
+    try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+        setStatus('Model loaded');
         return;
+    } catch (_) {
+        // fallback when hosted in subfolder
     }
 
-    await openCamera();
-    await loadModels();
-    showStatus('Camera ready. Detecting face every 3 seconds...', 'success');
-
-    setInterval(async () => {
-        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
-        if (detections.length > 0) {
-            const now = Date.now();
-            if (now - lastMarkedAt > 7000) {
-                lastMarkedAt = now;
-                markAttendance(studentId);
-            }
-        }
-    }, 3000);
+    await faceapi.nets.tinyFaceDetector.loadFromUri('../models');
+    setStatus('Model loaded (subfolder path)');
 }
 
-startBtn.addEventListener('click', () => {
-    startDetection().catch(() => showStatus('Camera/model load failed', 'alert'));
-});
+async function startCamera() {
+    setStatus('Starting camera...');
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    video.srcObject = stream;
+    setStatus('Camera started');
+}
+
+async function startDetectionLoop() {
+    if (detectionStarted) return;
+    detectionStarted = true;
+
+    await ensureModelAvailable();
+    await startCamera();
+    setStatus('Face detection started');
+
+    setInterval(async () => {
+        if (!selectedStudentId) {
+            return;
+        }
+
+        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+        if (detections.length > 0) {
+            setStatus('Face detected');
+
+            const now = Date.now();
+            if (now - lastMarkedAt < 7000) {
+                return;
+            }
+            lastMarkedAt = now;
+
+            markAttendance(selectedStudentId, selectedRegister);
+        }
+    }, 2000);
+}
+
+async function resolveStudentByRegister(registerNo) {
+    const response = await fetch('../api/get_students.php');
+    const data = await response.json();
+    if (!data.success || !Array.isArray(data.students)) {
+        throw new Error('Unable to load students');
+    }
+
+    const student = data.students.find((s) => String(s.register_no).trim() === String(registerNo).trim());
+    if (!student) {
+        throw new Error('Student not found for scanned QR');
+    }
+
+    return student;
+}
+
+function markAttendance(studentId, registerNo) {
+    fetch('../api/face_mark.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'student_id=' + encodeURIComponent(studentId) + '&register_no=' + encodeURIComponent(registerNo)
+    })
+    .then((res) => res.json())
+    .then((data) => {
+        showMessage(data.message || 'Unknown response', !!data.ok);
+    })
+    .catch(() => {
+        showMessage('Attendance API failed', false);
+    });
+}
+
+async function handleQrScan(decodedText) {
+    try {
+        scannedRegisterEl.textContent = decodedText;
+        setStatus('Resolving student from QR...');
+
+        const student = await resolveStudentByRegister(decodedText);
+        selectedStudentId = student.id;
+        selectedRegister = student.register_no;
+        studentNameEl.textContent = student.name + ' (' + student.register_no + ')';
+
+        showMessage('QR matched. Starting face detection...', true);
+        await startDetectionLoop();
+    } catch (error) {
+        showMessage(error.message || 'QR processing failed', false);
+        setStatus('Waiting for valid QR scan...');
+    }
+}
+
+function onScanSuccess(decodedText) {
+    handleQrScan(decodedText);
+}
+
+const html5QrCode = new Html5QrcodeScanner('reader', { fps: 10, qrbox: 250 });
+html5QrCode.render(onScanSuccess);
 </script>
 </body>
 </html>
