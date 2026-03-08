@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS students (
   id INT AUTO_INCREMENT PRIMARY KEY,
   student_uid VARCHAR(30) NOT NULL UNIQUE,
+  register_no VARCHAR(120) DEFAULT NULL UNIQUE,
   madrasa_id INT NOT NULL,
   full_name VARCHAR(120) NOT NULL,
   class_name VARCHAR(40) NOT NULL,
@@ -120,3 +121,29 @@ INSERT IGNORE INTO madrasas (id, name, location) VALUES
 (11, 'Badria Dars', 'Kollam'),
 (12, 'Misbahul Hudha', 'Wayanad'),
 (13, 'Najathul Islam Madrasa', 'Kasaragod');
+
+
+CREATE TABLE IF NOT EXISTS settings (
+  setting_key VARCHAR(120) PRIMARY KEY,
+  setting_value TEXT
+);
+
+CREATE TABLE IF NOT EXISTS subjects (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  code VARCHAR(120) NOT NULL UNIQUE,
+  subject_name VARCHAR(180) NOT NULL,
+  max_mark DECIMAL(8,2) DEFAULT 50,
+  pass_mark DECIMAL(8,2) DEFAULT 18,
+  display_order INT DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS marks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  exam_id INT DEFAULT 0,
+  student_id INT NOT NULL,
+  subject_id INT NOT NULL,
+  mark DECIMAL(8,2) DEFAULT 0,
+  UNIQUE KEY uk_exam_student_subject (exam_id, student_id, subject_id),
+  FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+  FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
+);

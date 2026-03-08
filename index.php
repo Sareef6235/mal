@@ -118,7 +118,7 @@ $user = $_SESSION['user'] ?? null;
         <button class="btn btn-primary">Login</button>
       </form>
       <p id="authState" class="admin-state">Default: admin/madrasa123, teacher/teacher123, viewer/viewer123</p>
-      <div class="toolbar"><button id="backupJson" class="btn btn-outline">Backup JSON</button><a class="btn btn-outline" href="schema.sql" download>Download SQL Schema</a></div>
+      <div class="toolbar"><button id="backupJson" class="btn btn-outline">Backup JSON</button><a class="btn btn-outline" href="schema.sql" download>Download SQL Schema</a><a class="btn btn-outline" href="admin_bulk_upload.php">Bulk Sheet/CSV Import</a></div>
     </article>
   </section>
 </main>
