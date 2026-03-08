@@ -146,6 +146,10 @@ $user = $_SESSION['user'] ?? null;
         <label class="btn btn-outline" for="importJson">Import JSON</label><input id="importJson" type="file" accept="application/json" hidden>
         <a class="btn btn-outline" href="schema.sql" download>Download SQL Schema</a>
         <a class="btn btn-outline" href="admin_bulk_upload.php">Bulk Sheet/CSV Import</a>
+        <a class="btn btn-outline" href="admission_form.php">Online Admission</a>
+        <a class="btn btn-outline" href="fee_management.php">Fee Management</a>
+        <a class="btn btn-outline" href="id_card_generator_bulk.php">ID Card Bulk</a>
+        <a class="btn btn-outline" href="self_card.php">Self Card</a>
       </div>
     </article>
   </section>
