@@ -12,5 +12,5 @@ $target = [
     'student' => 'student/profile.php',
 ][$role] ?? 'login.php';
 
-header("Location: {$target}");
+header('Location: ' . app_url($target));
 exit;

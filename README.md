@@ -28,7 +28,7 @@ CREATE TABLE attendance (
 );
 ```
 
-2. Configure DB environment variables if needed (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`).
+2. Default DB config is pre-filled for your hosting DB. You can still override using env vars (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`).
 3. Run:
 
 ```bash

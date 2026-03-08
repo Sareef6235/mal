@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-$host = getenv('DB_HOST') ?: '127.0.0.1';
-$dbName = getenv('DB_NAME') ?: 'madrasa_attendance';
-$user = getenv('DB_USER') ?: 'root';
-$pass = getenv('DB_PASS') ?: '';
+$host = getenv('DB_HOST') ?: 'localhost';
+$dbName = getenv('DB_NAME') ?: 'hvernued_p2';
+$user = getenv('DB_USER') ?: 'hvernued_cpses_hvnqmd5ph8';
+$pass = getenv('DB_PASS') ?: 'Zirect@1618*1##';
 
 try {
     $pdo = new PDO(

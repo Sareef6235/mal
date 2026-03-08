@@ -10,3 +10,8 @@ button:hover { background: #4338ca; }
 table { width: 100%; border-collapse: collapse; }
 th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; }
 a { color: #4f46e5; text-decoration: none; }
+.site-header { background: #111827; color: #fff; padding: 12px 0; }
+.header-inner { display: flex; justify-content: space-between; align-items: center; margin: 0 auto; box-shadow: none; background: transparent; padding: 0 20px; }
+.site-header h2 { margin: 0; font-size: 20px; }
+.site-header nav { display: flex; gap: 12px; flex-wrap: wrap; }
+.site-header a { color: #c7d2fe; font-weight: 600; }

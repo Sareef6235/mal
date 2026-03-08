@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Invalid credentials.';
     } else {
         $_SESSION['user'] = ['username' => $username, 'role' => $users[$username]['role']];
-        header('Location: dashboard.php');
+        header('Location: ' . app_url('dashboard.php'));
         exit;
     }
 }
@@ -34,9 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+<?php require __DIR__ . '/includes/header.php'; ?>
 <div class="container card">
-    <h1>Smart Madrasa Attendance</h1>
-    <p>Login to continue.</p>
+    <h1>Login</h1>
     <?php if ($error): ?><div class="alert"><?= htmlspecialchars($error) ?></div><?php endif; ?>
     <form method="post">
         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token()) ?>">
