@@ -147,3 +147,33 @@ CREATE TABLE IF NOT EXISTS marks (
   FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
   FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE
 );
+
+
+CREATE TABLE IF NOT EXISTS messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  madrasa_id INT NOT NULL,
+  sender_role VARCHAR(20) NOT NULL,
+  sender_name VARCHAR(120) NOT NULL,
+  body TEXT NOT NULL,
+  admin_reply TEXT DEFAULT NULL,
+  status VARCHAR(20) DEFAULT 'Open',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  replied_at TIMESTAMP NULL,
+  FOREIGN KEY (madrasa_id) REFERENCES madrasas(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS payrolls (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  madrasa_id INT NOT NULL,
+  teacher_id INT DEFAULT NULL,
+  staff_name VARCHAR(120) NOT NULL,
+  month_key VARCHAR(7) NOT NULL,
+  basic_amount DECIMAL(10,2) DEFAULT 0,
+  allowance DECIMAL(10,2) DEFAULT 0,
+  deduction DECIMAL(10,2) DEFAULT 0,
+  net_amount DECIMAL(10,2) DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'Unpaid',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (madrasa_id) REFERENCES madrasas(id) ON DELETE CASCADE,
+  FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE SET NULL
+);

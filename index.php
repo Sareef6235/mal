@@ -7,7 +7,7 @@ $user = $_SESSION['user'] ?? null;
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Madrasa Management Portal (SQL)</title>
+  <title>Madrasa Premium Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@ $user = $_SESSION['user'] ?? null;
 <header class="app-header glass">
   <div>
     <h1>Madrasa Management Portal</h1>
-    <p>SQL-backed platform for 13 madrasas</p>
+    <p>Connected multi-page style portal for unlimited madrasas</p>
   </div>
   <div class="header-controls">
     <button id="themeToggle" class="btn btn-outline">🌗 Theme</button>
@@ -30,6 +30,7 @@ $user = $_SESSION['user'] ?? null;
   <section class="top-controls glass">
     <label for="madrasaSelect">Madrasa</label>
     <select id="madrasaSelect"></select>
+    <button id="addMadrasaBtn" class="btn btn-outline role-admin">+ New Madrasa</button>
     <input id="globalSearch" type="search" placeholder="Search Name / Class / ID">
     <div id="profileInfo" class="profile-info"></div>
   </section>
@@ -38,10 +39,12 @@ $user = $_SESSION['user'] ?? null;
     <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
     <button class="tab-btn" data-tab="students">Students</button>
     <button class="tab-btn" data-tab="results">Results</button>
-    <button class="tab-btn" data-tab="markbook">Markbook</button>
     <button class="tab-btn" data-tab="attendance">Attendance</button>
+    <button class="tab-btn" data-tab="markbook">Markbook</button>
     <button class="tab-btn" data-tab="teachers">Teachers</button>
     <button class="tab-btn" data-tab="announcements">Announcements</button>
+    <button class="tab-btn" data-tab="messages">Messages</button>
+    <button class="tab-btn" data-tab="payroll">Salary</button>
     <button class="tab-btn" data-tab="admin">Admin</button>
   </nav>
 
@@ -71,9 +74,20 @@ $user = $_SESSION['user'] ?? null;
 
   <section id="results" class="tab-panel">
     <article class="section-card glass">
-      <div class="section-title-row"><h2>Exam & Results</h2><button id="addResultBtn" class="btn btn-primary role-edit">Add Result</button></div>
+      <div class="section-title-row"><h2>Premium Exam & Results</h2><button id="addResultBtn" class="btn btn-primary role-edit">Add / Edit Result</button></div>
+      <div id="topperCards" class="card-grid"></div>
       <div id="resultsSummary" class="result-summary"></div>
       <div id="resultsWrap" class="table-wrap"></div>
+    </article>
+  </section>
+
+  <section id="attendance" class="tab-panel">
+    <article class="section-card glass">
+      <div class="section-title-row"><h2>Attendance</h2><button id="saveAttendanceBtn" class="btn btn-primary role-edit">Save Attendance</button></div>
+      <div class="toolbar"><input id="attendanceDate" type="date"><input id="attendanceMonth" type="month"><button id="loadAttendanceBtn" class="btn btn-outline">Load Day</button></div>
+      <div id="attendanceWrap" class="table-wrap"></div>
+      <div id="attendanceStats" class="card-grid"></div>
+      <article class="section-card glass"><h3>Monthly Attendance Chart</h3><canvas id="monthlyAttendanceChart"></canvas></article>
     </article>
   </section>
 
@@ -84,13 +98,6 @@ $user = $_SESSION['user'] ?? null;
       <div class="toolbar"><button id="printMarkbook" class="btn btn-outline">Print</button><button id="pdfMarkbook" class="btn btn-primary">PDF Export</button></div>
       <h3>Mark Edit History</h3>
       <div id="historyArea" class="table-wrap"></div>
-    </article>
-  </section>
-
-  <section id="attendance" class="tab-panel">
-    <article class="section-card glass">
-      <div class="section-title-row"><h2>Attendance</h2><button id="takeAttendanceBtn" class="btn btn-primary role-edit">Daily Attendance</button></div>
-      <div id="attendanceWrap" class="table-wrap"></div>
     </article>
   </section>
 
@@ -108,9 +115,24 @@ $user = $_SESSION['user'] ?? null;
     </article>
   </section>
 
+  <section id="messages" class="tab-panel">
+    <article class="section-card glass">
+      <div class="section-title-row"><h2>Madrasa Messages</h2><button id="sendMessageBtn" class="btn btn-primary">Send Message</button></div>
+      <div id="messageWrap" class="table-wrap"></div>
+    </article>
+  </section>
+
+  <section id="payroll" class="tab-panel">
+    <article class="section-card glass">
+      <div class="section-title-row"><h2>Dynamic Salary Register</h2><button id="addPayrollBtn" class="btn btn-primary role-admin">Add Salary Entry</button></div>
+      <div id="payrollSummary" class="card-grid"></div>
+      <div id="payrollWrap" class="table-wrap"></div>
+    </article>
+  </section>
+
   <section id="admin" class="tab-panel">
     <article class="section-card glass">
-      <h2>Login & Security</h2>
+      <h2>Login, Security, Import/Export</h2>
       <form id="loginForm" class="admin-login-form">
         <select id="roleSelect"><option>Admin</option><option>Teacher</option><option>Viewer</option></select>
         <input id="username" required placeholder="Username">
@@ -118,12 +140,18 @@ $user = $_SESSION['user'] ?? null;
         <button class="btn btn-primary">Login</button>
       </form>
       <p id="authState" class="admin-state">Default: admin/madrasa123, teacher/teacher123, viewer/viewer123</p>
-      <div class="toolbar"><button id="backupJson" class="btn btn-outline">Backup JSON</button><a class="btn btn-outline" href="schema.sql" download>Download SQL Schema</a><a class="btn btn-outline" href="admin_bulk_upload.php">Bulk Sheet/CSV Import</a></div>
+      <div class="toolbar">
+        <button id="backupJson" class="btn btn-outline">Export JSON</button>
+        <button id="exportCsvAll" class="btn btn-outline">Export CSV (All)</button>
+        <label class="btn btn-outline" for="importJson">Import JSON</label><input id="importJson" type="file" accept="application/json" hidden>
+        <a class="btn btn-outline" href="schema.sql" download>Download SQL Schema</a>
+        <a class="btn btn-outline" href="admin_bulk_upload.php">Bulk Sheet/CSV Import</a>
+      </div>
     </article>
   </section>
 </main>
 
-<footer class="app-footer glass"><p>© 2026 • Responsive • Multi-madrasa • Session secured</p></footer>
+<footer class="app-footer glass"><p>© 2026 • Connected menus across all modules • Responsive premium dashboard</p></footer>
 <dialog id="entityDialog"></dialog>
 <script>window.initialUser = <?php echo json_encode($user); ?>;</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
