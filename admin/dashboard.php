@@ -7,19 +7,22 @@ require_once __DIR__ . '/../config/db.php';
 require_auth('admin');
 
 $totalStudents = (int) $pdo->query('SELECT COUNT(*) FROM students')->fetchColumn();
-$todayAttendance = (int) $pdo->query('SELECT COUNT(*) FROM attendance WHERE date = CURDATE()')->fetchColumn();
+$todayAttendance = (int) $pdo->query('SELECT COUNT(*) FROM attendance WHERE date=CURDATE()')->fetchColumn();
 ?>
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Admin Dashboard</title><link rel="stylesheet" href="../assets/css/style.css"><script src="https://cdn.jsdelivr.net/npm/chart.js"></script></head>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
 <body>
 <?php require __DIR__ . '/../includes/header.php'; ?>
-<div class="container">
-<h1>Admin Dashboard</h1>
-<p>Total Students: <?= $totalStudents ?></p>
-<p>Today's Attendance: <?= $todayAttendance ?></p>
-<canvas id="statsChart" height="120"></canvas>
+<div class="container card">
+    <h2>Dashboard</h2>
+
+    Total Students: <?= $totalStudents ?><br><br>
+    Today's Attendance: <?= $todayAttendance ?>
 </div>
-<script>
-new Chart(document.getElementById('statsChart'), {type:'bar', data:{labels:['Students','Today Attendance'], datasets:[{data:[<?= $totalStudents ?>, <?= $todayAttendance ?>], backgroundColor:['#4f46e5','#16a34a']}]}});
-</script>
-</body></html>
+</body>
+</html>

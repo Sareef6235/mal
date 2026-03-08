@@ -2,20 +2,55 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/_helpers.php';
+header('Content-Type: application/json');
 
-$registerNo = trim($_POST['register_no'] ?? '');
-if ($registerNo === '') {
-    json_response(['success' => false, 'message' => 'Register number is required.'], 422);
+require_once __DIR__ . '/../config/db.php';
+
+$register = trim($_POST['register_no'] ?? '');
+
+if ($register === '') {
+    echo json_encode([
+        'ok' => false,
+        'message' => 'Register number required',
+    ]);
+    exit;
 }
 
-$stmt = $pdo->prepare('SELECT id, name FROM students WHERE register_no = ? LIMIT 1');
-$stmt->execute([$registerNo]);
+$stmt = $pdo->prepare('SELECT id,name FROM students WHERE register_no=?');
+$stmt->execute([$register]);
 $student = $stmt->fetch();
 
 if (!$student) {
-    json_response(['success' => false, 'message' => 'Student not found.'], 404);
+    echo json_encode([
+        'ok' => false,
+        'message' => 'Student not found',
+    ]);
+    exit;
 }
 
-mark_attendance($pdo, (int) $student['id'], 'qr');
-json_response(['success' => true, 'message' => 'Attendance marked for ' . $student['name']]);
+$date = date('Y-m-d');
+$time = date('H:i:s');
+
+$check = $pdo->prepare('SELECT id FROM attendance WHERE student_id=? AND date=?');
+$check->execute([$student['id'], $date]);
+
+if ($check->fetch()) {
+    echo json_encode([
+        'ok' => true,
+        'message' => 'Already marked',
+    ]);
+    exit;
+}
+
+$stmt = $pdo->prepare('INSERT INTO attendance(student_id,date,time,method) VALUES(?,?,?,?)');
+$stmt->execute([
+    $student['id'],
+    $date,
+    $time,
+    'qr',
+]);
+
+echo json_encode([
+    'ok' => true,
+    'message' => 'Attendance marked for ' . $student['name'],
+]);
