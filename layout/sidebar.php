@@ -16,6 +16,8 @@ $menu = [
     ['Database Select', '../database_select.php', 'bi-database-gear'],
     ['MySQL DB Page', '../database_mysql.php', 'bi-server'],
     ['SQLite DB Page', '../database_sqlite.php', 'bi-filetype-db'],
+    ['Admin Portal', '../admin_portal.php', 'bi-person-workspace'],
+    ['Class Sheet', '../class_result_sheet.php', 'bi-table'],
 ];
 ?>
 <aside class="col-lg-2 sidebar p-3" id="sidebarNav">
