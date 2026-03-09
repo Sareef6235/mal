@@ -1,0 +1,4 @@
+<?php require __DIR__.'/../db.php'; $db=connect_db($config['db']); ensure_core_tables($db); $rows=$db->query('SELECT f.id,s.full_name,f.month_key,f.amount,f.paid_amount,f.status FROM fees f INNER JOIN students s ON s.id=f.student_id ORDER BY f.id DESC')->fetchAll()?:[]; include __DIR__.'/../layout/header.php'; include __DIR__.'/../layout/sidebar.php'; ?>
+<h3>Fees</h3><a class="btn btn-primary btn-sm" href="fee_collect.php">Collect Fee</a>
+<table class="table mt-3"><tr><th>Student</th><th>Month</th><th>Amount</th><th>Paid</th><th>Status</th></tr><?php foreach($rows as $r): ?><tr><td><?= h((string)$r['full_name']) ?></td><td><?= h((string)$r['month_key']) ?></td><td><?= h((string)$r['amount']) ?></td><td><?= h((string)$r['paid_amount']) ?></td><td><?= h((string)$r['status']) ?></td></tr><?php endforeach; ?></table>
+<?php include __DIR__.'/../layout/footer.php'; ?>
