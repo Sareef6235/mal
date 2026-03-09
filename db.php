@@ -1,86 +1,28 @@
 <?php
 declare(strict_types=1);
 
-$config = require __DIR__ . '/config/config.php';
+require_once __DIR__ . '/bootstrap.php';
 
 function connect_db(array $cfg): PDO {
-    $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s', $cfg['host'], $cfg['name'], $cfg['charset']);
-    return new PDO($dsn, $cfg['user'], $cfg['pass'], [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-    ]);
+    $db = db_connect($cfg);
+    if (!$db) {
+        throw new RuntimeException('Database connection failed.');
+    }
+    return $db;
 }
 
 function ensure_core_tables(PDO $db): void {
-    $db->exec('CREATE TABLE IF NOT EXISTS students (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        register_no VARCHAR(120) UNIQUE,
-        full_name VARCHAR(191) NOT NULL,
-        class_name VARCHAR(80) NOT NULL,
-        parent_name VARCHAR(191) DEFAULT NULL,
-        phone VARCHAR(50) DEFAULT NULL,
-        address VARCHAR(255) DEFAULT NULL,
-        photo_path VARCHAR(255) DEFAULT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
-
-    $db->exec('CREATE TABLE IF NOT EXISTS subjects (
-        id INT PRIMARY KEY,
-        code VARCHAR(120) UNIQUE,
-        subject_name VARCHAR(180) NOT NULL,
-        max_mark DECIMAL(8,2) DEFAULT 50,
-        pass_mark DECIMAL(8,2) DEFAULT 18,
-        display_order INT DEFAULT 1
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
-
-    $db->exec('CREATE TABLE IF NOT EXISTS exams (
-        id INT PRIMARY KEY,
-        madrasa_id INT DEFAULT 1,
-        exam_name VARCHAR(191),
-        exam_type VARCHAR(80),
-        exam_date DATE NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
-
-    $db->exec('CREATE TABLE IF NOT EXISTS marks (
-        exam_id INT NOT NULL,
-        student_id INT NOT NULL,
-        subject_id INT NOT NULL,
-        mark DECIMAL(8,2) DEFAULT 0,
-        PRIMARY KEY (exam_id, student_id, subject_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
-
-    $db->exec('CREATE TABLE IF NOT EXISTS attendance (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        student_id INT NOT NULL,
-        attended_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
-
-    $db->exec('CREATE TABLE IF NOT EXISTS fees (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        student_id INT NOT NULL,
-        month_key VARCHAR(7) NOT NULL,
-        amount DECIMAL(10,2) DEFAULT 0,
-        paid_amount DECIMAL(10,2) DEFAULT 0,
-        status VARCHAR(30) DEFAULT "Pending",
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+    ensure_import_tables($db);
 }
 
-function fetch_csv_rows(string $filePath): array {
+function fetch_csv_rows_from_file(string $filePath): array {
     $rows = [];
     if (!is_file($filePath)) return $rows;
-
     $h = fopen($filePath, 'r');
     if ($h === false) return $rows;
 
     $header = fgetcsv($h, 0, ',', '"', '\\');
-    if (!$header) {
-        fclose($h);
-        return $rows;
-    }
-
+    if (!$header) { fclose($h); return $rows; }
     $header = array_map(fn($v) => strtolower(trim((string)$v)), $header);
 
     while (($line = fgetcsv($h, 0, ',', '"', '\\')) !== false) {
@@ -96,42 +38,41 @@ function ensure_exam(PDO $db, int $examId): void {
     $find->execute(['id' => $examId]);
     if ($find->fetch()) return;
 
-    $insert = $db->prepare('INSERT INTO exams (id, madrasa_id, exam_name, exam_type, exam_date) VALUES (:id, 1, :name, :type, CURRENT_DATE)');
+    $sql = db_driver($db) === 'sqlite'
+        ? 'INSERT INTO exams (id, madrasa_id, exam_name, exam_type, exam_date) VALUES (:id, 1, :name, :type, DATE("now"))'
+        : 'INSERT INTO exams (id, madrasa_id, exam_name, exam_type, exam_date) VALUES (:id, 1, :name, :type, CURRENT_DATE)';
+    $insert = $db->prepare($sql);
     $insert->execute(['id' => $examId, 'name' => 'Imported Exam', 'type' => 'Midterm']);
 }
 
 function ensure_subject(PDO $db, int $subjectId): void {
-    $insert = $db->prepare('INSERT INTO subjects (id, code, subject_name, max_mark, pass_mark, display_order) VALUES (:id, :code, :name, 50, 18, :ord) ON DUPLICATE KEY UPDATE subject_name=VALUES(subject_name)');
-    $insert->execute([
-        'id' => $subjectId,
-        'code' => 'SUB-' . $subjectId,
-        'name' => 'Subject ' . $subjectId,
-        'ord' => $subjectId,
-    ]);
+    $driver = db_driver($db);
+    if ($driver === 'sqlite') {
+        $insert = $db->prepare('INSERT OR IGNORE INTO subjects (id, code, subject_name, max_mark, pass_mark, display_order) VALUES (:id, :code, :name, 50, 18, :ord)');
+    } else {
+        $insert = $db->prepare('INSERT INTO subjects (id, code, subject_name, max_mark, pass_mark, display_order) VALUES (:id, :code, :name, 50, 18, :ord) ON DUPLICATE KEY UPDATE subject_name=VALUES(subject_name)');
+    }
+    $insert->execute(['id' => $subjectId, 'code' => 'SUB-' . $subjectId, 'name' => 'Subject ' . $subjectId, 'ord' => $subjectId]);
 }
 
 function find_student_by_register(PDO $db, string $register): ?array {
-    $st = $db->prepare('SELECT id, register_no, full_name, class_name FROM students WHERE register_no = :register_no LIMIT 1');
+    $st = $db->prepare('SELECT id, COALESCE(register_no, student_uid) AS register_no, full_name, class_name FROM students WHERE register_no = :register_no LIMIT 1');
     $st->execute(['register_no' => $register]);
-    $row = $st->fetch();
-    return $row ?: null;
+    return $st->fetch() ?: null;
 }
 
 function insert_mark(PDO $db, int $examId, int $studentId, int $subjectId, float $mark): void {
-    $st = $db->prepare('INSERT INTO marks (exam_id, student_id, subject_id, mark) VALUES (:exam_id, :student_id, :subject_id, :mark) ON DUPLICATE KEY UPDATE mark = VALUES(mark)');
-    $st->execute([
-        'exam_id' => $examId,
-        'student_id' => $studentId,
-        'subject_id' => $subjectId,
-        'mark' => $mark,
-    ]);
+    $driver = db_driver($db);
+    $sql = $driver === 'sqlite'
+        ? 'INSERT INTO marks (exam_id, student_id, subject_id, mark) VALUES (:exam_id, :student_id, :subject_id, :mark) ON CONFLICT(exam_id, student_id, subject_id) DO UPDATE SET mark=:mark'
+        : 'INSERT INTO marks (exam_id, student_id, subject_id, mark) VALUES (:exam_id, :student_id, :subject_id, :mark) ON DUPLICATE KEY UPDATE mark = VALUES(mark)';
+    $st = $db->prepare($sql);
+    $st->execute(['exam_id' => $examId, 'student_id' => $studentId, 'subject_id' => $subjectId, 'mark' => $mark]);
 }
 
 function import_exam_marks_from_csv(PDO $db, string $filePath): array {
-    $rows = fetch_csv_rows($filePath);
-    $imported = 0;
-    $skipped = 0;
-    $errors = [];
+    $rows = fetch_csv_rows_from_file($filePath);
+    $imported = 0; $skipped = 0; $errors = [];
 
     $db->beginTransaction();
     try {
@@ -143,18 +84,12 @@ function import_exam_marks_from_csv(PDO $db, string $filePath): array {
             $markRaw = $row['mark'] ?? null;
 
             if ($examId <= 0 || $register === '' || $subjectId <= 0 || !is_numeric((string)$markRaw)) {
-                $skipped++;
-                $errors[] = "Line {$line}: invalid required values.";
-                continue;
+                $skipped++; $errors[] = "Line {$line}: invalid required values."; continue;
             }
-
             $student = find_student_by_register($db, $register);
             if (!$student) {
-                $skipped++;
-                $errors[] = "Line {$line}: student not found for {$register}.";
-                continue;
+                $skipped++; $errors[] = "Line {$line}: student not found for {$register}."; continue;
             }
-
             ensure_exam($db, $examId);
             ensure_subject($db, $subjectId);
             insert_mark($db, $examId, (int)$student['id'], $subjectId, (float)$markRaw);
@@ -171,27 +106,18 @@ function import_exam_marks_from_csv(PDO $db, string $filePath): array {
 
 function calculate_student_totals(PDO $db, int $examId): array {
     $st = $db->prepare('SELECT s.id AS student_id, s.full_name, s.class_name, SUM(m.mark) AS total_marks, AVG(m.mark) AS average_marks
-        FROM marks m
-        INNER JOIN students s ON s.id = m.student_id
-        WHERE m.exam_id = :exam_id
-        GROUP BY s.id, s.full_name, s.class_name
-        ORDER BY total_marks DESC');
+        FROM marks m INNER JOIN students s ON s.id = m.student_id
+        WHERE m.exam_id = :exam_id GROUP BY s.id, s.full_name, s.class_name ORDER BY total_marks DESC');
     $st->execute(['exam_id' => $examId]);
     return $st->fetchAll() ?: [];
 }
 
 function generate_rankings(array $totals): array {
-    $ranked = [];
-    $rank = 0;
-    $i = 0;
-    $prev = null;
+    $ranked = []; $rank = 0; $i = 0; $prev = null;
     foreach ($totals as $row) {
-        $i++;
-        $score = (float)$row['total_marks'];
+        $i++; $score = (float)$row['total_marks'];
         if ($prev === null || $score < $prev) $rank = $i;
-        $row['rank'] = $rank;
-        $ranked[] = $row;
-        $prev = $score;
+        $row['rank'] = $rank; $ranked[] = $row; $prev = $score;
     }
     return $ranked;
 }

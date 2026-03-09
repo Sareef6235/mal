@@ -7,9 +7,9 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     $photoPath = null;
     if(!empty($_FILES['photo']['tmp_name'])){
         $name = uniqid('stu_', true).'.jpg';
-        $dir = __DIR__.'/../photos'; if(!is_dir($dir)) mkdir($dir,0775,true);
+        $dir = __DIR__.'/../uploads/student_photos'; if(!is_dir($dir)) mkdir($dir,0775,true);
         $dest = $dir.'/'.$name;
-        if(move_uploaded_file($_FILES['photo']['tmp_name'],$dest)){ $photoPath = 'photos/'.$name; }
+        if(move_uploaded_file($_FILES['photo']['tmp_name'],$dest)){ $photoPath = 'student_photos/'.$name; }
     }
     $st=$db->prepare('INSERT INTO students(register_no,full_name,class_name,parent_name,phone,address,photo_path) VALUES(:r,:n,:c,:p,:ph,:a,:pp)');
     $st->execute(['r'=>trim($_POST['register_no']??''),'n'=>trim($_POST['full_name']??''),'c'=>trim($_POST['class_name']??''),'p'=>trim($_POST['parent_name']??''),'ph'=>trim($_POST['phone']??''),'a'=>trim($_POST['address']??''),'pp'=>$photoPath]);

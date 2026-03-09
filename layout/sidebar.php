@@ -1,26 +1,25 @@
 <?php
 declare(strict_types=1);
+$path = basename((string)parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH));
 $menu = [
-    'Dashboard' => 'dashboard.php',
-    'Students' => 'students.php',
-    'Admissions' => 'student_add.php',
-    'Fees' => 'fees.php',
-    'Attendance (QR)' => 'attendance_qr.php',
-    'Exams' => 'exams.php',
-    'Subjects' => 'subjects.php',
-    'Results Import' => 'results_import.php',
-    'Results View' => 'results_view.php',
-    'Rank List' => 'rank_list.php',
-    'Marksheet' => 'marksheet.php',
-    'ID Cards' => 'id_card.php',
-    'Reports' => '../reports/result_report.php',
+    ['Dashboard', 'dashboard.php', 'bi-speedometer2'],
+    ['Students', 'students.php', 'bi-people'],
+    ['Subjects', 'subjects.php', 'bi-journal-bookmark'],
+    ['Exams', 'exams.php', 'bi-journal-check'],
+    ['Results Import', 'results_import.php', 'bi-upload'],
+    ['Rank List', 'rank_list.php', 'bi-trophy'],
+    ['Marksheet', 'marksheet.php', 'bi-file-earmark-text'],
+    ['Attendance (QR)', 'attendance_qr.php', 'bi-qr-code-scan'],
+    ['Fees', 'fees.php', 'bi-cash-stack'],
+    ['ID Cards', 'id_card.php', 'bi-person-vcard'],
+    ['Reports', '../reports/result_report.php', 'bi-graph-up-arrow'],
 ];
 ?>
-<aside class="col-md-2 bg-light min-vh-100 p-3">
-  <ul class="nav flex-column gap-2">
-    <?php foreach ($menu as $label => $href): ?>
-      <li class="nav-item"><a class="nav-link" href="<?= h($href) ?>"><?= h($label) ?></a></li>
+<aside class="col-lg-2 sidebar p-3" id="sidebarNav">
+  <ul class="nav flex-column gap-1">
+    <?php foreach ($menu as [$label, $href, $icon]): ?>
+      <li class="nav-item"><a class="nav-link <?= $path === basename($href) ? 'active' : '' ?>" href="<?= e($href) ?>"><i class="bi <?= e($icon) ?> me-2"></i><?= e($label) ?></a></li>
     <?php endforeach; ?>
   </ul>
 </aside>
-<main class="col-md-10 p-3">
+<main class="col-lg-10 p-3 content-wrap">
