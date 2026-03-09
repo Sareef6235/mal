@@ -67,7 +67,7 @@ function ensure_subject(PDO $db, int $subjectId, ?string $subjectCode = null, ?s
 }
 
 function find_student_by_register(PDO $db, string $register): ?array {
-    $st = $db->prepare('SELECT id, COALESCE(register_no, student_uid) AS register_no, full_name, class_name FROM students WHERE register_no = :register_no LIMIT 1');
+    $st = $db->prepare('SELECT id, COALESCE(register_no, student_uid, register_number) AS register_no, ' . student_name_sql() . ' AS full_name, class_name FROM students WHERE COALESCE(register_no, register_number) = :register_no LIMIT 1');
     $st->execute(['register_no' => $register]);
     return $st->fetch() ?: null;
 }
@@ -100,8 +100,8 @@ function import_exam_marks_from_csv(PDO $db, string $filePath): array {
             $student = find_student_by_register($db, $register);
             if (!$student) {
                 $sqlStudent = db_driver($db)==='sqlite'
-                    ? 'INSERT INTO students (register_no, full_name, class_name, madrasa_id, gender, attendance_percent) VALUES (:r,:n,:c,1,:g,0) ON CONFLICT(register_no) DO UPDATE SET full_name=:n, class_name=:c'
-                    : 'INSERT INTO students (register_no, full_name, class_name, madrasa_id, gender, attendance_percent) VALUES (:r,:n,:c,1,:g,0) ON DUPLICATE KEY UPDATE full_name=:n, class_name=:c';
+                    ? 'INSERT INTO students (register_no, full_name, name, class_name, madrasa_id, gender, attendance_percent) VALUES (:r,:n,:n,:c,1,:g,0) ON CONFLICT(register_no) DO UPDATE SET full_name=:n, name=:n, class_name=:c'
+                    : 'INSERT INTO students (register_no, full_name, name, class_name, madrasa_id, gender, attendance_percent) VALUES (:r,:n,:n,:c,1,:g,0) ON DUPLICATE KEY UPDATE full_name=:n, name=:n, class_name=:c';
                 $db->prepare($sqlStudent)->execute(['r'=>$register,'n'=>$name,'c'=>$class,'g'=>$gender]);
                 $student = find_student_by_register($db, $register);
             }
@@ -139,7 +139,8 @@ function import_exam_marks_from_csv(PDO $db, string $filePath): array {
 }
 
 function calculate_student_totals(PDO $db, int $examId): array {
-    $st = $db->prepare('SELECT s.id AS student_id, s.full_name, s.class_name, SUM(m.mark) AS total_marks, AVG(m.mark) AS average_marks FROM marks m INNER JOIN students s ON s.id = m.student_id WHERE m.exam_id = :exam_id GROUP BY s.id, s.full_name, s.class_name ORDER BY total_marks DESC');
+    $nameExpr = student_name_sql();
+    $st = $db->prepare('SELECT s.id AS student_id, ' . $nameExpr . ' AS full_name, s.class_name, SUM(m.mark) AS total_marks, AVG(m.mark) AS average_marks FROM marks m INNER JOIN students s ON s.id = m.student_id WHERE m.exam_id = :exam_id GROUP BY s.id, s.class_name, ' . $nameExpr . ' ORDER BY total_marks DESC');
     $st->execute(['exam_id' => $examId]);
     return $st->fetchAll() ?: [];
 }

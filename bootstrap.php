@@ -1,24 +1,22 @@
 <?php
 declare(strict_types=1);
 
-$dbType = null;
 $dbTypeFile = __DIR__ . '/db_config.php';
-if (is_file($dbTypeFile)) {
-    $selected = include $dbTypeFile;
-    if (is_array($selected) && in_array(($selected['db_type'] ?? ''), ['sqlite','mysql'], true)) {
-        $dbType = (string)$selected['db_type'];
-    }
-}
+$selected = is_file($dbTypeFile) ? include $dbTypeFile : [];
+$dbConfig = (is_array($selected) && is_array($selected['db'] ?? null)) ? $selected['db'] : [];
+$dbType = (is_array($selected) && in_array(($selected['db_type'] ?? ''), ['sqlite', 'mysql'], true))
+    ? (string)$selected['db_type']
+    : ((is_array($dbConfig) && in_array(($dbConfig['driver'] ?? ''), ['sqlite', 'mysql'], true)) ? (string)$dbConfig['driver'] : null);
 
 $config = [
     'db' => [
-        'driver' => $dbType ?: (getenv('DB_DRIVER') ?: 'sqlite'),
-        'host' => getenv('DB_HOST') ?: 'localhost',
-        'name' => getenv('DB_NAME') ?: 'hvernued_p2',
-        'user' => getenv('DB_USER') ?: 'hvernued_cpses_hvnqmd5ph8',
-        'pass' => getenv('DB_PASS') ?: 'Zirect@1618*1##',
-        'charset' => getenv('DB_CHARSET') ?: 'utf8mb4',
-        'sqlite_path' => __DIR__ . '/data/madrasa.sqlite',
+        'driver' => $dbType ?: (string)($dbConfig['driver'] ?? (getenv('DB_DRIVER') ?: 'sqlite')),
+        'host' => (string)($dbConfig['host'] ?? (getenv('DB_HOST') ?: 'localhost')),
+        'name' => (string)($dbConfig['name'] ?? (getenv('DB_NAME') ?: 'hvernued_p2')),
+        'user' => (string)($dbConfig['user'] ?? (getenv('DB_USER') ?: 'hvernued_cpses_hvnqmd5ph8')),
+        'pass' => (string)($dbConfig['pass'] ?? (getenv('DB_PASS') ?: 'Zirect@1618*1##')),
+        'charset' => (string)($dbConfig['charset'] ?? (getenv('DB_CHARSET') ?: 'utf8mb4')),
+        'sqlite_path' => (string)($dbConfig['sqlite_path'] ?? (__DIR__ . '/data/madrasa.sqlite')),
     ],
     'app' => [
         'site_title' => 'Premium Madrasa Student Result Management System',
@@ -69,6 +67,8 @@ function db_connect(array $cfg): ?PDO {
 
 function db_driver(PDO $db): string { return (string)$db->getAttribute(PDO::ATTR_DRIVER_NAME); }
 
+function student_name_sql(): string { return 'COALESCE(NULLIF(full_name, ""), NULLIF(name, ""), "Unknown")'; }
+
 function ensure_import_tables(PDO $db): void {
     $driver = db_driver($db);
     if ($driver === 'sqlite') {
@@ -85,11 +85,30 @@ function ensure_import_tables(PDO $db): void {
 
         $cols = $db->query('PRAGMA table_info(students)')->fetchAll();
         $haveRegisterNo = false;
+        $haveRegisterNumber = false;
+        $haveFullName = false;
+        $haveName = false;
         foreach ($cols as $c) if (($c['name'] ?? '') === 'register_no') $haveRegisterNo = true;
+        foreach ($cols as $c) {
+            if (($c['name'] ?? '') === 'full_name') $haveFullName = true;
+            if (($c['name'] ?? '') === 'name') $haveName = true;
+            if (($c['name'] ?? '') === 'register_number') $haveRegisterNumber = true;
+        }
         if (!$haveRegisterNo) {
             $db->exec('ALTER TABLE students ADD COLUMN register_no TEXT');
             $db->exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_students_register_no ON students(register_no)');
         }
+        if (!$haveFullName) {
+            $db->exec('ALTER TABLE students ADD COLUMN full_name TEXT');
+        }
+        if (!$haveName) {
+            $db->exec('ALTER TABLE students ADD COLUMN name TEXT');
+        }
+        if (!$haveRegisterNumber) {
+            $db->exec('ALTER TABLE students ADD COLUMN register_number TEXT');
+        }
+        $db->exec('UPDATE students SET register_no = COALESCE(NULLIF(register_no, ""), register_number), register_number = COALESCE(NULLIF(register_number, ""), register_no)');
+        $db->exec('UPDATE students SET full_name = COALESCE(NULLIF(full_name, ""), name), name = COALESCE(NULLIF(name, ""), full_name)');
     } else {
         $db->exec('CREATE TABLE IF NOT EXISTS students (id INT AUTO_INCREMENT PRIMARY KEY, student_uid VARCHAR(40) UNIQUE, register_no VARCHAR(120) UNIQUE, full_name VARCHAR(191), class_name VARCHAR(80), gender VARCHAR(20), photo_path VARCHAR(255), attendance_percent DECIMAL(5,2) DEFAULT 0, madrasa_id INT DEFAULT 1, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
         $db->exec('CREATE TABLE IF NOT EXISTS teachers (id INT AUTO_INCREMENT PRIMARY KEY, madrasa_id INT DEFAULT 1, full_name VARCHAR(191), subject_name VARCHAR(120), class_name VARCHAR(80), attendance_percent DECIMAL(5,2) DEFAULT 100, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
@@ -102,6 +121,11 @@ function ensure_import_tables(PDO $db): void {
         $db->exec('CREATE TABLE IF NOT EXISTS self_profiles (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(191) NOT NULL, msr_no VARCHAR(100) NOT NULL UNIQUE, address VARCHAR(255) NOT NULL, place VARCHAR(191) NOT NULL, work_madrasa VARCHAR(191) NOT NULL, phone VARCHAR(50) NOT NULL, qr_token VARCHAR(64) NOT NULL UNIQUE, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)');
         $db->exec('CREATE TABLE IF NOT EXISTS attendance_logs (id INT AUTO_INCREMENT PRIMARY KEY, profile_id INT NOT NULL, name VARCHAR(191) NOT NULL, msr_no VARCHAR(100) NOT NULL, phone VARCHAR(50) NOT NULL, place VARCHAR(191) NOT NULL, attended_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
         try { $db->exec('ALTER TABLE students ADD COLUMN register_no VARCHAR(120) UNIQUE'); } catch (Throwable) {}
+        try { $db->exec('ALTER TABLE students ADD COLUMN full_name VARCHAR(191) NULL'); } catch (Throwable) {}
+        try { $db->exec('ALTER TABLE students ADD COLUMN name VARCHAR(191) NULL'); } catch (Throwable) {}
+        try { $db->exec('ALTER TABLE students ADD COLUMN register_number VARCHAR(120) NULL'); } catch (Throwable) {}
+        $db->exec('UPDATE students SET register_no = COALESCE(NULLIF(register_no, ""), register_number), register_number = COALESCE(NULLIF(register_number, ""), register_no)');
+        $db->exec('UPDATE students SET full_name = COALESCE(NULLIF(full_name, ""), name), name = COALESCE(NULLIF(name, ""), full_name)');
     }
 }
 
@@ -180,11 +204,11 @@ function attendance_scan_msr_url(string $msrNo): string { return trim($msrNo) ==
 function fetch_students_for_id_cards(PDO $db, string $className = '', int $limit = 1000): array {
     $limit = max(1, min(1000, $limit));
     if ($className !== '') {
-        $st = $db->prepare('SELECT id, full_name AS name, COALESCE(register_no, student_uid) AS register_no, class_name FROM students WHERE class_name = :class_name ORDER BY register_no ASC LIMIT ' . $limit);
+        $st = $db->prepare('SELECT id, ' . student_name_sql() . ' AS name, COALESCE(register_no, student_uid, register_number) AS register_no, class_name FROM students WHERE class_name = :class_name ORDER BY register_no ASC LIMIT ' . $limit);
         $st->execute(['class_name' => $className]);
         return $st->fetchAll() ?: [];
     }
-    $st = $db->query('SELECT id, full_name AS name, COALESCE(register_no, student_uid) AS register_no, class_name FROM students ORDER BY class_name ASC LIMIT ' . $limit);
+    $st = $db->query('SELECT id, ' . student_name_sql() . ' AS name, COALESCE(register_no, student_uid, register_number) AS register_no, class_name FROM students ORDER BY class_name ASC LIMIT ' . $limit);
     return $st ? ($st->fetchAll() ?: []) : [];
 }
 
@@ -193,7 +217,7 @@ function photo_upload_path(string $registerNo): string {
 }
 
 function fetch_student_result(PDO $db, array $appConfig, int $studentId, int $examId = 0): ?array {
-    $studentStmt = $db->prepare('SELECT id, COALESCE(register_no, student_uid) AS register_no, full_name AS name, class_name FROM students WHERE id = :id LIMIT 1');
+    $studentStmt = $db->prepare('SELECT id, COALESCE(register_no, student_uid, register_number) AS register_no, ' . student_name_sql() . ' AS name, class_name FROM students WHERE id = :id LIMIT 1');
     $studentStmt->execute(['id' => $studentId]);
     $student = $studentStmt->fetch();
     if (!$student) return null;

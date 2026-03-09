@@ -5,6 +5,11 @@ $current = is_file(__DIR__ . '/db_config.php') ? ((include __DIR__ . '/db_config
 render_header('SQLite Database Setup');
 ?>
 <div class="card">
+  <p>
+    <a class="" href="database_mysql.php">MySQL DB</a>
+    |
+    <a class="active" href="database_sqlite.php">SQLite DB</a>
+  </p>
   <h2>SQLite (Single File Database)</h2>
   <p class="small">Use this option for local/single-file database mode.</p>
   <form method="post" action="save_db.php">
