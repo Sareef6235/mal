@@ -73,27 +73,51 @@ function insert_mark(PDO $db, int $examId, int $studentId, int $subjectId, float
 function import_exam_marks_from_csv(PDO $db, string $filePath): array {
     $rows = fetch_csv_rows_from_file($filePath);
     $imported = 0; $skipped = 0; $errors = [];
+    $ignore = ['exam_id','exam','register_no','register_number','name','full_name','student_name','class','class_name','gender','subject_id','mark','total','rank'];
 
     $db->beginTransaction();
     try {
-        foreach ($rows as $idx => $row) {
+        foreach ($rows as $idx => $raw) {
+            $row = normalize_row($raw);
             $line = $idx + 2;
-            $examId = (int)($row['exam_id'] ?? 0);
-            $register = trim((string)($row['register_number'] ?? ''));
-            $subjectId = (int)($row['subject_id'] ?? 0);
-            $markRaw = $row['mark'] ?? null;
+            $examId = (int)($row['exam_id'] ?? 1);
+            $register = trim((string)($row['register_no'] ?? ''));
+            $name = trim((string)($row['name'] ?? ''));
+            $class = trim((string)($row['class'] ?? 'General'));
+            $gender = strtolower((string)($row['gender'] ?? 'boy')) === 'girl' ? 'Girl' : 'Boy';
 
-            if ($examId <= 0 || $register === '' || $subjectId <= 0 || !is_numeric((string)$markRaw)) {
-                $skipped++; $errors[] = "Line {$line}: invalid required values."; continue;
-            }
+            if ($register === '' || $name === '') { $skipped++; $errors[] = "Line {$line}: missing student info."; continue; }
+
             $student = find_student_by_register($db, $register);
             if (!$student) {
-                $skipped++; $errors[] = "Line {$line}: student not found for {$register}."; continue;
+                $st = db_driver($db)==='sqlite'
+                    ? $db->prepare('INSERT INTO students (register_no, full_name, class_name, madrasa_id, gender, attendance_percent) VALUES (:r,:n,:c,1,:g,0) ON CONFLICT(register_no) DO UPDATE SET full_name=:n, class_name=:c')
+                    : $db->prepare('INSERT INTO students (register_no, full_name, class_name, madrasa_id, gender, attendance_percent) VALUES (:r,:n,:c,1,:g,0) ON DUPLICATE KEY UPDATE full_name=:n, class_name=:c');
+                $st->execute(['r'=>$register,'n'=>$name,'c'=>$class,'g'=>$gender]);
+                $student = find_student_by_register($db, $register);
             }
+            if (!$student) { $skipped++; $errors[] = "Line {$line}: student unresolved."; continue; }
+
             ensure_exam($db, $examId);
-            ensure_subject($db, $subjectId);
-            insert_mark($db, $examId, (int)$student['id'], $subjectId, (float)$markRaw);
-            $imported++;
+            $rowImported = 0;
+
+            foreach ($row as $col => $val) {
+                if (in_array($col, $ignore, true)) continue;
+                if ($val === '' || !is_numeric((string)$val)) continue;
+                $sid = abs(crc32($col)) % 100000; if ($sid === 0) $sid = 1;
+                ensure_subject($db, $sid);
+                insert_mark($db, $examId, (int)$student['id'], $sid, (float)$val);
+                $imported++; $rowImported++;
+            }
+
+            if ($rowImported === 0 && isset($row['subject_id'], $row['mark']) && is_numeric((string)$row['subject_id']) && is_numeric((string)$row['mark'])) {
+                $sid = (int)$row['subject_id'];
+                ensure_subject($db, $sid);
+                insert_mark($db, $examId, (int)$student['id'], $sid, (float)$row['mark']);
+                $imported++;
+            } elseif ($rowImported === 0) {
+                $skipped++;
+            }
         }
         $db->commit();
     } catch (Throwable $e) {
@@ -103,6 +127,7 @@ function import_exam_marks_from_csv(PDO $db, string $filePath): array {
 
     return ['imported' => $imported, 'skipped' => $skipped, 'errors' => $errors];
 }
+
 
 function calculate_student_totals(PDO $db, int $examId): array {
     $st = $db->prepare('SELECT s.id AS student_id, s.full_name, s.class_name, SUM(m.mark) AS total_marks, AVG(m.mark) AS average_marks

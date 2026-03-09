@@ -9,8 +9,10 @@ $class = trim((string)($_GET['class_name'] ?? ''));
 $students = fetch_students_for_id_cards($db, $class, 1000);
 $classes = $db->query('SELECT DISTINCT class_name FROM students ORDER BY class_name')->fetchAll(PDO::FETCH_COLUMN) ?: [];
 
+$madrasaTitle = setting($db, 'site_title', (string)($config['app']['site_title'] ?? 'Madrasa'));
 render_header('Bulk ID Card Generator');
 ?>
+<style>@media print { body * { visibility:hidden !important; } #printArea, #printArea * { visibility:visible !important; } #printArea { position:absolute; left:0; top:0; width:100%; } #printArea button { display:none !important; } }</style>
 <div class="card">
   <form method="get" style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;">
     <select name="class_name"><option value="">All Classes</option><?php foreach($classes as $c): ?><option value="<?= e((string)$c) ?>" <?= $class===$c?'selected':'' ?>><?= e((string)$c) ?></option><?php endforeach; ?></select>
@@ -25,7 +27,7 @@ render_header('Bulk ID Card Generator');
     $qr = 'https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=' . rawurlencode(attendance_scan_msr_url((string)$s['register_no']));
   ?>
     <article style="background:#fff;color:#0f172a;border-radius:12px;padding:10px;border:1px solid #cbd5e1;">
-      <h4 style="margin:0 0 6px;text-align:center;font-size:13px;">MADRASA ID CARD</h4>
+      <h4 style="margin:0 0 6px;text-align:center;font-size:13px;"><?= e($madrasaTitle) ?> ID CARD</h4>
       <div style="display:flex;gap:8px;align-items:center;">
         <img src="<?= e($photo) ?>" alt="photo" style="width:70px;height:90px;object-fit:cover;border-radius:6px;border:1px solid #ddd;">
         <div style="font-size:12px;line-height:1.35;">

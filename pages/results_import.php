@@ -10,9 +10,9 @@ include __DIR__ . '/../layout/header.php';
 include __DIR__ . '/../layout/sidebar.php';
 ?>
 <h3>Results Import</h3>
-<p>CSV format: <code>exam_id,register_number,subject_id,mark</code></p>
+<p>Flexible upload: supports standard <code>exam_id,register_number,subject_id,mark</code> or any subject-column format.</p>
 <form method="post" enctype="multipart/form-data" class="mb-3">
-  <input type="file" class="form-control" name="csv_file" accept=".csv" required>
+  <input type="file" class="form-control" name="csv_file" accept=".csv,.txt,.data" required>
   <button class="btn btn-primary mt-2">Import CSV</button>
 </form>
 <div class="alert alert-info">Imported: <?= (int)$report['imported'] ?> | Skipped: <?= (int)$report['skipped'] ?></div>

@@ -13,6 +13,7 @@ $menu = [
     ['Fees', 'fees.php', 'bi-cash-stack'],
     ['ID Cards', 'id_card.php', 'bi-person-vcard'],
     ['Reports', '../reports/result_report.php', 'bi-graph-up-arrow'],
+    ['Database Select', '../database_select.php', 'bi-database-gear'],
 ];
 ?>
 <aside class="col-lg-2 sidebar p-3" id="sidebarNav">
