@@ -22,11 +22,11 @@ function sys_subjects(): array {
 }
 
 function sys_ranked_students(?string $className = null): array {
-    $sql = 'SELECT s.id, COALESCE(s.register_no, s.student_uid) AS register_no, COALESCE(s.full_name, s.name) AS name, s.class_name, COALESCE(SUM(m.mark),0) AS total
+    $sql = 'SELECT s.id, COALESCE(s.register_no, s.student_uid) AS register_no, s.full_name AS name, s.class_name, COALESCE(SUM(m.mark),0) AS total
             FROM students s LEFT JOIN marks m ON m.student_id = s.id';
     $params = [];
     if ($className !== null) { $sql .= ' WHERE s.class_name=:c'; $params['c'] = $className; }
-    $sql .= ' GROUP BY s.id, s.register_no, s.student_uid, s.full_name, s.name, s.class_name ORDER BY total DESC, name ASC';
+    $sql .= ' GROUP BY s.id, s.register_no, s.student_uid, s.full_name,  s.class_name ORDER BY total DESC, name ASC';
     $st = db()->prepare($sql); $st->execute($params); $rows = $st->fetchAll() ?: [];
     $rank=0; $prev=null;
     foreach ($rows as $i => &$r) {
@@ -44,7 +44,7 @@ function sys_rank_for_student(int $sid, ?string $className): ?int {
 
 function sys_fetch_student_result(int $id): ?array {
     $db = db();
-    $st = $db->prepare('SELECT id, COALESCE(register_no, student_uid) AS register_no, COALESCE(full_name, name) AS name, class_name FROM students WHERE id=:id LIMIT 1');
+    $st = $db->prepare('SELECT id, COALESCE(register_no, student_uid) AS register_no, full_name AS name, class_name FROM students WHERE id=:id LIMIT 1');
     $st->execute(['id' => $id]);
     $student = $st->fetch();
     if (!$student) return null;

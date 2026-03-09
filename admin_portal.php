@@ -15,7 +15,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     $msg=$count>0?"Synced {$count} students.":'Sync failed or empty sheet.';
   }
 }
-$students=$db->query('SELECT id,COALESCE(register_no,student_uid) register_no,COALESCE(full_name,name) name,class_name FROM students ORDER BY class_name,name LIMIT 500')->fetchAll() ?: [];
+$students=$db->query('SELECT id,COALESCE(register_no,student_uid) register_no,full_name name,class_name FROM students ORDER BY class_name,name LIMIT 500')->fetchAll() ?: [];
 $rows=sys_ranked_students();
 $classes = $db->query('SELECT DISTINCT class_name FROM students ORDER BY class_name')->fetchAll(PDO::FETCH_COLUMN) ?: [];
 ?>

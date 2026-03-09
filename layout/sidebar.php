@@ -18,6 +18,10 @@ $menu = [
     ['SQLite DB Page', '../database_sqlite.php', 'bi-filetype-db'],
     ['Admin Portal', '../admin_portal.php', 'bi-person-workspace'],
     ['Class Sheet', '../class_result_sheet.php', 'bi-table'],
+    ['Register Result', '../register_result.php', 'bi-search'],
+    ['Certificate', '../certificate.php', 'bi-award'],
+    ['ID Admin', '../admin_cards.php', 'bi-person-badge'],
+    ['A4 ID Print', '../idcard_bulk.php', 'bi-printer'],
 ];
 ?>
 <aside class="col-lg-2 sidebar p-3" id="sidebarNav">
