@@ -66,6 +66,7 @@ function ensure_import_tables(PDO $db): void {
         $db->exec('CREATE TABLE IF NOT EXISTS students (id INTEGER PRIMARY KEY AUTOINCREMENT, student_uid TEXT UNIQUE, register_no TEXT UNIQUE, full_name TEXT, class_name TEXT, gender TEXT, photo_path TEXT, attendance_percent REAL DEFAULT 0, madrasa_id INTEGER DEFAULT 1, created_at TEXT DEFAULT CURRENT_TIMESTAMP)');
         $db->exec('CREATE TABLE IF NOT EXISTS teachers (id INTEGER PRIMARY KEY AUTOINCREMENT, madrasa_id INTEGER, full_name TEXT, subject_name TEXT, class_name TEXT, attendance_percent REAL DEFAULT 100, created_at TEXT DEFAULT CURRENT_TIMESTAMP)');
         $db->exec('CREATE TABLE IF NOT EXISTS settings (setting_key TEXT PRIMARY KEY, setting_value TEXT)');
+        $db->exec('CREATE TABLE IF NOT EXISTS exams (id INTEGER PRIMARY KEY, madrasa_id INTEGER DEFAULT 1, exam_name TEXT, exam_type TEXT, exam_date TEXT, created_at TEXT DEFAULT CURRENT_TIMESTAMP)');
         $db->exec('CREATE TABLE IF NOT EXISTS subjects (id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT UNIQUE, subject_name TEXT, max_mark REAL DEFAULT 50, pass_mark REAL DEFAULT 18, display_order INTEGER DEFAULT 1)');
         $db->exec('CREATE TABLE IF NOT EXISTS marks (id INTEGER PRIMARY KEY AUTOINCREMENT, exam_id INTEGER DEFAULT 0, student_id INTEGER NOT NULL, subject_id INTEGER NOT NULL, mark REAL DEFAULT 0, UNIQUE(exam_id, student_id, subject_id))');
         $db->exec('CREATE TABLE IF NOT EXISTS admissions (id INTEGER PRIMARY KEY AUTOINCREMENT, madrasa_name TEXT, student_name TEXT, guardian_name TEXT, phone TEXT, class_name TEXT, address TEXT, photo_path TEXT, status TEXT DEFAULT "Pending", created_at TEXT DEFAULT CURRENT_TIMESTAMP)');
@@ -84,6 +85,7 @@ function ensure_import_tables(PDO $db): void {
         $db->exec('CREATE TABLE IF NOT EXISTS students (id INT AUTO_INCREMENT PRIMARY KEY, student_uid VARCHAR(40) UNIQUE, register_no VARCHAR(120) UNIQUE, full_name VARCHAR(191), class_name VARCHAR(80), gender VARCHAR(20), photo_path VARCHAR(255), attendance_percent DECIMAL(5,2) DEFAULT 0, madrasa_id INT DEFAULT 1, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
         $db->exec('CREATE TABLE IF NOT EXISTS teachers (id INT AUTO_INCREMENT PRIMARY KEY, madrasa_id INT DEFAULT 1, full_name VARCHAR(191), subject_name VARCHAR(120), class_name VARCHAR(80), attendance_percent DECIMAL(5,2) DEFAULT 100, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
         $db->exec('CREATE TABLE IF NOT EXISTS settings (setting_key VARCHAR(120) PRIMARY KEY, setting_value TEXT)');
+        $db->exec('CREATE TABLE IF NOT EXISTS exams (id INT PRIMARY KEY, madrasa_id INT DEFAULT 1, exam_name VARCHAR(191), exam_type VARCHAR(80), exam_date DATE NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
         $db->exec('CREATE TABLE IF NOT EXISTS subjects (id INT AUTO_INCREMENT PRIMARY KEY, code VARCHAR(120) UNIQUE, subject_name VARCHAR(180), max_mark DECIMAL(8,2) DEFAULT 50, pass_mark DECIMAL(8,2) DEFAULT 18, display_order INT DEFAULT 1)');
         $db->exec('CREATE TABLE IF NOT EXISTS marks (id INT AUTO_INCREMENT PRIMARY KEY, exam_id INT DEFAULT 0, student_id INT NOT NULL, subject_id INT NOT NULL, mark DECIMAL(8,2) DEFAULT 0, UNIQUE KEY uk_exam_student_sub(exam_id, student_id, subject_id))');
         $db->exec('CREATE TABLE IF NOT EXISTS admissions (id INT AUTO_INCREMENT PRIMARY KEY, madrasa_name VARCHAR(191), student_name VARCHAR(191), guardian_name VARCHAR(191), phone VARCHAR(50), class_name VARCHAR(80), address VARCHAR(255), photo_path VARCHAR(255), status VARCHAR(30) DEFAULT "Pending", created_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
@@ -176,12 +178,56 @@ function photo_upload_path(string $registerNo): string {
     return __DIR__ . '/photos/' . preg_replace('/[^a-zA-Z0-9_\-]/', '', $registerNo) . '.jpg';
 }
 
+function fetch_student_result(PDO $db, array $appConfig, int $studentId, int $examId = 0): ?array {
+    $studentStmt = $db->prepare('SELECT id, COALESCE(register_no, student_uid) AS register_no, full_name AS name, class_name FROM students WHERE id = :id LIMIT 1');
+    $studentStmt->execute(['id' => $studentId]);
+    $student = $studentStmt->fetch();
+    if (!$student) return null;
+
+    $subjectStmt = $db->prepare('SELECT s.subject_name AS name, s.max_mark, s.pass_mark, COALESCE(m.mark, 0) AS mark FROM subjects s LEFT JOIN marks m ON m.subject_id = s.id AND m.student_id = :student_id AND m.exam_id = :exam_id ORDER BY s.display_order ASC, s.id ASC');
+    $subjectStmt->execute(['student_id' => $studentId, 'exam_id' => $examId]);
+    $subjects = $subjectStmt->fetchAll() ?: [];
+    if (!$subjects) return null;
+
+    $obtainedTotal = 0.0;
+    $possibleTotal = 0.0;
+    $allPassed = true;
+    foreach ($subjects as &$subject) {
+        $mark = (float)($subject['mark'] ?? 0);
+        $maxMark = (float)($subject['max_mark'] ?? ($appConfig['default_subject_max_mark'] ?? 50));
+        $passMark = (float)($subject['pass_mark'] ?? ($appConfig['default_subject_pass_mark'] ?? 18));
+        $subject['mark'] = $mark;
+        $subject['max_mark'] = $maxMark;
+        $subject['status'] = $mark >= $passMark ? 'PASS' : 'FAIL';
+        if ($mark < $passMark) $allPassed = false;
+        $obtainedTotal += $mark;
+        $possibleTotal += $maxMark;
+    }
+    unset($subject);
+
+    $percentage = $possibleTotal > 0 ? round(($obtainedTotal / $possibleTotal) * 100, 2) : 0.0;
+    $grade = $percentage >= 90 ? 'A+' : ($percentage >= 80 ? 'A' : ($percentage >= 70 ? 'B+' : ($percentage >= 60 ? 'B' : ($percentage >= 50 ? 'C' : 'F'))));
+
+    return [
+        'student' => $student,
+        'subjects' => $subjects,
+        'obtained_total' => round($obtainedTotal, 2),
+        'possible_total' => round($possibleTotal, 2),
+        'percentage' => $percentage,
+        'grade' => $grade,
+        'status' => $allPassed ? 'PASS' : 'FAIL',
+        'class_rank' => 'N/A',
+        'overall_rank' => 'N/A',
+        'promotion_message' => $allPassed ? 'Promoted to next class.' : 'Needs improvement for promotion.',
+    ];
+}
+
 function render_header(string $title): void {
     $active = basename((string)parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH));
     echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . e($title) . '</title>';
     echo '<style>:root{--bg:#0f172a;--glass:rgba(255,255,255,.14);--line:rgba(255,255,255,.24);--text:#f8fafc;--muted:#cbd5e1}*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);background:linear-gradient(135deg,#0b1023,#16213e,#1d2f5f)}.container{max-width:1180px;margin:16px auto;padding:0 12px 20px}.hero,.card{padding:14px;border-radius:14px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px)}.card{margin-top:12px}.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.nav a{padding:8px 12px;border-radius:8px;background:rgba(124,58,237,.35);border:1px solid rgba(196,181,253,.4);text-decoration:none;color:#fff}.nav a.active{outline:2px solid #c4b5fd}input,select,button,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(15,23,42,.6);color:#fff}button{cursor:pointer;background:linear-gradient(120deg,#4f46e5,#7c3aed)}table{width:100%;border-collapse:collapse;min-width:560px}th,td{padding:9px;border-bottom:1px solid rgba(255,255,255,.18);text-align:left}.small{color:var(--muted)}.msg-ok{color:#86efac}.msg-bad{color:#fecaca}</style></head><body><main class="container">';
     echo '<section class="hero"><h1>' . e($title) . '</h1><p class="small">Connected Madrasa Portal Pages</p><nav class="nav">';
-    $menu = ['index.php'=>'Portal','admin_bulk_upload.php'=>'Bulk Import','admission_form.php'=>'Online Admission','fee_management.php'=>'Fee Management','id_card_generator_bulk.php'=>'ID Bulk','idcard_edit.php'=>'Edit ID Card','idcard.php'=>'ID Card','self_card.php'=>'Self Card','self_card_bulk.php'=>'Self Card Bulk','attendance_qr.php'=>'QR Attendance','qr_scanner_dashboard.php'=>'Scanner Dashboard','scanner.php'=>'Camera Scanner'];
+    $menu = ['index.php'=>'Portal','admin_bulk_upload.php'=>'Bulk Import','admission_form.php'=>'Online Admission','fee_management.php'=>'Fee Management','id_card_generator_bulk.php'=>'ID Bulk','idcard_edit.php'=>'Edit ID Card','idcard.php'=>'ID Card','self_card.php'=>'Self Card','self_card_bulk.php'=>'Self Card Bulk','attendance_qr.php'=>'QR Attendance','qr_scanner_dashboard.php'=>'Scanner Dashboard','scanner.php'=>'Camera Scanner','student_result_viewer.php'=>'Result Viewer'];
     foreach ($menu as $href => $label) echo '<a class="' . ($active === $href ? 'active' : '') . '" href="' . e($href) . '">' . e($label) . '</a>';
     echo '</nav></section>';
 }

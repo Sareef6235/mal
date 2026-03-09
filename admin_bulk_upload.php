@@ -50,8 +50,12 @@ function sync_rows(PDO $db, array $rows, array &$errors = []): int
 
     $stmtGetStudent = $db->prepare('SELECT id FROM students WHERE register_no=:r LIMIT 1');
     $stmtExam = $db->prepare('SELECT id FROM exams WHERE id=?');
-    $stmtInsertExam = $db->prepare("INSERT INTO exams (id, madrasa_id, exam_name, exam_type, exam_date) VALUES (?, 1, 'Imported Exam', 'Midterm', DATE('now'))");
-    $stmtEnsureSubject = $db->prepare("INSERT OR IGNORE INTO subjects(id, code, subject_name, max_mark, pass_mark, display_order) VALUES (?, ?, ?, 50, 18, ?)");
+    $stmtInsertExam = $driver === 'sqlite'
+        ? $db->prepare("INSERT INTO exams (id, madrasa_id, exam_name, exam_type, exam_date) VALUES (?, 1, 'Imported Exam', 'Midterm', DATE('now'))")
+        : $db->prepare("INSERT INTO exams (id, madrasa_id, exam_name, exam_type, exam_date) VALUES (?, 1, 'Imported Exam', 'Midterm', CURRENT_DATE)");
+    $stmtEnsureSubject = $driver === 'sqlite'
+        ? $db->prepare("INSERT OR IGNORE INTO subjects(id, code, subject_name, max_mark, pass_mark, display_order) VALUES (?, ?, ?, 50, 18, ?)")
+        : $db->prepare("INSERT INTO subjects(id, code, subject_name, max_mark, pass_mark, display_order) VALUES (?, ?, ?, 50, 18, ?) ON DUPLICATE KEY UPDATE code=VALUES(code), subject_name=VALUES(subject_name)");
 
     $count = 0;
 
