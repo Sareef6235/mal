@@ -12,6 +12,19 @@ if (!$db) {
     die('Database connection failed.');
 }
 
+$driver = db_driver($db);
+if ($driver === 'sqlite') {
+    $db->exec("CREATE TABLE IF NOT EXISTS exams (id INTEGER PRIMARY KEY, madrasa_id INTEGER, exam_name TEXT, exam_type TEXT, exam_date TEXT)");
+    $db->exec("CREATE TABLE IF NOT EXISTS students (id INTEGER PRIMARY KEY AUTOINCREMENT, register_no TEXT UNIQUE, full_name TEXT, class_name TEXT, madrasa_id INTEGER, gender TEXT, attendance_percent REAL)");
+    $db->exec("CREATE TABLE IF NOT EXISTS subjects (id INTEGER PRIMARY KEY, code TEXT, subject_name TEXT, max_mark INTEGER, pass_mark INTEGER, display_order INTEGER)");
+    $db->exec("CREATE TABLE IF NOT EXISTS marks (exam_id INTEGER, student_id INTEGER, subject_id INTEGER, mark REAL, PRIMARY KEY (exam_id, student_id, subject_id))");
+} else {
+    $db->exec("CREATE TABLE IF NOT EXISTS exams (id INT PRIMARY KEY, madrasa_id INT, exam_name VARCHAR(191), exam_type VARCHAR(80), exam_date DATE)");
+    $db->exec("CREATE TABLE IF NOT EXISTS students (id INT AUTO_INCREMENT PRIMARY KEY, register_no VARCHAR(120) UNIQUE, full_name VARCHAR(191), class_name VARCHAR(80), madrasa_id INT, gender VARCHAR(20), attendance_percent DECIMAL(5,2))");
+    $db->exec("CREATE TABLE IF NOT EXISTS subjects (id INT PRIMARY KEY, code VARCHAR(120), subject_name VARCHAR(180), max_mark INT, pass_mark INT, display_order INT)");
+    $db->exec("CREATE TABLE IF NOT EXISTS marks (exam_id INT, student_id INT, subject_id INT, mark DECIMAL(8,2), PRIMARY KEY (exam_id, student_id, subject_id))");
+}
+
 $message = '';
 $previewRows = [];
 $sheetUrl = '';

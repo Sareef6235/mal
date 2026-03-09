@@ -140,9 +140,14 @@ function fetch_csv_rows(string $url, int $timeout = 25): array {
     }
     if (!$raw) return [];
     $fp = fopen('php://temp', 'r+'); if ($fp === false) return [];
-    fwrite($fp, $raw); rewind($fp); $header = fgetcsv($fp); if (!$header) { fclose($fp); return []; }
+    fwrite($fp, $raw);
+    rewind($fp);
+
+    $header = fgetcsv($fp, 0, ",", '"', "\\");
+
+    if (!$header) { fclose($fp); return []; }
     $header = array_map(fn($h) => strtolower(trim((string)$h)), $header); $rows = [];
-    while (($line = fgetcsv($fp)) !== false) { if (!array_filter($line, fn($v) => trim((string)$v) !== '')) continue; $rows[] = array_combine($header, array_pad($line, count($header), '')); }
+    while (($line = fgetcsv($fp, 0, ",", '"', "\\")) !== false) { if (!array_filter($line, fn($v) => trim((string)$v) !== '')) continue; $rows[] = array_combine($header, array_pad($line, count($header), '')); }
     fclose($fp); return $rows;
 }
 
