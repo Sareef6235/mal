@@ -40,56 +40,83 @@ function fetch_csv_from_url(string $url): array
     return fetch_csv_rows(sheet_to_csv_url($url), 25);
 }
 
+
+function normalize_import_row(array $row): array
+{
+    $normalized = [];
+    foreach ($row as $key => $value) {
+        $k = strtolower(trim(str_replace([' ', '-'], '_', (string)$key)));
+        $normalized[$k] = is_string($value) ? trim($value) : $value;
+    }
+
+    if (isset($normalized['register_number']) && !isset($normalized['register_no'])) $normalized['register_no'] = (string)$normalized['register_number'];
+    if (isset($normalized['student_register']) && !isset($normalized['register_no'])) $normalized['register_no'] = (string)$normalized['student_register'];
+    if (isset($normalized['full_name']) && !isset($normalized['name'])) $normalized['name'] = (string)$normalized['full_name'];
+    if (isset($normalized['student_name']) && !isset($normalized['name'])) $normalized['name'] = (string)$normalized['student_name'];
+    if (isset($normalized['class_name']) && !isset($normalized['class'])) $normalized['class'] = (string)$normalized['class_name'];
+    if (!isset($normalized['exam_id']) && isset($normalized['exam'])) $normalized['exam_id'] = $normalized['exam'];
+
+    return $normalized;
+}
+
+function read_csv_rows(string $file): array
+{
+    $rows = [];
+    if (($handle = fopen($file, 'r')) === false) return $rows;
+
+    $header = fgetcsv($handle, 0, ',', '"', '\\');
+    if (!$header) { fclose($handle); return $rows; }
+
+    $header = array_map(fn($h) => strtolower(trim(str_replace([' ', '-'], '_', (string)$h))), $header);
+
+    while (($line = fgetcsv($handle, 0, ',', '"', '\\')) !== false) {
+        if (!array_filter($line, fn($v) => trim((string)$v) !== '')) continue;
+        if (count($line) !== count($header)) $line = array_pad($line, count($header), '');
+        $rows[] = normalize_import_row(array_combine($header, $line) ?: []);
+    }
+
+    fclose($handle);
+    return $rows;
+}
+
 function sync_rows(PDO $db, array $rows, array &$errors = []): int
 {
     if (!$rows) return 0;
-
-    $subjects = [
-        'quran' => 7, 'hiflu' => 8, 'fiqh' => 17, 'aqeeda' => 19, 'thajveed' => 14, 'droos' => 22,
-        'lisanul_quran' => 10, 'thareekh' => 18, 'thadreebu' => 9, 'thafheem_reading' => 1,
-        'thafheem_write' => 2, 'duroos_read' => 3, 'duroos_write' => 4, 'dheeniyath_akhlaq' => 5,
-        'kedayuth' => 6, 'thafseer' => 21
-    ];
 
     $driver = (string)$db->getAttribute(PDO::ATTR_DRIVER_NAME);
 
     if ($driver === 'sqlite') {
         $stmtMarks = $db->prepare('INSERT INTO marks (exam_id, student_id, subject_id, mark) VALUES (:exam_id, :student_id, :subject_id, :mark) ON CONFLICT(exam_id, student_id, subject_id) DO UPDATE SET mark=:mark');
         $stmtStudent = $db->prepare('INSERT INTO students (register_no, full_name, class_name, madrasa_id, gender, attendance_percent) VALUES (:r, :n, :c, 1, :g, 0) ON CONFLICT(register_no) DO UPDATE SET full_name=:n, class_name=:c');
+        $stmtEnsureSubject = $db->prepare('INSERT OR IGNORE INTO subjects(id, code, subject_name, max_mark, pass_mark, display_order) VALUES (?, ?, ?, 50, 18, ?)');
+        $stmtInsertExam = $db->prepare("INSERT INTO exams (id, madrasa_id, exam_name, exam_type, exam_date) VALUES (?, 1, 'Imported Exam', 'Midterm', DATE('now'))");
     } else {
         $stmtMarks = $db->prepare('INSERT INTO marks (exam_id, student_id, subject_id, mark) VALUES (:exam_id, :student_id, :subject_id, :mark) ON DUPLICATE KEY UPDATE mark=:mark');
         $stmtStudent = $db->prepare('INSERT INTO students (register_no, full_name, class_name, madrasa_id, gender, attendance_percent) VALUES (:r, :n, :c, 1, :g, 0) ON DUPLICATE KEY UPDATE full_name=:n, class_name=:c');
+        $stmtEnsureSubject = $db->prepare('INSERT INTO subjects(id, code, subject_name, max_mark, pass_mark, display_order) VALUES (?, ?, ?, 50, 18, ?) ON DUPLICATE KEY UPDATE subject_name=VALUES(subject_name), code=VALUES(code)');
+        $stmtInsertExam = $db->prepare("INSERT INTO exams (id, madrasa_id, exam_name, exam_type, exam_date) VALUES (?, 1, 'Imported Exam', 'Midterm', CURRENT_DATE)");
     }
 
     $stmtGetStudent = $db->prepare('SELECT id FROM students WHERE register_no=:r LIMIT 1');
     $stmtExam = $db->prepare('SELECT id FROM exams WHERE id=?');
-    $stmtInsertExam = $driver === 'sqlite'
-        ? $db->prepare("INSERT INTO exams (id, madrasa_id, exam_name, exam_type, exam_date) VALUES (?, 1, 'Imported Exam', 'Midterm', DATE('now'))")
-        : $db->prepare("INSERT INTO exams (id, madrasa_id, exam_name, exam_type, exam_date) VALUES (?, 1, 'Imported Exam', 'Midterm', CURRENT_DATE)");
-    $stmtEnsureSubject = $driver === 'sqlite'
-        ? $db->prepare("INSERT OR IGNORE INTO subjects(id, code, subject_name, max_mark, pass_mark, display_order) VALUES (?, ?, ?, 50, 18, ?)")
-        : $db->prepare("INSERT INTO subjects(id, code, subject_name, max_mark, pass_mark, display_order) VALUES (?, ?, ?, 50, 18, ?) ON DUPLICATE KEY UPDATE code=VALUES(code), subject_name=VALUES(subject_name)");
 
     $count = 0;
+    $ignoreColumns = ['exam_id','exam','register_no','register_number','student_register','name','full_name','student_name','class','class_name','gender','total','rank','average'];
 
     $db->beginTransaction();
     try {
-        foreach ($rows as $i => $row) {
+        foreach ($rows as $i => $rawRow) {
+            $row = normalize_import_row($rawRow);
             $rowIndex = $i + 2;
 
-            if (!isset($row['exam_id'], $row['register_no'], $row['name'], $row['class'])) {
-                $errors[] = "Line $rowIndex: Missing required fields.";
-                continue;
-            }
-
-            $examId = (int)$row['exam_id'];
-            $registerNo = trim((string)$row['register_no']);
-            $name = trim((string)$row['name']);
-            $class = trim((string)$row['class']);
+            $examId = (int)($row['exam_id'] ?? 1);
+            $registerNo = trim((string)($row['register_no'] ?? ''));
+            $name = trim((string)($row['name'] ?? ''));
+            $class = trim((string)($row['class'] ?? 'General'));
             $gender = isset($row['gender']) && strtolower((string)$row['gender']) === 'girl' ? 'Girl' : 'Boy';
 
-            if ($registerNo === '' || $name === '' || $class === '') {
-                $errors[] = "Line $rowIndex: Empty register_no, name, or class.";
+            if ($registerNo === '' || $name === '') {
+                $errors[] = "Line $rowIndex: Missing student info.";
                 continue;
             }
 
@@ -104,33 +131,34 @@ function sync_rows(PDO $db, array $rows, array &$errors = []): int
 
             $stmtExam->execute([$examId]);
             if (!$stmtExam->fetch()) {
-                try { $stmtInsertExam->execute([$examId]); } catch (Throwable $e) {
-                    $errors[] = "Line $rowIndex: Failed to create exam $examId";
-                    continue;
-                }
+                $stmtInsertExam->execute([$examId]);
             }
 
-            foreach ($subjects as $subName => $subId) {
-                if (!isset($row[$subName]) || $row[$subName] === '') continue;
+            $rowImported = 0;
+            foreach ($row as $col => $value) {
+                if (in_array($col, $ignoreColumns, true)) continue;
+                if ($value === '' || !is_numeric((string)$value)) continue;
 
-                $mark = (float)$row[$subName];
-                if (!is_numeric((string)$row[$subName])) continue;
+                $subjectId = abs(crc32($col)) % 100000;
+                if ($subjectId === 0) $subjectId = 1;
+                $subjectName = ucwords(str_replace('_', ' ', $col));
 
-                $stmtEnsureSubject->execute([$subId, $subName, ucwords(str_replace('_', ' ', $subName)), $subId]);
+                $stmtEnsureSubject->execute([$subjectId, $col, $subjectName, $subjectId]);
+                $stmtMarks->execute([':exam_id' => $examId, ':student_id' => $studentId, ':subject_id' => $subjectId, ':mark' => (float)$value]);
+                $count++;
+                $rowImported++;
+            }
 
-                $stmtMarks->execute([
-                    ':exam_id' => $examId,
-                    ':student_id' => $studentId,
-                    ':subject_id' => $subId,
-                    ':mark' => $mark
-                ]);
-
+            if ($rowImported === 0 && isset($row['subject_id'], $row['mark']) && is_numeric((string)$row['subject_id']) && is_numeric((string)$row['mark'])) {
+                $subjectId = (int)$row['subject_id'];
+                $stmtEnsureSubject->execute([$subjectId, 'subject_' . $subjectId, 'Subject ' . $subjectId, $subjectId]);
+                $stmtMarks->execute([':exam_id' => $examId, ':student_id' => $studentId, ':subject_id' => $subjectId, ':mark' => (float)$row['mark']]);
                 $count++;
             }
         }
 
         $db->commit();
-    } catch (PDOException $e) {
+    } catch (Throwable $e) {
         $db->rollBack();
         $errors[] = 'Database Error: ' . $e->getMessage();
     }
@@ -138,10 +166,11 @@ function sync_rows(PDO $db, array $rows, array &$errors = []): int
     return $count;
 }
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['sheet_url'])) {
         $sheetUrl = trim((string)$_POST['sheet_url']);
-        $previewRows = fetch_csv_from_url($sheetUrl);
+        $previewRows = array_map('normalize_import_row', fetch_csv_from_url($sheetUrl));
 
         if (isset($_POST['preview'])) {
             $message = !$previewRows
@@ -158,19 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($_FILES['csv_file']['tmp_name'])) {
         $file = $_FILES['csv_file']['tmp_name'];
-        $previewRows = [];
-
-        if (($handle = fopen($file, 'r')) !== false) {
-            $header = fgetcsv($handle, 0, ',', '"', '\\');
-            $cleanHeader = array_map(fn($h) => str_replace(' ', '_', strtolower(trim((string)$h))), $header ?: []);
-
-            while (($line = fgetcsv($handle, 0, ',', '"', '\\')) !== false) {
-                if (count($line) !== count($cleanHeader)) continue;
-                $previewRows[] = array_combine($cleanHeader, $line);
-            }
-
-            fclose($handle);
-        }
+        $previewRows = read_csv_rows($file);
 
         if (isset($_POST['preview'])) {
             $message = "<p class='msg-ok'>Preview fetched " . count($previewRows) . " rows from CSV.</p>";
