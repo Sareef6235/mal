@@ -14,6 +14,8 @@ $menu = [
     ['ID Cards', 'id_card.php', 'bi-person-vcard'],
     ['Reports', '../reports/result_report.php', 'bi-graph-up-arrow'],
     ['Database Select', '../database_select.php', 'bi-database-gear'],
+    ['MySQL DB Page', '../database_mysql.php', 'bi-server'],
+    ['SQLite DB Page', '../database_sqlite.php', 'bi-filetype-db'],
 ];
 ?>
 <aside class="col-lg-2 sidebar p-3" id="sidebarNav">
