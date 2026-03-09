@@ -150,6 +150,9 @@ $user = $_SESSION['user'] ?? null;
         <a class="btn btn-outline" href="fee_management.php">Fee Management</a>
         <a class="btn btn-outline" href="id_card_generator_bulk.php">ID Card Bulk</a>
         <a class="btn btn-outline" href="self_card.php">Self Card</a>
+        <a class="btn btn-outline" href="idcard_edit.php?register_no=STD-240101-0001">Edit ID Card Page</a>
+        <a class="btn btn-outline" href="attendance_qr.php">QR Attendance Page</a>
+        <a class="btn btn-outline" href="qr_scanner_dashboard.php">Scanner Dashboard</a>
       </div>
     </article>
   </section>
