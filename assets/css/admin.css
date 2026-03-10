@@ -35,3 +35,19 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-s
 .comment-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(2,6,23,.04);transition:all .2s ease}
 .comment-card:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(59,130,246,.12)}
 .progress{background:#e2e8f0}
+
+.erp-nav{position:sticky;top:64px;z-index:1035;background:#0f172a;border-bottom:1px solid rgba(148,163,184,.25);box-shadow:0 8px 24px rgba(2,6,23,.2)}
+.erp-nav .nav-link{color:#e2e8f0!important;padding:.65rem .8rem;border-radius:.55rem;font-weight:500;transition:all .25s ease}
+.erp-nav .nav-item:hover>.nav-link,.erp-nav .active-group>.nav-link{background:rgba(59,130,246,.22);color:#fff!important}
+.erp-nav .dropdown-menu{display:block;opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .25s ease,transform .25s ease,visibility .25s ease;pointer-events:none;margin-top:.35rem;border:1px solid #dbeafe;border-radius:.7rem;max-height:65vh;overflow:auto}
+.erp-nav .dropdown-item{border-radius:.5rem;padding:.45rem .75rem;transition:all .2s ease}
+.erp-nav .dropdown-item:hover,.erp-nav .dropdown-item.active{background:#eff6ff;color:#1d4ed8}
+.erp-nav .dropdown-item.is-checked{background:#dbeafe;color:#1e3a8a;font-weight:600}
+.erp-nav .dropdown-item.is-checked::after{content:"•";float:right;color:#1d4ed8;font-size:1.2rem;line-height:1}
+.nav-search-group{min-width:min(100%,280px)}
+.nav-search-group .input-group-text{background:#1e293b;color:#cbd5e1;border-color:#334155}
+.nav-search-group .form-control{background:#0b1220;color:#e2e8f0;border-color:#334155}
+.nav-search-group .form-control::placeholder{color:#94a3b8}
+.nav-search-group .form-control:focus{box-shadow:none;border-color:#60a5fa}
+@media(min-width:1200px){.erp-nav .dropdown:hover>.dropdown-menu,.erp-nav .dropdown-menu.show{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}}
+@media(max-width:1199px){.erp-nav{top:64px}.erp-nav .navbar-collapse{padding:1rem 0}.erp-nav .dropdown-menu{display:none;opacity:1;visibility:visible;transform:none;pointer-events:auto;max-height:320px}.erp-nav .dropdown-menu.show{display:block}.erp-nav .nav-link{padding:.6rem .75rem}.content-wrap{margin-top:.35rem}}
