@@ -30,3 +30,5 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-s
 .fest-gradient h3,.fest-gradient h4,.fest-gradient p{color:#fff}
 .table-modern tbody tr{transition:all .25s ease}
 .table-modern tbody tr:hover{transform:translateX(4px)}
+.help-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:.9rem;padding:1rem;box-shadow:0 6px 18px rgba(15,23,42,.05)}
+.help-card h6{font-weight:700;color:#1e3a8a}

@@ -15,6 +15,7 @@ $groups = [
             ['Results Import', 'results_import.php', 'bi-upload'],
             ['Rank List', 'rank_list.php', 'bi-trophy'],
             ['Marksheet', 'marksheet.php', 'bi-file-earmark-text'],
+            ['User Guide', 'user_guide.php', 'bi-question-circle'],
         ],
     ],
     [

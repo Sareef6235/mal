@@ -106,12 +106,18 @@ function ensure_import_tables(PDO $db): void {
         $haveFullName = false;
         $haveName = false;
         $haveClassName = false;
+        $haveClassId = false;
+        $haveClassRank = false;
+        $haveOverallRank = false;
         foreach ($cols as $c) if (($c['name'] ?? '') === 'register_no') $haveRegisterNo = true;
         foreach ($cols as $c) {
             if (($c['name'] ?? '') === 'full_name') $haveFullName = true;
             if (($c['name'] ?? '') === 'name') $haveName = true;
             if (($c['name'] ?? '') === 'register_number') $haveRegisterNumber = true;
             if (($c['name'] ?? '') === 'class_name') $haveClassName = true;
+            if (($c['name'] ?? '') === 'class_id') $haveClassId = true;
+            if (($c['name'] ?? '') === 'class_rank') $haveClassRank = true;
+            if (($c['name'] ?? '') === 'overall_rank') $haveOverallRank = true;
         }
         if (!$haveRegisterNo) {
             $db->exec('ALTER TABLE students ADD COLUMN register_no TEXT');
@@ -128,6 +134,15 @@ function ensure_import_tables(PDO $db): void {
         }
         if (!$haveClassName) {
             $db->exec('ALTER TABLE students ADD COLUMN class_name TEXT');
+        }
+        if (!$haveClassId) {
+            $db->exec('ALTER TABLE students ADD COLUMN class_id INTEGER');
+        }
+        if (!$haveClassRank) {
+            $db->exec('ALTER TABLE students ADD COLUMN class_rank INTEGER');
+        }
+        if (!$haveOverallRank) {
+            $db->exec('ALTER TABLE students ADD COLUMN overall_rank INTEGER');
         }
         $db->exec('UPDATE students SET register_no = COALESCE(NULLIF(register_no, ""), register_number), register_number = COALESCE(NULLIF(register_number, ""), register_no)');
         $db->exec('UPDATE students SET full_name = COALESCE(NULLIF(full_name, ""), name), name = COALESCE(NULLIF(name, ""), full_name)');
@@ -164,6 +179,9 @@ function ensure_import_tables(PDO $db): void {
         try { $db->exec('ALTER TABLE students ADD COLUMN name VARCHAR(191) NULL'); } catch (Throwable) {}
         try { $db->exec('ALTER TABLE students ADD COLUMN register_number VARCHAR(120) NULL'); } catch (Throwable) {}
         try { $db->exec('ALTER TABLE students ADD COLUMN class_name VARCHAR(80) NULL'); } catch (Throwable) {}
+        try { $db->exec('ALTER TABLE students ADD COLUMN class_id INT NULL'); } catch (Throwable) {}
+        try { $db->exec('ALTER TABLE students ADD COLUMN class_rank INT NULL'); } catch (Throwable) {}
+        try { $db->exec('ALTER TABLE students ADD COLUMN overall_rank INT NULL'); } catch (Throwable) {}
         $db->exec('UPDATE students SET register_no = COALESCE(NULLIF(register_no, ""), register_number), register_number = COALESCE(NULLIF(register_number, ""), register_no)');
         $db->exec('UPDATE students SET full_name = COALESCE(NULLIF(full_name, ""), name), name = COALESCE(NULLIF(name, ""), full_name)');
     }
@@ -305,7 +323,7 @@ function render_header(string $title): void {
     echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . e($title) . '</title>';
     echo '<style>:root{--bg:#0f172a;--glass:rgba(255,255,255,.14);--line:rgba(255,255,255,.24);--text:#f8fafc;--muted:#cbd5e1}*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);background:linear-gradient(135deg,#0b1023,#16213e,#1d2f5f)}.container{max-width:1180px;margin:16px auto;padding:0 12px 20px}.hero,.card{padding:14px;border-radius:14px;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px)}.card{margin-top:12px}.nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.nav a{padding:8px 12px;border-radius:8px;background:rgba(124,58,237,.35);border:1px solid rgba(196,181,253,.4);text-decoration:none;color:#fff}.nav a.active{outline:2px solid #c4b5fd}input,select,button,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:rgba(15,23,42,.6);color:#fff}button{cursor:pointer;background:linear-gradient(120deg,#4f46e5,#7c3aed)}table{width:100%;border-collapse:collapse;min-width:560px}th,td{padding:9px;border-bottom:1px solid rgba(255,255,255,.18);text-align:left}.small{color:var(--muted)}.msg-ok{color:#86efac}.msg-bad{color:#fecaca}</style></head><body><main class="container">';
     echo '<section class="hero"><h1>' . e($title) . '</h1><p class="small">Connected Madrasa Portal Pages</p><nav class="nav">';
-    $menu = ['index.php'=>'Portal','admin_bulk_upload.php'=>'Bulk Import','student_result_viewer.php'=>'Result Viewer','pages/dashboard.php'=>'ERP Dashboard','pages/fest_dashboard.php'=>'Fest Dashboard','pages/festivals.php'=>'Festivals','pages/festival_events.php'=>'Fest Events','pages/festival_participants.php'=>'Fest Participants','pages/festival_scoreboard.php'=>'Fest Scoreboard','pages/students.php'=>'Students','pages/subjects.php'=>'Subjects','pages/exams.php'=>'Exams','pages/results_import.php'=>'Results Import','pages/rank_list.php'=>'Rank List','pages/marksheet.php'=>'Marksheet','pages/attendance_qr.php'=>'Attendance QR','pages/fees.php'=>'Fees','pages/id_card.php'=>'ID Cards','reports/result_report.php'=>'Reports','admission_form.php'=>'Online Admission','fee_management.php'=>'Fee Management','id_card_generator_bulk.php'=>'ID Bulk','idcard_edit.php'=>'Edit ID Card','idcard.php'=>'ID Card','self_card.php'=>'Self Card','self_card_bulk.php'=>'Self Card Bulk','attendance_qr.php'=>'QR Attendance','qr_scanner_dashboard.php'=>'Scanner Dashboard','scanner.php'=>'Camera Scanner','database_select.php'=>'DB Select','database_mysql.php'=>'MySQL DB','database_sqlite.php'=>'SQLite DB','admin_portal.php'=>'Admin Portal','class_result_sheet.php'=>'Class Sheet','register_result.php'=>'Register Result','class_result.php'=>'Class Result','certificate.php'=>'Certificate','admin_cards.php'=>'ID Admin','idcard_bulk.php'=>'A4 ID Print'];
+    $menu = ['index.php'=>'Portal','admin_bulk_upload.php'=>'Bulk Import','student_result_viewer.php'=>'Result Viewer','pages/dashboard.php'=>'ERP Dashboard','pages/user_guide.php'=>'User Guide','pages/fest_dashboard.php'=>'Fest Dashboard','pages/festivals.php'=>'Festivals','pages/festival_events.php'=>'Fest Events','pages/festival_participants.php'=>'Fest Participants','pages/festival_scoreboard.php'=>'Fest Scoreboard','pages/students.php'=>'Students','pages/subjects.php'=>'Subjects','pages/exams.php'=>'Exams','pages/results_import.php'=>'Results Import','pages/rank_list.php'=>'Rank List','pages/marksheet.php'=>'Marksheet','pages/attendance_qr.php'=>'Attendance QR','pages/fees.php'=>'Fees','pages/id_card.php'=>'ID Cards','reports/result_report.php'=>'Reports','admission_form.php'=>'Online Admission','fee_management.php'=>'Fee Management','id_card_generator_bulk.php'=>'ID Bulk','idcard_edit.php'=>'Edit ID Card','idcard.php'=>'ID Card','self_card.php'=>'Self Card','self_card_bulk.php'=>'Self Card Bulk','attendance_qr.php'=>'QR Attendance','qr_scanner_dashboard.php'=>'Scanner Dashboard','scanner.php'=>'Camera Scanner','database_select.php'=>'DB Select','database_mysql.php'=>'MySQL DB','database_sqlite.php'=>'SQLite DB','admin_portal.php'=>'Admin Portal','class_result_sheet.php'=>'Class Sheet','register_result.php'=>'Register Result','class_result.php'=>'Class Result','certificate.php'=>'Certificate','admin_cards.php'=>'ID Admin','idcard_bulk.php'=>'A4 ID Print'];
     foreach ($menu as $href => $label) echo '<a class="' . ($active === $href ? 'active' : '') . '" href="' . e($href) . '">' . e($label) . '</a>';
     echo '</nav></section>';
 }
