@@ -1,0 +1,3 @@
+<?php require __DIR__.'/../db.php'; $db=connect_db($config['db']); ensure_core_tables($db); $rows=$db->query('SELECT s.full_name,s.register_no,a.attended_at FROM attendance a INNER JOIN students s ON s.id=a.student_id ORDER BY a.attended_at DESC LIMIT 200')->fetchAll()?:[]; include __DIR__.'/../layout/header.php'; include __DIR__.'/../layout/sidebar.php'; ?>
+<h3>Attendance Report</h3><table class="table"><tr><th>Name</th><th>Register</th><th>Date Time</th></tr><?php foreach($rows as $r): ?><tr><td><?= h((string)$r['full_name']) ?></td><td><?= h((string)$r['register_no']) ?></td><td><?= h((string)$r['attended_at']) ?></td></tr><?php endforeach; ?></table>
+<?php include __DIR__.'/../layout/footer.php'; ?>

@@ -1,0 +1,37 @@
+:root{--primary:#2563EB;--secondary:#10B981;--bg:#F8FAFC;--card:#fff;--text:#1F2937;--muted:#6b7280}
+body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.topbar{background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:1040}
+.sidebar{background:#0f172a;color:#e2e8f0;min-height:calc(100vh - 64px);transition:all .3s ease}
+.sidebar .nav-link{color:#cbd5e1;border-radius:.5rem;padding:.6rem .75rem}
+.sidebar .nav-link:hover,.sidebar .nav-link.active{background:rgba(37,99,235,.2);color:#fff}
+.content-wrap{animation:fadeIn .4s ease}
+.card-soft{background:var(--card);border:0;border-radius:1rem;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+.stat-card{transition:transform .2s ease,box-shadow .2s ease}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(37,99,235,.16)}
+.table-modern thead th{background:#eef2ff;color:#334155}
+.table-modern tbody tr:hover{background:#f8fafc}
+.student-photo{width:48px;height:48px;object-fit:cover;border-radius:.75rem;transition:transform .2s ease}
+.student-photo:hover{transform:scale(1.08)}
+.btn-primary{background:var(--primary);border-color:var(--primary)}
+.badge-success{background:var(--secondary)}
+@media(max-width:991px){.sidebar{position:fixed;left:-260px;top:64px;width:250px;z-index:1060}.sidebar.open{left:0}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.sidebar-title{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:.65rem}
+.menu-group{border:1px solid rgba(148,163,184,.25);border-radius:.65rem;margin-bottom:.6rem;background:rgba(15,23,42,.25)}
+.menu-group summary{list-style:none;cursor:pointer;padding:.6rem .75rem;font-weight:600;color:#e2e8f0;display:flex;justify-content:space-between;align-items:center}
+.menu-group summary::-webkit-details-marker{display:none}
+.menu-group summary .bi-chevron-down{transition:transform .2s ease}
+.menu-group[open] summary .bi-chevron-down{transform:rotate(180deg)}
+.menu-group .nav{padding:0 .45rem .5rem .45rem}
+.sidebar .nav-link.is-checked,.sidebar .nav-link.active{background:rgba(239,68,68,.28)!important;color:#fecaca;border:1px solid rgba(248,113,113,.4)}
+.sidebar .nav-link.is-checked::after{content:'✓';float:right;color:#ef4444;font-weight:700}
+.fest-gradient{background:linear-gradient(135deg,#1d4ed8,#7c3aed,#059669)!important;color:#fff;border:none}
+.fest-gradient h3,.fest-gradient h4,.fest-gradient p{color:#fff}
+.table-modern tbody tr{transition:all .25s ease}
+.table-modern tbody tr:hover{transform:translateX(4px)}
+.help-card{background:#ffffff;border:1px solid #e2e8f0;border-radius:.9rem;padding:1rem;box-shadow:0 6px 18px rgba(15,23,42,.05)}
+.help-card h6{font-weight:700;color:#1e3a8a}
+.comment-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 6px 20px rgba(2,6,23,.04);transition:all .2s ease}
+.comment-card:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(59,130,246,.12)}
+.progress{background:#e2e8f0}
