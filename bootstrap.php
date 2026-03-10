@@ -88,11 +88,13 @@ function ensure_import_tables(PDO $db): void {
         $haveRegisterNumber = false;
         $haveFullName = false;
         $haveName = false;
+        $haveClassName = false;
         foreach ($cols as $c) if (($c['name'] ?? '') === 'register_no') $haveRegisterNo = true;
         foreach ($cols as $c) {
             if (($c['name'] ?? '') === 'full_name') $haveFullName = true;
             if (($c['name'] ?? '') === 'name') $haveName = true;
             if (($c['name'] ?? '') === 'register_number') $haveRegisterNumber = true;
+            if (($c['name'] ?? '') === 'class_name') $haveClassName = true;
         }
         if (!$haveRegisterNo) {
             $db->exec('ALTER TABLE students ADD COLUMN register_no TEXT');
@@ -106,6 +108,9 @@ function ensure_import_tables(PDO $db): void {
         }
         if (!$haveRegisterNumber) {
             $db->exec('ALTER TABLE students ADD COLUMN register_number TEXT');
+        }
+        if (!$haveClassName) {
+            $db->exec('ALTER TABLE students ADD COLUMN class_name TEXT');
         }
         $db->exec('UPDATE students SET register_no = COALESCE(NULLIF(register_no, ""), register_number), register_number = COALESCE(NULLIF(register_number, ""), register_no)');
         $db->exec('UPDATE students SET full_name = COALESCE(NULLIF(full_name, ""), name), name = COALESCE(NULLIF(name, ""), full_name)');
@@ -124,6 +129,7 @@ function ensure_import_tables(PDO $db): void {
         try { $db->exec('ALTER TABLE students ADD COLUMN full_name VARCHAR(191) NULL'); } catch (Throwable) {}
         try { $db->exec('ALTER TABLE students ADD COLUMN name VARCHAR(191) NULL'); } catch (Throwable) {}
         try { $db->exec('ALTER TABLE students ADD COLUMN register_number VARCHAR(120) NULL'); } catch (Throwable) {}
+        try { $db->exec('ALTER TABLE students ADD COLUMN class_name VARCHAR(80) NULL'); } catch (Throwable) {}
         $db->exec('UPDATE students SET register_no = COALESCE(NULLIF(register_no, ""), register_number), register_number = COALESCE(NULLIF(register_number, ""), register_no)');
         $db->exec('UPDATE students SET full_name = COALESCE(NULLIF(full_name, ""), name), name = COALESCE(NULLIF(name, ""), full_name)');
     }
