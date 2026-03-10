@@ -15,8 +15,7 @@ if (!isset($config)) { require_once __DIR__ . '/../bootstrap.php'; }
 <body>
 <nav class="topbar navbar navbar-expand-lg">
   <div class="container-fluid">
-    <button class="btn btn-outline-primary d-lg-none" id="sidebarToggle"><i class="bi bi-list"></i></button>
-    <span class="navbar-brand fw-semibold ms-2">Madrasa ERP System</span>
+    <span class="navbar-brand fw-semibold ms-2 ms-lg-0">Madrasa ERP System</span>
     <?php $helpTopic = basename((string)parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH)); ?>
     <div class="ms-auto d-flex align-items-center gap-2">
       <a class="btn btn-outline-info btn-sm" href="/pages/user_guide.php?topic=<?= e($helpTopic) ?>" data-bs-toggle="tooltip" data-bs-title="Open bilingual help"><i class="bi bi-question-circle me-1"></i>Help</a>
