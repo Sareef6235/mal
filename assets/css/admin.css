@@ -16,3 +16,13 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-s
 .badge-success{background:var(--secondary)}
 @media(max-width:991px){.sidebar{position:fixed;left:-260px;top:64px;width:250px;z-index:1060}.sidebar.open{left:0}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.sidebar-title{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;margin-bottom:.65rem}
+.menu-group{border:1px solid rgba(148,163,184,.25);border-radius:.65rem;margin-bottom:.6rem;background:rgba(15,23,42,.25)}
+.menu-group summary{list-style:none;cursor:pointer;padding:.6rem .75rem;font-weight:600;color:#e2e8f0;display:flex;justify-content:space-between;align-items:center}
+.menu-group summary::-webkit-details-marker{display:none}
+.menu-group summary .bi-chevron-down{transition:transform .2s ease}
+.menu-group[open] summary .bi-chevron-down{transform:rotate(180deg)}
+.menu-group .nav{padding:0 .45rem .5rem .45rem}
+.sidebar .nav-link.is-checked,.sidebar .nav-link.active{background:rgba(239,68,68,.28)!important;color:#fecaca;border:1px solid rgba(248,113,113,.4)}
+.sidebar .nav-link.is-checked::after{content:'✓';float:right;color:#ef4444;font-weight:700}
