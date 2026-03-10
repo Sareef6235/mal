@@ -42,6 +42,17 @@ $groups = [
             ['A4 ID Print', '../idcard_bulk.php', 'bi-printer'],
         ],
     ],
+    [
+        'title' => 'Fest ERP',
+        'icon' => 'bi-stars',
+        'items' => [
+            ['Fest Dashboard', 'fest_dashboard.php', 'bi-speedometer'],
+            ['Festivals', 'festivals.php', 'bi-calendar-event'],
+            ['Events', 'festival_events.php', 'bi-megaphone'],
+            ['Participants', 'festival_participants.php', 'bi-person-lines-fill'],
+            ['Live Scoreboard', 'festival_scoreboard.php', 'bi-tv'],
+        ],
+    ],
 ];
 ?>
 <aside class="col-lg-2 sidebar p-3" id="sidebarNav">

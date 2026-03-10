@@ -26,3 +26,7 @@ body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-s
 .menu-group .nav{padding:0 .45rem .5rem .45rem}
 .sidebar .nav-link.is-checked,.sidebar .nav-link.active{background:rgba(239,68,68,.28)!important;color:#fecaca;border:1px solid rgba(248,113,113,.4)}
 .sidebar .nav-link.is-checked::after{content:'✓';float:right;color:#ef4444;font-weight:700}
+.fest-gradient{background:linear-gradient(135deg,#1d4ed8,#7c3aed,#059669)!important;color:#fff;border:none}
+.fest-gradient h3,.fest-gradient h4,.fest-gradient p{color:#fff}
+.table-modern tbody tr{transition:all .25s ease}
+.table-modern tbody tr:hover{transform:translateX(4px)}
