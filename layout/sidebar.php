@@ -51,6 +51,8 @@ $groups = [
             ['Festivals', 'festivals.php', 'bi-calendar-event'],
             ['Events', 'festival_events.php', 'bi-megaphone'],
             ['Participants', 'festival_participants.php', 'bi-person-lines-fill'],
+            ['Festival Feedback', 'festival_feedback.php', 'bi-chat-left-dots'],
+            ['Feedback Moderation', 'festival_feedback_admin.php', 'bi-shield-check'],
             ['Live Scoreboard', 'festival_scoreboard.php', 'bi-tv'],
         ],
     ],
