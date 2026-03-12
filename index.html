@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ml">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>🕌 നിസ്കാരം ട്രാക്കർ</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="top-card">
+        <div>
+          <h1>🕌 നിസ്കാരം ട്രാക്കർ</h1>
+          <p>Daily Prayer &amp; Study Tracker</p>
+        </div>
+        <div class="date-chip">
+          <span>ഇന്നത്തെ തിയതി</span>
+          <strong id="todayDate"></strong>
+        </div>
+      </header>
+
+      <section id="home" class="page active" aria-label="Home">
+        <div class="card">
+          <h2>Today’s Topper 🏆</h2>
+          <ul class="leaderboard">
+            <li><span>Stu 2</span><strong>120 pt</strong></li>
+            <li><span>Stu 1</span><strong>106 pt</strong></li>
+            <li><span>Abid</span><strong>98 pt</strong></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2>Week’s Topper 📅</h2>
+          <ul class="leaderboard">
+            <li><span>Stu 2</span><strong>702 pt</strong></li>
+            <li><span>Stu 1</span><strong>661 pt</strong></li>
+            <li><span>Abid</span><strong>598 pt</strong></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2>Month’s Topper 📆</h2>
+          <ul class="leaderboard">
+            <li><span>Stu 2</span><strong>2,890 pt</strong></li>
+            <li><span>Stu 1</span><strong>2,701 pt</strong></li>
+            <li><span>Abid</span><strong>2,490 pt</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="tracker" class="page" aria-label="Tracker">
+        <div class="card">
+          <h2>ക്ലാസ് തിരഞ്ഞെടുക്കുക</h2>
+          <div class="form-group">
+            <label for="classSelect">Class</label>
+            <select id="classSelect">
+              <option value="1">1</option>
+              <option value="2">2</option>
+            </select>
+          </div>
+          <button id="addClassBtn" class="button">+ add more classes</button>
+          <p id="classMessage" class="muted"></p>
+        </div>
+      </section>
+
+      <section id="history" class="page" aria-label="History">
+        <div class="card">
+          <h2>History Filter</h2>
+          <div class="filter-grid">
+            <div class="form-group">
+              <label for="classFilter">Class</label>
+              <select id="classFilter">
+                <option>എല്ലാം</option>
+                <option>1</option>
+                <option>2</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="dateFilter">Date</label>
+              <input type="date" id="dateFilter" />
+            </div>
+            <div class="form-group">
+              <label for="studentFilter">Student</label>
+              <select id="studentFilter">
+                <option>All students</option>
+                <option>Stu 1</option>
+                <option>Stu 2</option>
+                <option>Abid</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>History List</h2>
+          <ul class="history-list">
+            <li>
+              <div>
+                <strong>Stu 2</strong>
+                <p>2026-03-12, 6 pt, 110 prayers</p>
+              </div>
+              <div class="prayer-icons" aria-label="prayer-icons">
+                <span title="സുബഹ്">🌅</span>
+                <span title="പകലാ">☀️</span>
+                <span title="അസർ">🕓</span>
+                <span title="മഗ്രിബ്">🌇</span>
+                <span title="ഇഷാ">🌙</span>
+              </div>
+            </li>
+            <li>
+              <div>
+                <strong>Stu 1</strong>
+                <p>2026-03-12, 5 pt, 97 prayers</p>
+              </div>
+              <div class="prayer-icons" aria-label="prayer-icons">
+                <span title="സുബഹ്">🌅</span>
+                <span title="പകലാ">☀️</span>
+                <span title="അസർ">🕓</span>
+                <span title="മഗ്രിബ്">🌇</span>
+                <span title="ഇഷാ">🌙</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="profile" class="page" aria-label="Profile">
+        <div class="card">
+          <h2>നിസ്കാരം ട്രാക്കർ</h2>
+          <p>Madrasa Prayer &amp; Study Tracking</p>
+          <button class="button">Admin Sign In</button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Bottom Navigation">
+      <a href="#/home" data-page="home" class="nav-link active">🏠<span>Home</span></a>
+      <a href="#/tracker" data-page="tracker" class="nav-link">📝<span>Tracker</span></a>
+      <a href="#/history" data-page="history" class="nav-link">📚<span>History</span></a>
+      <a href="#/profile" data-page="profile" class="nav-link">👤<span>Profile</span></a>
+    </nav>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
