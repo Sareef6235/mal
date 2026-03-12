@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ഹിസ്റ്ററി | നിസ്കാരം ട്രാക്കർ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-indigo-50 pb-24 text-slate-800">
+  <main class="mx-auto w-full max-w-[420px] px-4 pt-4">
+    <header class="rounded-3xl border border-white/30 bg-white/70 p-4 shadow-xl backdrop-blur-md">
+      <h1 class="text-lg font-bold">📜 ഹിസ്റ്ററി</h1>
+      <p class="text-xs text-slate-600">Saved prayer records</p>
+    </header>
+
+    <section class="mt-4 rounded-2xl border border-white/30 bg-white/70 p-4 shadow-lg backdrop-blur space-y-2">
+      <select id="filterClass" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"><option value="">എല്ലാ ക്ലാസുകളും</option></select>
+      <input id="filterDate" type="date" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm" />
+      <select id="filterStudent" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"><option value="">All students</option></select>
+    </section>
+
+    <section id="historyList" class="mt-3 space-y-2"></section>
+  </main>
+
+  <nav class="fixed bottom-0 left-0 right-0 mx-auto grid w-full max-w-md grid-cols-4 border-t border-slate-200 bg-white/95 px-1 py-2 shadow-2xl backdrop-blur-md">
+    <a href="home.html" class="flex flex-col items-center text-[11px] font-medium text-slate-500"><span class="text-lg">🏠</span>ഹോം</a>
+    <a href="tracker.html" class="flex flex-col items-center text-[11px] font-medium text-slate-500"><span class="text-lg">📖</span>ട്രാക്കർ</a>
+    <a href="history.html" class="flex flex-col items-center text-[11px] font-medium text-emerald-600"><span class="text-lg">⏱</span>ഹിസ്റ്ററി</a>
+    <a href="profile.html" class="flex flex-col items-center text-[11px] font-medium text-slate-500"><span class="text-lg">👤</span>പ്രൊഫൈൽ</a>
+  </nav>
+
+  <script>
+    const STORAGE_KEY = 'niskaram-tracker-entries';
+    const CLASS_KEY = 'niskaram-tracker-classes';
+
+    function getEntries() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+
+    function getClasses() {
+      return JSON.parse(localStorage.getItem(CLASS_KEY) || '["Class 1","Class 2"]');
+    }
+
+    function statusChip(label, done) {
+      return `<span class="rounded-full px-2 py-1 text-[11px] ${done ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'}">${label}</span>`;
+    }
+
+    const filterClass = document.getElementById('filterClass');
+    const filterDate = document.getElementById('filterDate');
+    const filterStudent = document.getElementById('filterStudent');
+    const historyList = document.getElementById('historyList');
+
+    filterClass.innerHTML += getClasses().map((c) => `<option value="${c}">${c}</option>`).join('');
+
+    function renderStudents() {
+      const students = [...new Set(getEntries().map((e) => e.name))].filter(Boolean).sort();
+      filterStudent.innerHTML = '<option value="">All students</option>' + students.map((s) => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    function renderHistory() {
+      let entries = getEntries().slice().reverse();
+      if (filterClass.value) entries = entries.filter((e) => e.class === filterClass.value);
+      if (filterDate.value) entries = entries.filter((e) => e.date === filterDate.value);
+      if (filterStudent.value) entries = entries.filter((e) => e.name === filterStudent.value);
+
+      if (!entries.length) {
+        historyList.innerHTML = '<div class="rounded-2xl bg-white/70 p-4 text-sm text-slate-600 shadow">No records found.</div>';
+        return;
+      }
+
+      historyList.innerHTML = entries.map((entry) => `
+        <article class="rounded-2xl border border-white/30 bg-white/70 p-4 shadow-lg backdrop-blur">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold">${entry.name}</h3>
+            <span class="rounded-full bg-indigo-100 px-2 py-1 text-[11px] text-indigo-700">${entry.class}</span>
+          </div>
+          <p class="mt-1 text-xs text-slate-600">Date: ${entry.date}</p>
+          <p class="text-sm font-medium text-emerald-700">Points: ${entry.points}</p>
+          <div class="mt-2 flex flex-wrap gap-1">
+            ${statusChip('സുബഹ്', entry.prayers?.subah)}
+            ${statusChip('ളുഹ്ർ', entry.prayers?.dhuhr)}
+            ${statusChip('അസർ', entry.prayers?.asr)}
+            ${statusChip('മഗരിബ്', entry.prayers?.maghrib)}
+            ${statusChip('ഇഷാ', entry.prayers?.isha)}
+          </div>
+        </article>
+      `).join('');
+    }
+
+    [filterClass, filterDate, filterStudent].forEach((el) => el.addEventListener('change', renderHistory));
+    renderStudents();
+    renderHistory();
+  </script>
+</body>
+</html>

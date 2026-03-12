@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | നിസ്കാരം ട്രാക്കർ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-indigo-50 pb-24 text-slate-800">
+  <main class="mx-auto w-full max-w-[420px] px-4 pt-4">
+    <header class="rounded-3xl border border-white/30 bg-white/70 p-4 shadow-xl backdrop-blur-md">
+      <h1 class="text-xl font-bold">Admin Dashboard</h1>
+      <p class="text-xs text-slate-600">Manage classes and view full statistics</p>
+    </header>
+
+    <section class="mt-4 rounded-2xl border border-white/30 bg-white/70 p-4 shadow-lg backdrop-blur">
+      <h2 class="mb-2 font-semibold">Class Management</h2>
+      <p class="text-xs text-slate-600">ഇത് അഡ്മിൻ പേജിലാണ് മാത്രം ലഭ്യമാകുന്നത്.</p>
+      <button id="addClassBtn" class="mt-3 w-full rounded-xl bg-indigo-600 px-3 py-2 text-sm font-medium text-white">+ add more classes</button>
+      <ul id="classList" class="mt-3 space-y-1 text-sm"></ul>
+    </section>
+
+    <section class="mt-3 grid grid-cols-2 gap-2">
+      <article class="rounded-2xl border border-white/30 bg-white/70 p-3 shadow-lg backdrop-blur">
+        <p class="text-xs text-slate-500">Total Students</p>
+        <p id="totalStudents" class="text-lg font-bold">0</p>
+      </article>
+      <article class="rounded-2xl border border-white/30 bg-white/70 p-3 shadow-lg backdrop-blur">
+        <p class="text-xs text-slate-500">Total Records</p>
+        <p id="totalRecords" class="text-lg font-bold">0</p>
+      </article>
+    </section>
+
+    <section class="mt-3 rounded-2xl border border-white/30 bg-white/70 p-4 shadow-lg backdrop-blur">
+      <h2 class="font-semibold">Prayer Statistics</h2>
+      <ul id="prayerStats" class="mt-2 space-y-1 text-sm"></ul>
+    </section>
+
+    <section class="mt-3 rounded-2xl border border-white/30 bg-white/70 p-4 shadow-lg backdrop-blur">
+      <h2 class="font-semibold">View All History</h2>
+      <div id="allHistory" class="mt-2 space-y-2 text-sm"></div>
+    </section>
+  </main>
+
+  <nav class="fixed bottom-0 left-0 right-0 mx-auto grid w-full max-w-md grid-cols-4 border-t border-slate-200 bg-white/95 px-1 py-2 shadow-2xl backdrop-blur-md">
+    <a href="home.html" class="flex flex-col items-center text-[11px] font-medium text-slate-500"><span class="text-lg">🏠</span>ഹോം</a>
+    <a href="tracker.html" class="flex flex-col items-center text-[11px] font-medium text-slate-500"><span class="text-lg">📖</span>ട്രാക്കർ</a>
+    <a href="history.html" class="flex flex-col items-center text-[11px] font-medium text-slate-500"><span class="text-lg">⏱</span>ഹിസ്റ്ററി</a>
+    <a href="profile.html" class="flex flex-col items-center text-[11px] font-medium text-emerald-600"><span class="text-lg">👤</span>പ്രൊഫൈൽ</a>
+  </nav>
+
+  <script>
+    const STORAGE_KEY = 'niskaram-tracker-entries';
+    const CLASS_KEY = 'niskaram-tracker-classes';
+
+    if (localStorage.getItem('niskaram-admin-auth') !== '1') {
+      location.href = 'login.html';
+    }
+
+    function getEntries() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+
+    function getClasses() {
+      return JSON.parse(localStorage.getItem(CLASS_KEY) || '["Class 1","Class 2"]');
+    }
+
+    function setClasses(classes) {
+      localStorage.setItem(CLASS_KEY, JSON.stringify(classes));
+    }
+
+    function renderClasses() {
+      const classes = getClasses();
+      document.getElementById('classList').innerHTML = classes.map((c) => `<li class="rounded-lg bg-slate-100 px-2 py-1">${c}</li>`).join('');
+    }
+
+    document.getElementById('addClassBtn').addEventListener('click', () => {
+      const classes = getClasses();
+      const next = `Class ${classes.length + 1}`;
+      classes.push(next);
+      setClasses(classes);
+      renderClasses();
+      alert(`${next} added`);
+    });
+
+    function renderStats() {
+      const entries = getEntries();
+      const students = new Set(entries.map((e) => e.name).filter(Boolean));
+      document.getElementById('totalStudents').textContent = String(students.size);
+      document.getElementById('totalRecords').textContent = String(entries.length);
+
+      const keys = ['subah', 'dhuhr', 'asr', 'maghrib', 'isha'];
+      const labels = ['സുബഹ്', 'ളുഹ്ർ', 'അസർ', 'മഗരിബ്', 'ഇഷാ'];
+      const statHtml = keys.map((k, i) => {
+        const count = entries.filter((e) => e.prayers && e.prayers[k]).length;
+        return `<li>${labels[i]}: <strong>${count}</strong></li>`;
+      }).join('');
+      document.getElementById('prayerStats').innerHTML = statHtml;
+
+      const history = entries.slice().reverse().map((e) => `
+        <div class="rounded-xl bg-slate-100 px-3 py-2">
+          <div><strong>${e.name}</strong> (${e.class})</div>
+          <div class="text-xs text-slate-600">${e.date} • ${e.points} pt</div>
+        </div>
+      `).join('');
+      document.getElementById('allHistory').innerHTML = history || '<p class="text-slate-600">No records yet.</p>';
+    }
+
+    renderClasses();
+    renderStats();
+  </script>
+</body>
+</html>

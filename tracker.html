@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ട്രാക്കർ | നിസ്കാരം ട്രാക്കർ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-indigo-50 pb-24 text-slate-800">
+  <main class="mx-auto w-full max-w-[420px] px-4 pt-4">
+    <header class="rounded-3xl border border-white/30 bg-white/70 p-4 shadow-xl backdrop-blur-md">
+      <h1 class="text-lg font-bold">📿 നമസ്കാരം രേഖപ്പെടുത്തുക</h1>
+      <p class="text-xs text-slate-600">Prayer entry for വിദ്യാർത്ഥികൾ</p>
+    </header>
+
+    <section class="mt-4 rounded-2xl border border-white/30 bg-white/70 p-4 shadow-lg backdrop-blur space-y-3">
+      <div>
+        <label class="mb-1 block text-sm font-medium">ക്ലാസ് തിരഞ്ഞെടുക്കുക</label>
+        <select id="classSelect" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm"></select>
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium">Student Name</label>
+        <input id="studentName" type="text" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm" placeholder="വിദ്യാർത്ഥിയുടെ പേര്" />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium">Date</label>
+        <input id="entryDate" type="date" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 text-sm">
+        <button data-prayer="subah" class="pray-btn rounded-xl border border-slate-300 bg-white px-3 py-2 text-left">☀️ സുബഹ്</button>
+        <button data-prayer="dhuhr" class="pray-btn rounded-xl border border-slate-300 bg-white px-3 py-2 text-left">🌞 ളുഹ്ർ</button>
+        <button data-prayer="asr" class="pray-btn rounded-xl border border-slate-300 bg-white px-3 py-2 text-left">⛅ അസർ</button>
+        <button data-prayer="maghrib" class="pray-btn rounded-xl border border-slate-300 bg-white px-3 py-2 text-left">🌇 മഗരിബ്</button>
+        <button data-prayer="isha" class="pray-btn col-span-2 rounded-xl border border-slate-300 bg-white px-3 py-2 text-left">🌙 ഇഷാ</button>
+      </div>
+
+      <div class="rounded-xl bg-emerald-50 px-3 py-2 text-sm">Total Points: <span id="pointsPreview" class="font-semibold">0</span></div>
+      <button id="saveBtn" class="w-full rounded-xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white">Save</button>
+    </section>
+  </main>
+
+  <nav class="fixed bottom-0 left-0 right-0 mx-auto grid w-full max-w-md grid-cols-4 border-t border-slate-200 bg-white/95 px-1 py-2 shadow-2xl backdrop-blur-md">
+    <a href="home.html" class="flex flex-col items-center text-[11px] font-medium text-slate-500"><span class="text-lg">🏠</span>ഹോം</a>
+    <a href="tracker.html" class="flex flex-col items-center text-[11px] font-medium text-emerald-600"><span class="text-lg">📖</span>ട്രാക്കർ</a>
+    <a href="history.html" class="flex flex-col items-center text-[11px] font-medium text-slate-500"><span class="text-lg">⏱</span>ഹിസ്റ്ററി</a>
+    <a href="profile.html" class="flex flex-col items-center text-[11px] font-medium text-slate-500"><span class="text-lg">👤</span>പ്രൊഫൈൽ</a>
+  </nav>
+
+  <script>
+    const STORAGE_KEY = 'niskaram-tracker-entries';
+    const CLASS_KEY = 'niskaram-tracker-classes';
+    const PRAYER_POINTS = 10;
+    const state = { subah: false, dhuhr: false, asr: false, maghrib: false, isha: false };
+
+    function getClasses() {
+      return JSON.parse(localStorage.getItem(CLASS_KEY) || '["Class 1","Class 2"]');
+    }
+
+    function getEntries() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    }
+
+    function setEntries(entries) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    const classSelect = document.getElementById('classSelect');
+    classSelect.innerHTML = getClasses().map((c) => `<option value="${c}">${c}</option>`).join('');
+
+    const pointsPreview = document.getElementById('pointsPreview');
+    const entryDate = document.getElementById('entryDate');
+    entryDate.value = new Date().toISOString().slice(0, 10);
+
+    function updatePoints() {
+      pointsPreview.textContent = Object.values(state).filter(Boolean).length * PRAYER_POINTS;
+    }
+
+    document.querySelectorAll('.pray-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.prayer;
+        state[key] = !state[key];
+        btn.classList.toggle('bg-emerald-500', state[key]);
+        btn.classList.toggle('text-white', state[key]);
+        btn.classList.toggle('border-emerald-500', state[key]);
+        updatePoints();
+      });
+    });
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      const name = document.getElementById('studentName').value.trim();
+      if (!name) {
+        alert('Student Name നൽകുക');
+        return;
+      }
+
+      const points = Object.values(state).filter(Boolean).length * PRAYER_POINTS;
+      const entry = {
+        name,
+        class: classSelect.value,
+        date: entryDate.value || new Date().toISOString().slice(0, 10),
+        prayers: { ...state },
+        points
+      };
+
+      const entries = getEntries();
+      entries.push(entry);
+      setEntries(entries);
+
+      document.getElementById('studentName').value = '';
+      Object.keys(state).forEach((key) => { state[key] = false; });
+      document.querySelectorAll('.pray-btn').forEach((btn) => {
+        btn.classList.remove('bg-emerald-500', 'text-white', 'border-emerald-500');
+      });
+      updatePoints();
+      alert('Saved വിജയകരമായി');
+    });
+  </script>
+</body>
+</html>

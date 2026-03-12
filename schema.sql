@@ -1,0 +1,44 @@
+-- SQL schema for നിസ്കാരം ട്രാക്കർ (Prayer Tracker)
+-- Compatible with typical cPanel MySQL/MariaDB
+
+CREATE TABLE IF NOT EXISTS classes (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  class_name VARCHAR(100) NOT NULL UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS students (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  class_id INT UNSIGNED NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_students_class FOREIGN KEY (class_id) REFERENCES classes(id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS prayer_records (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  student_id INT UNSIGNED NOT NULL,
+  prayer_date DATE NOT NULL,
+  subah TINYINT(1) NOT NULL DEFAULT 0,
+  dhuhr TINYINT(1) NOT NULL DEFAULT 0,
+  asr TINYINT(1) NOT NULL DEFAULT 0,
+  maghrib TINYINT(1) NOT NULL DEFAULT 0,
+  isha TINYINT(1) NOT NULL DEFAULT 0,
+  points INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_records_student FOREIGN KEY (student_id) REFERENCES students(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  UNIQUE KEY uniq_student_day (student_id, prayer_date)
+);
+
+-- Optional admin users table
+CREATE TABLE IF NOT EXISTS admins (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(80) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Sample defaults
+INSERT IGNORE INTO classes (class_name) VALUES ('Class 1'), ('Class 2');
