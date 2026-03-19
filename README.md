@@ -17,6 +17,15 @@ FluxStudio Suite is a cPanel-ready PHP 8+ SaaS starter that combines a universal
 - `database/` - MySQL schema
 - `scripts/` - maintenance utilities such as cleanup cron jobs
 
+## Included module pages
+
+- `public/converter.php` - working bulk conversion demo with smart recommendations, share links, and downloads
+- `public/image-editor.php` - image editor workspace page
+- `public/document-tools.php` - document tools page
+- `public/video-tools.php` - FFmpeg-ready video tools page
+- `public/seo-tools.php` - dedicated SEO toolkit page
+- `public/projects.php`, `public/downloads.php`, `public/admin.php`, `public/analytics.php` - saved projects, delivery, admin, and analytics areas
+
 ## Quick start
 
 1. Copy `app/config/env.example.php` to `app/config/.env.php`.

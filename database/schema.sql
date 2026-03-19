@@ -70,3 +70,42 @@ CREATE TABLE file_history (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_file_history_user_id (user_id)
 );
+
+CREATE TABLE share_links (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NULL,
+    conversion_id BIGINT UNSIGNED NULL,
+    share_token VARCHAR(100) NOT NULL UNIQUE,
+    expires_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_share_links_user_id (user_id)
+);
+
+CREATE TABLE subscriptions (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    plan_code VARCHAR(50) NOT NULL DEFAULT 'free',
+    status VARCHAR(40) NOT NULL DEFAULT 'active',
+    started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ends_at TIMESTAMP NULL,
+    INDEX idx_subscriptions_user_id (user_id)
+);
+
+CREATE TABLE analytics_events (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NULL,
+    event_name VARCHAR(120) NOT NULL,
+    payload_json JSON NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_analytics_events_user_id (user_id)
+);
+
+CREATE TABLE notification_queue (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NULL,
+    email_to VARCHAR(190) NOT NULL,
+    subject_line VARCHAR(190) NOT NULL,
+    body_text TEXT NOT NULL,
+    status VARCHAR(40) NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

@@ -199,8 +199,9 @@ $recentActivities = [
                         ['id' => 'projects', 'label' => 'Saved projects', 'icon' => '★'],
                         ['id' => 'downloads', 'label' => 'Download history', 'icon' => '↓'],
                     ] as $nav): ?>
-                        <button
-                            @click="activePanel = '<?= htmlspecialchars($nav['id']) ?>'"
+                        <a
+                            href="<?= htmlspecialchars(match ($nav['id']) { 'convert' => 'converter.php', 'image' => 'image-editor.php', 'docs' => 'document-tools.php', 'video' => 'video-tools.php', 'seo' => 'seo-tools.php', 'projects' => 'projects.php', 'downloads' => 'downloads.php', default => 'index.php#workspace', }) ?>"
+                            @mouseenter="activePanel = '<?= htmlspecialchars($nav['id']) ?>'"
                             :class="activePanel === '<?= htmlspecialchars($nav['id']) ?>' ? 'border-cyan-300/40 bg-cyan-400/10 text-white shadow-glow-soft' : 'border-white/10 bg-white/5 text-slate-200'"
                             class="flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition duration-200 hover:border-cyan-300/40 hover:bg-cyan-400/10 hover:text-white"
                         >
@@ -209,7 +210,7 @@ $recentActivities = [
                                 <span><?= htmlspecialchars($nav['label']) ?></span>
                             </span>
                             <span>→</span>
-                        </button>
+                        </a>
                     <?php endforeach; ?>
                 </div>
 
@@ -508,6 +509,8 @@ $recentActivities = [
             <p>© <?= date('Y') ?> FluxStudio Suite. Build once, deploy on cPanel, scale with APIs.</p>
             <div class="flex flex-wrap gap-4">
                 <a href="dashboard.php" class="hover:text-white">Dashboard</a>
+                <a href="admin.php" class="hover:text-white">Admin</a>
+                <a href="analytics.php" class="hover:text-white">Analytics</a>
                 <a href="install.php" class="hover:text-white">Install guide</a>
                 <a href="api/seo.php" class="hover:text-white">API sample</a>
             </div>
