@@ -241,7 +241,7 @@ $recentActivities = [
                         <div class="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-100">Supports images, PDFs, DOCX, videos, audio, batch jobs, and instant previews.</div>
                     </div>
 
-                    <div x-data="converterWidget()" data-converter-root class="mt-6 grid gap-6 xl:grid-cols-[1fr_0.9fr]">
+                    <div x-data="converterWidget()" x-init="init()" data-converter-root class="mt-6 grid gap-6 xl:grid-cols-[1fr_0.9fr]">
                         <div>
                             <label for="converter-files" class="upload-zone relative flex min-h-[16rem] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed border-white/15 bg-slate-900/60 p-6 text-center">
                                 <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]"></div>

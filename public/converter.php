@@ -10,7 +10,7 @@ $module = [
         ['icon' => '⌁', 'title' => 'QR download text', 'meta' => 'Expose share token text for QR integrations.'],
     ],
     'content' => <<<HTML
-        <div x-data="converterWidget()" data-converter-root>
+        <div x-data="converterWidget()" x-init="init()" data-converter-root>
             <div class="grid gap-4 md:grid-cols-3">
                 <select x-model="sourceType" data-converter-source class="input-surface">
                     <option value="auto">Auto detect</option>
