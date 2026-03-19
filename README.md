@@ -32,5 +32,6 @@ FluxStudio Suite is a cPanel-ready PHP 8+ SaaS starter that combines a universal
 2. Update database credentials and API keys.
 3. Import `database/schema.sql` into MySQL.
 4. Optional: import `database/seed_demo_user.sql` to add the demo login `123v213@gmail.com` with password `mhn1234` (stored hashed in the database).
-5. Point your domain/document root to `public/`.
-6. Run `php scripts/cleanup.php` via cron every 10 minutes.
+5. Optional: import `database/seed_dashboard_demo.sql` to preload dashboard conversions, SEO logs, subscriptions, and history records.
+6. Point your domain/document root to `public/`.
+7. Run `php scripts/cleanup.php` via cron every 10 minutes.

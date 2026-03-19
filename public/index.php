@@ -329,6 +329,7 @@ $recentActivities = [
                                 </div>
                             </template>
                             <div x-show="!files.length" class="rounded-2xl border border-dashed border-white/10 p-6 text-sm text-slate-400">Selected files will appear here with progress and previews.</div>
+                            <div id="conversion-results" class="rounded-3xl border border-white/10 bg-white/5 p-5 text-sm text-slate-300">Converted files, download links, and share links will appear here after you start a conversion.</div>
                         </div>
                     </div>
                 </section>
@@ -383,8 +384,13 @@ $recentActivities = [
         </section>
 
         <section id="modules" class="grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
-            <?php foreach ($toolCategories as $tool): ?>
-                <article class="glass-card group overflow-hidden p-5">
+            <?php foreach ([
+                'converter' => 'converter.php',
+                'image' => 'image-editor.php',
+                'seo' => 'seo-tools.php',
+                'account' => 'dashboard.php',
+            ] as $key => $link): $tool = $toolCategories[$key]; ?>
+                <a href="<?= htmlspecialchars($link) ?>" class="glass-card group block overflow-hidden p-5">
                     <div class="h-1 rounded-full bg-gradient-to-r <?= htmlspecialchars($tool['gradient']) ?>"></div>
                     <h3 class="mt-5 text-2xl font-bold text-white"><?= htmlspecialchars($tool['title']) ?></h3>
                     <p class="mt-3 text-sm leading-6 text-slate-300"><?= htmlspecialchars($tool['description']) ?></p>
@@ -394,7 +400,7 @@ $recentActivities = [
                         <?php endforeach; ?>
                     </ul>
                     <div class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-cyan-200 transition group-hover:gap-3">Open module <span>→</span></div>
-                </article>
+                </a>
             <?php endforeach; ?>
         </section>
 
