@@ -179,26 +179,46 @@ $recentActivities = [
             </div>
         </section>
 
-        <section id="workspace" class="grid gap-6 xl:grid-cols-[0.78fr_1.22fr]">
+        <section id="workspace" class="grid gap-6 xl:grid-cols-[0.78fr_1.22fr]" x-data="workspaceHub()">
             <aside class="glass-card p-5 lg:p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Dashboard</p>
                         <h2 class="mt-2 text-2xl font-bold">Unified workspace</h2>
                     </div>
-                    <span class="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200">PWA ready</span>
+                    <span class="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-100">PWA ready</span>
                 </div>
 
                 <div class="mt-6 space-y-3 text-sm">
-                    <?php foreach (['Quick convert', 'Image lab', 'Document center', 'Video tools', 'SEO cockpit', 'Saved projects', 'Download history'] as $nav): ?>
-                        <button class="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left text-slate-200 transition hover:border-cyan-300/40 hover:bg-cyan-400/10 hover:text-white">
-                            <span><?= htmlspecialchars($nav) ?></span>
+                    <?php foreach ([
+                        ['id' => 'convert', 'label' => 'Quick convert', 'icon' => '⇄'],
+                        ['id' => 'image', 'label' => 'Image lab', 'icon' => '✦'],
+                        ['id' => 'docs', 'label' => 'Document center', 'icon' => '▣'],
+                        ['id' => 'video', 'label' => 'Video tools', 'icon' => '▶'],
+                        ['id' => 'seo', 'label' => 'SEO cockpit', 'icon' => '⌁'],
+                        ['id' => 'projects', 'label' => 'Saved projects', 'icon' => '★'],
+                        ['id' => 'downloads', 'label' => 'Download history', 'icon' => '↓'],
+                    ] as $nav): ?>
+                        <button
+                            @click="activePanel = '<?= htmlspecialchars($nav['id']) ?>'"
+                            :class="activePanel === '<?= htmlspecialchars($nav['id']) ?>' ? 'border-cyan-300/40 bg-cyan-400/10 text-white shadow-glow-soft' : 'border-white/10 bg-white/5 text-slate-200'"
+                            class="flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition duration-200 hover:border-cyan-300/40 hover:bg-cyan-400/10 hover:text-white"
+                        >
+                            <span class="flex items-center gap-3">
+                                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-sm"><?= htmlspecialchars($nav['icon']) ?></span>
+                                <span><?= htmlspecialchars($nav['label']) ?></span>
+                            </span>
                             <span>→</span>
                         </button>
                     <?php endforeach; ?>
                 </div>
 
                 <div class="mt-6 rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 to-white/5 p-4">
+                    <div class="mb-4 rounded-2xl border border-white/10 bg-slate-950/50 p-4">
+                        <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Live status</p>
+                        <p class="mt-2 text-lg font-semibold text-white" x-text="panelMeta[activePanel].title"></p>
+                        <p class="mt-2 text-sm leading-6 text-slate-300" x-text="panelMeta[activePanel].description"></p>
+                    </div>
                     <p class="text-xs uppercase tracking-[0.3em] text-slate-400">Deployment</p>
                     <h3 class="mt-2 text-lg font-semibold">cPanel checklist</h3>
                     <ul class="mt-3 space-y-2 text-sm text-slate-300">
@@ -217,16 +237,25 @@ $recentActivities = [
                             <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Universal converter</p>
                             <h2 class="mt-2 text-2xl font-bold">Drag, drop, queue, and monitor conversions</h2>
                         </div>
-                        <div class="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-100">Supports images, PDFs, DOCX, videos, audio, and batch jobs.</div>
+                        <div class="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-100">Supports images, PDFs, DOCX, videos, audio, batch jobs, and instant previews.</div>
                     </div>
 
                     <div x-data="converterWidget()" class="mt-6 grid gap-6 xl:grid-cols-[1fr_0.9fr]">
                         <div>
-                            <label for="converter-files" class="upload-zone flex min-h-[16rem] cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed border-white/15 bg-slate-900/60 p-6 text-center">
+                            <label for="converter-files" class="upload-zone relative flex min-h-[16rem] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed border-white/15 bg-slate-900/60 p-6 text-center">
+                                <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]"></div>
                                 <input id="converter-files" type="file" class="hidden" multiple @change="loadFiles($event)">
                                 <div class="animate-float rounded-full bg-white/10 p-4 text-3xl">⬆</div>
                                 <h3 class="mt-4 text-xl font-semibold">Drop files anywhere here</h3>
                                 <p class="mt-2 max-w-md text-sm text-slate-400">Batch upload with type validation, secure sanitization, lazy preview generation, and timed cleanup.</p>
+                                <div class="mt-5 flex flex-wrap justify-center gap-2 text-xs text-slate-300">
+                                    <span class="chip">JPG</span>
+                                    <span class="chip">PNG</span>
+                                    <span class="chip">WEBP</span>
+                                    <span class="chip">PDF</span>
+                                    <span class="chip">MP4</span>
+                                    <span class="chip">MP3</span>
+                                </div>
                             </label>
                             <div class="mt-4 grid gap-3 md:grid-cols-3">
                                 <select x-model="sourceType" class="input-surface">
@@ -246,6 +275,20 @@ $recentActivities = [
                                 </select>
                                 <button @click="startMockConversion()" class="primary-button w-full">Start conversion</button>
                             </div>
+                            <div class="mt-4 grid gap-3 sm:grid-cols-3">
+                                <div class="metric-card">
+                                    <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Queue</p>
+                                    <p class="mt-2 text-2xl font-bold text-white" x-text="files.length"></p>
+                                </div>
+                                <div class="metric-card">
+                                    <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Preset</p>
+                                    <p class="mt-2 text-2xl font-bold text-white" x-text="sourceType === 'auto' ? 'Smart' : sourceType"></p>
+                                </div>
+                                <div class="metric-card">
+                                    <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Cleanup</p>
+                                    <p class="mt-2 text-2xl font-bold text-white">30m</p>
+                                </div>
+                            </div>
                         </div>
                         <div class="space-y-4">
                             <div class="rounded-3xl border border-white/10 bg-white/5 p-4">
@@ -257,8 +300,24 @@ $recentActivities = [
                                     <div class="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-400 to-fuchsia-400 transition-all duration-300" :style="`width:${progress}%`"></div>
                                 </div>
                             </div>
+                            <div class="rounded-3xl border border-white/10 bg-slate-900/60 p-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-semibold text-white">Smart preview</p>
+                                        <p class="mt-1 text-xs text-slate-400">Shows a sample queued item before real uploads.</p>
+                                    </div>
+                                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300" x-text="targetFormat.toUpperCase()">WEBP</span>
+                                </div>
+                                <div class="mt-4 flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+                                    <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400/20 to-fuchsia-400/20 text-2xl">🖼</div>
+                                    <div>
+                                        <p class="font-medium text-white" x-text="files[0]?.name ?? 'preview.jpg'"></p>
+                                        <p class="text-sm text-slate-400" x-text="files[0] ? Math.round(files[0].size / 1024) + ' KB' : '904 KB'"></p>
+                                    </div>
+                                </div>
+                            </div>
                             <template x-for="file in files" :key="file.name">
-                                <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-sm">
+                                <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-sm transition hover:-translate-y-0.5 hover:border-cyan-300/30">
                                     <div class="flex items-center justify-between gap-4">
                                         <div>
                                             <p class="font-medium text-white" x-text="file.name"></p>
@@ -282,8 +341,22 @@ $recentActivities = [
                         <span class="rounded-full bg-fuchsia-400/10 px-3 py-1 text-xs text-fuchsia-200">API ready</span>
                     </div>
                     <div class="mt-6 grid gap-4">
-                        <?php foreach (['Resize & compress', 'Crop / rotate / flip', 'Background remover', 'AI upscale', 'Watermark', 'Filters & blur', 'Thumbnail generator'] as $feature): ?>
-                            <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200"><?= htmlspecialchars($feature) ?></div>
+                        <?php foreach ([
+                            ['icon' => '◫', 'title' => 'Resize & compress', 'meta' => 'Responsive exports for web, social, and marketplace images'],
+                            ['icon' => '⤾', 'title' => 'Crop / rotate / flip', 'meta' => 'Precision framing with quick presets and freeform controls'],
+                            ['icon' => '✂', 'title' => 'Background remover', 'meta' => 'remove.bg / API-ready pipeline for product photography'],
+                            ['icon' => '⬈', 'title' => 'AI upscale', 'meta' => 'Sharpen low-res assets and prep thumbnails or banners'],
+                            ['icon' => '✎', 'title' => 'Watermark', 'meta' => 'Text/image watermark positioning with brand-safe spacing'],
+                            ['icon' => '◌', 'title' => 'Filters & blur', 'meta' => 'Brightness, contrast, saturation, blur, and visual styling'],
+                            ['icon' => '▥', 'title' => 'Thumbnail generator', 'meta' => 'Auto-create packs for YouTube, blog, and product grids'],
+                        ] as $feature): ?>
+                            <div class="feature-tile">
+                                <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-lg"><?= htmlspecialchars($feature['icon']) ?></div>
+                                <div>
+                                    <h3 class="font-semibold text-white"><?= htmlspecialchars($feature['title']) ?></h3>
+                                    <p class="mt-1 text-sm leading-6 text-slate-400"><?= htmlspecialchars($feature['meta']) ?></p>
+                                </div>
+                            </div>
                         <?php endforeach; ?>
                     </div>
                 </section>
@@ -298,9 +371,9 @@ $recentActivities = [
                     </div>
                     <form id="seo-form" class="mt-6 space-y-4">
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Csrf::token()) ?>">
-                        <input type="url" name="url" class="input-surface" placeholder="https://example.com">
-                        <input type="text" name="keyword" class="input-surface" placeholder="Target keyword">
-                        <textarea name="content" rows="4" class="input-surface" placeholder="Paste page content or product summary"></textarea>
+                        <input type="url" name="url" class="input-surface" placeholder="https://example.com" value="https://example.com">
+                        <input type="text" name="keyword" class="input-surface" placeholder="Target keyword" value="file converter">
+                        <textarea name="content" rows="4" class="input-surface" placeholder="Paste page content or product summary">Fast online file conversion, image optimization, SEO audits, PDF tools, and media workflows for marketers, agencies, and creators.</textarea>
                         <button type="submit" class="primary-button w-full">Generate SEO insights</button>
                     </form>
                     <div id="seo-results" class="mt-4 rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-sm text-slate-300">Results will render here via Fetch API.</div>
@@ -366,9 +439,25 @@ $recentActivities = [
             <div class="glass-card p-6">
                 <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Platform values</p>
                 <h2 class="mt-2 text-3xl font-bold">Built for scale</h2>
+                <p class="mt-3 text-slate-300">Every block is redesigned to look more premium and behave like a serious SaaS product on mobile, tablet, and desktop.</p>
                 <div class="mt-6 grid gap-4 sm:grid-cols-2">
-                    <?php foreach (['Secure uploads', 'Role-ready schema', 'Reusable services', 'Auto cleanup cron', 'PWA assets', 'API adapters', 'Dark mode', 'Responsive layout'] as $value): ?>
-                        <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200"><?= htmlspecialchars($value) ?></div>
+                    <?php foreach ([
+                        ['icon' => '⛨', 'title' => 'Secure uploads', 'meta' => 'Validation, sanitization, and safer file handling'],
+                        ['icon' => '⌘', 'title' => 'Role-ready schema', 'meta' => 'Prepared for plans, teams, and future access layers'],
+                        ['icon' => '⚙', 'title' => 'Reusable services', 'meta' => 'Modular PHP services with clean extension points'],
+                        ['icon' => '⟳', 'title' => 'Auto cleanup cron', 'meta' => 'Timed cleanup flow for temporary uploads'],
+                        ['icon' => '◍', 'title' => 'PWA assets', 'meta' => 'Manifest and service worker for app-like installability'],
+                        ['icon' => '⇆', 'title' => 'API adapters', 'meta' => 'Cloudinary, AI, Google, and remove.bg ready'],
+                        ['icon' => '☾', 'title' => 'Dark mode', 'meta' => 'Luxury glass UI with smooth hover states'],
+                        ['icon' => '▣', 'title' => 'Responsive layout', 'meta' => 'High-end layout that scales beautifully across devices'],
+                    ] as $value): ?>
+                        <div class="value-card">
+                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-lg"><?= htmlspecialchars($value['icon']) ?></div>
+                            <div>
+                                <h3 class="font-semibold text-white"><?= htmlspecialchars($value['title']) ?></h3>
+                                <p class="mt-1 text-sm leading-6 text-slate-400"><?= htmlspecialchars($value['meta']) ?></p>
+                            </div>
+                        </div>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -376,19 +465,23 @@ $recentActivities = [
 
         <section id="pricing" class="grid gap-6 lg:grid-cols-3">
             <?php foreach ([
-                ['name' => 'Starter', 'price' => '$0', 'features' => ['3 daily conversions', 'Basic image tools', 'SEO previews']],
-                ['name' => 'Pro', 'price' => '$19', 'features' => ['Unlimited jobs', 'Batch processing', 'Project save & history']],
-                ['name' => 'Agency', 'price' => '$79', 'features' => ['Team seats', 'White-label ready', 'API integrations & logs']],
+                ['name' => 'Starter', 'price' => '$0', 'tag' => 'For creators', 'cta' => 'Launch Starter', 'features' => ['3 daily conversions', 'Basic image tools', 'SEO previews', 'Single user workspace'], 'tone' => ''],
+                ['name' => 'Pro', 'price' => '$19', 'tag' => 'Most popular', 'cta' => 'Go Pro', 'features' => ['Unlimited jobs', 'Batch processing', 'Project save & history', 'Priority queue + exports'], 'tone' => 'ring-1 ring-cyan-300/40 pricing-card-featured'],
+                ['name' => 'Agency', 'price' => '$79', 'tag' => 'For teams', 'cta' => 'Choose Agency', 'features' => ['Team seats', 'White-label ready', 'API integrations & logs', 'Dedicated onboarding flow'], 'tone' => ''],
             ] as $plan): ?>
-                <div class="glass-card p-6 <?= $plan['name'] === 'Pro' ? 'ring-1 ring-cyan-300/40' : '' ?>">
-                    <p class="text-sm uppercase tracking-[0.3em] text-slate-400"><?= htmlspecialchars($plan['name']) ?></p>
+                <div class="glass-card pricing-card p-6 <?= htmlspecialchars($plan['tone']) ?>">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="text-sm uppercase tracking-[0.3em] text-slate-400"><?= htmlspecialchars($plan['name']) ?></p>
+                        <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-200"><?= htmlspecialchars($plan['tag']) ?></span>
+                    </div>
                     <p class="mt-4 text-5xl font-black"><?= htmlspecialchars($plan['price']) ?><span class="text-base font-medium text-slate-400">/mo</span></p>
+                    <p class="mt-3 text-sm leading-6 text-slate-300"><?= $plan['name'] === 'Starter' ? 'Perfect for testing the platform and validating your workflows.' : ($plan['name'] === 'Pro' ? 'Best balance of scale, speed, and premium workflow automation.' : 'For agencies managing multiple brands, clients, and integrations.') ?></p>
                     <ul class="mt-6 space-y-3 text-sm text-slate-300">
                         <?php foreach ($plan['features'] as $feature): ?>
-                            <li>• <?= htmlspecialchars($feature) ?></li>
+                            <li class="flex items-center gap-3"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/15 text-emerald-200">✓</span> <span><?= htmlspecialchars($feature) ?></span></li>
                         <?php endforeach; ?>
                     </ul>
-                    <button class="primary-button mt-6 w-full">Choose <?= htmlspecialchars($plan['name']) ?></button>
+                    <button class="<?= $plan['name'] === 'Starter' ? 'glass-button border border-white/10' : 'primary-button' ?> mt-6 w-full"><?= htmlspecialchars($plan['cta']) ?></button>
                 </div>
             <?php endforeach; ?>
         </section>

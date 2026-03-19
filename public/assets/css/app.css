@@ -58,3 +58,52 @@ body {
     background: rgba(8, 47, 73, 0.36);
     transform: translateY(-2px);
 }
+.chip {
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    border-radius: 999px;
+    padding: 0.4rem 0.8rem;
+}
+.metric-card,
+.feature-tile,
+.value-card,
+.pricing-card {
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.05);
+    border-radius: 1.4rem;
+}
+.metric-card {
+    padding: 1rem;
+}
+.feature-tile,
+.value-card {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+.feature-tile:hover,
+.value-card:hover,
+.pricing-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(103,232,249,0.32);
+    background: rgba(15,23,42,0.78);
+}
+.pricing-card {
+    position: relative;
+    overflow: hidden;
+}
+.pricing-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(34,211,238,0.7), rgba(168,85,247,0.7), rgba(74,222,128,0.7));
+}
+.pricing-card-featured {
+    background: linear-gradient(180deg, rgba(8,47,73,0.55), rgba(88,28,135,0.28));
+}
+.shadow-glow-soft {
+    box-shadow: 0 15px 40px rgba(34, 211, 238, 0.18);
+}

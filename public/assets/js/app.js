@@ -7,12 +7,27 @@ function appState() {
   };
 }
 
+function workspaceHub() {
+  return {
+    activePanel: 'convert',
+    panelMeta: {
+      convert: { title: 'Quick convert', description: 'Batch-ready conversion queue for images, PDFs, video, and audio files.' },
+      image: { title: 'Image lab', description: 'Resize, compress, crop, remove backgrounds, and watermark branded visuals.' },
+      docs: { title: 'Document center', description: 'Merge, split, compress, and export office and PDF documents.' },
+      video: { title: 'Video tools', description: 'Prepare thumbnails, compress media, and extract audio with FFmpeg-ready flows.' },
+      seo: { title: 'SEO cockpit', description: 'Generate metadata, analyze keyword usage, and prepare sitemap + robots outputs.' },
+      projects: { title: 'Saved projects', description: 'Store repeat workflows and resume production work faster.' },
+      downloads: { title: 'Download history', description: 'Track exports, delivery dates, and project output history.' }
+    }
+  };
+}
+
 function converterWidget() {
   return {
-    files: [],
+    files: [{ name: 'preview.jpg', size: 925696 }],
     sourceType: 'auto',
     targetFormat: 'webp',
-    progress: 0,
+    progress: 64,
     loadFiles(event) {
       this.files = [...event.target.files];
       this.progress = 0;
@@ -50,14 +65,14 @@ async function submitSeoForm(event) {
 
   const data = payload.data;
   results.innerHTML = `
-    <div class="space-y-3">
-      <div><strong>SEO Score:</strong> ${data.score}/100</div>
-      <div><strong>Meta Description:</strong> ${data.metaDescription}</div>
-      <div><strong>Robots.txt:</strong> <pre class="mt-2 whitespace-pre-wrap rounded-xl bg-slate-950/80 p-3">${data.robots}</pre></div>
-      <div><strong>Sitemap Hints:</strong> ${data.sitemap.join(', ')}</div>
-      <div><strong>Keyword Density:</strong> ${data.keywordDensity}%</div>
-      <div><strong>Internal Links:</strong> ${data.internalLinks}</div>
-      <div><strong>AI Blog Outline:</strong> ${data.blogOutline.join(' • ')}</div>
+    <div class="grid gap-3 md:grid-cols-2">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4"><strong>SEO Score:</strong><div class="mt-2 text-2xl font-bold text-white">${data.score}/100</div></div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4"><strong>Keyword Density:</strong><div class="mt-2 text-2xl font-bold text-white">${data.keywordDensity}%</div></div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4 md:col-span-2"><strong>Meta Description:</strong><div class="mt-2 text-slate-300">${data.metaDescription}</div></div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4 md:col-span-2"><strong>Robots.txt:</strong><pre class="mt-2 whitespace-pre-wrap rounded-xl bg-slate-950/80 p-3">${data.robots}</pre></div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4 md:col-span-2"><strong>Sitemap Hints:</strong><div class="mt-2 text-slate-300">${data.sitemap.join(', ')}</div></div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4"><strong>Internal Links:</strong><div class="mt-2 text-white">${data.internalLinks}</div></div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4"><strong>AI Blog Outline:</strong><div class="mt-2 text-slate-300">${data.blogOutline.join(' • ')}</div></div>
     </div>`;
 }
 
