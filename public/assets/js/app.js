@@ -22,6 +22,129 @@ function workspaceHub() {
   };
 }
 
+function renderConverterDom(root, state) {
+  const queueCount = root.querySelector('[data-converter-queue-count]');
+  const preset = root.querySelector('[data-converter-preset]');
+  const progressLabel = root.querySelector('[data-converter-progress-label]');
+  const progressBar = root.querySelector('[data-converter-progress-bar]');
+  const previewName = root.querySelector('[data-converter-preview-name]');
+  const previewSize = root.querySelector('[data-converter-preview-size]');
+  const previewFormat = root.querySelector('[data-converter-preview-format]');
+  const fileList = root.querySelector('[data-converter-file-list]');
+  const source = root.querySelector('[data-converter-source]');
+  const target = root.querySelector('[data-converter-target]');
+
+  if (queueCount) queueCount.textContent = String(state.files.length);
+  if (preset && source) preset.textContent = source.value === 'auto' ? 'Smart' : source.value;
+  if (progressLabel) progressLabel.textContent = `${state.progress}%`;
+  if (progressBar) progressBar.style.width = `${state.progress}%`;
+  if (previewFormat && target) previewFormat.textContent = target.value.toUpperCase();
+
+  const firstFile = state.files[0] || { name: 'preview.jpg', size: 925696 };
+  if (previewName) previewName.textContent = firstFile.name;
+  if (previewSize) previewSize.textContent = `${Math.round(firstFile.size / 1024)} KB`;
+
+  if (fileList) {
+    fileList.innerHTML = state.files.map((file) => `
+      <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-sm transition hover:-translate-y-0.5 hover:border-cyan-300/30">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <p class="font-medium text-white">${file.name}</p>
+            <p class="text-slate-400">${Math.round(file.size / 1024)} KB</p>
+          </div>
+          <span class="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-300">${target ? target.value.toUpperCase() : 'WEBP'}</span>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function bindConverterRoots() {
+  document.querySelectorAll('[data-converter-root]').forEach((root) => {
+    const input = root.querySelector('[data-converter-input]');
+    const trigger = root.querySelector('[data-converter-trigger]');
+    const source = root.querySelector('[data-converter-source]');
+    const target = root.querySelector('[data-converter-target]');
+    const resultBox = root.querySelector('[data-converter-results]');
+
+    const state = {
+      files: [{ name: 'preview.jpg', size: 925696 }],
+      progress: 64
+    };
+
+    renderConverterDom(root, state);
+
+    input?.addEventListener('change', (event) => {
+      state.files = [...event.target.files];
+      state.progress = 0;
+      renderConverterDom(root, state);
+    });
+
+    source?.addEventListener('change', () => renderConverterDom(root, state));
+    target?.addEventListener('change', () => renderConverterDom(root, state));
+
+    trigger?.addEventListener('click', async () => {
+      const formData = new FormData();
+      formData.append('source_type', source?.value || 'auto');
+      formData.append('target_format', target?.value || 'webp');
+
+      if (state.files.length && state.files[0] instanceof File) {
+        state.files.forEach((file) => formData.append('files[]', file));
+      } else {
+        formData.append('demo_names', state.files.map((file) => file.name).join(','));
+      }
+
+      if (resultBox) resultBox.textContent = 'Preparing conversion queue, smart recommendation, and share links...';
+      state.progress = 10;
+      renderConverterDom(root, state);
+      const timer = setInterval(() => {
+        if (state.progress < 88) {
+          state.progress += 11;
+          renderConverterDom(root, state);
+        }
+      }, 180);
+
+      try {
+        const response = await fetch('api/conversion.php', { method: 'POST', body: formData });
+        const payload = await response.json();
+        clearInterval(timer);
+        state.progress = response.ok ? 100 : 0;
+        renderConverterDom(root, state);
+
+        if (!response.ok) {
+          if (resultBox) resultBox.textContent = payload.error || 'Conversion failed.';
+          return;
+        }
+
+        const data = payload.data;
+        if (resultBox) {
+          resultBox.innerHTML = `
+            <div class="space-y-4">
+              <div class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4 text-sm text-cyan-100">${data.recommendation}</div>
+              ${data.results.map((item) => `
+                <div class="rounded-3xl border border-white/10 bg-white/5 p-4">
+                  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                      <p class="text-lg font-semibold text-white">${item.name}</p>
+                      <p class="mt-1 text-sm text-slate-400">${item.preview}</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                      <a class="glass-button" href="${item.share_url}">Share link</a>
+                      <a class="primary-button" href="${item.download_url}">Download ${item.target_format}</a>
+                    </div>
+                  </div>
+                </div>`).join('')}
+            </div>`;
+        }
+      } catch (error) {
+        clearInterval(timer);
+        state.progress = 0;
+        renderConverterDom(root, state);
+        if (resultBox) resultBox.textContent = 'Conversion request failed. Please try again.';
+      }
+    });
+  });
+}
+
 function converterWidget() {
   return {
     files: [{ name: 'preview.jpg', size: 925696 }],
@@ -142,6 +265,7 @@ async function submitSeoForm(event) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  bindConverterRoots();
   const seoForm = document.getElementById('seo-form');
   if (seoForm) {
     seoForm.addEventListener('submit', submitSeoForm);

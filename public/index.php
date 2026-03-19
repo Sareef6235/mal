@@ -241,11 +241,11 @@ $recentActivities = [
                         <div class="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm text-cyan-100">Supports images, PDFs, DOCX, videos, audio, batch jobs, and instant previews.</div>
                     </div>
 
-                    <div x-data="converterWidget()" class="mt-6 grid gap-6 xl:grid-cols-[1fr_0.9fr]">
+                    <div x-data="converterWidget()" data-converter-root class="mt-6 grid gap-6 xl:grid-cols-[1fr_0.9fr]">
                         <div>
                             <label for="converter-files" class="upload-zone relative flex min-h-[16rem] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed border-white/15 bg-slate-900/60 p-6 text-center">
                                 <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.12),transparent_55%)]"></div>
-                                <input id="converter-files" type="file" class="hidden" multiple @change="loadFiles($event)">
+                                <input id="converter-files" data-converter-input type="file" class="hidden" multiple>
                                 <div class="animate-float rounded-full bg-white/10 p-4 text-3xl">⬆</div>
                                 <h3 class="mt-4 text-xl font-semibold">Drop files anywhere here</h3>
                                 <p class="mt-2 max-w-md text-sm text-slate-400">Batch upload with type validation, secure sanitization, lazy preview generation, and timed cleanup.</p>
@@ -259,14 +259,14 @@ $recentActivities = [
                                 </div>
                             </label>
                             <div class="mt-4 grid gap-3 md:grid-cols-3">
-                                <select x-model="sourceType" class="input-surface">
+                                <select x-model="sourceType" data-converter-source class="input-surface">
                                     <option value="auto">Auto detect</option>
                                     <option value="image">Image</option>
                                     <option value="document">Document</option>
                                     <option value="video">Video</option>
                                     <option value="audio">Audio</option>
                                 </select>
-                                <select x-model="targetFormat" class="input-surface">
+                                <select x-model="targetFormat" data-converter-target class="input-surface">
                                     <option value="webp">WEBP</option>
                                     <option value="png">PNG</option>
                                     <option value="jpg">JPG</option>
@@ -274,16 +274,16 @@ $recentActivities = [
                                     <option value="mp3">MP3</option>
                                     <option value="mp4">MP4</option>
                                 </select>
-                                <button @click="startMockConversion()" class="primary-button w-full">Start conversion</button>
+                                <button type="button" data-converter-trigger class="primary-button w-full">Start conversion</button>
                             </div>
                             <div class="mt-4 grid gap-3 sm:grid-cols-3">
                                 <div class="metric-card">
                                     <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Queue</p>
-                                    <p class="mt-2 text-2xl font-bold text-white" x-text="files.length"></p>
+                                    <p class="mt-2 text-2xl font-bold text-white" data-converter-queue-count x-text="files.length"></p>
                                 </div>
                                 <div class="metric-card">
                                     <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Preset</p>
-                                    <p class="mt-2 text-2xl font-bold text-white" x-text="sourceType === 'auto' ? 'Smart' : sourceType"></p>
+                                    <p class="mt-2 text-2xl font-bold text-white" data-converter-preset x-text="sourceType === 'auto' ? 'Smart' : sourceType"></p>
                                 </div>
                                 <div class="metric-card">
                                     <p class="text-xs uppercase tracking-[0.25em] text-slate-400">Cleanup</p>
@@ -295,10 +295,10 @@ $recentActivities = [
                             <div class="rounded-3xl border border-white/10 bg-white/5 p-4">
                                 <div class="flex items-center justify-between text-sm">
                                     <span class="text-slate-300">Queue status</span>
-                                    <span class="text-cyan-200" x-text="progress + '%'">0%</span>
+                                    <span class="text-cyan-200" data-converter-progress-label x-text="progress + '%'">0%</span>
                                 </div>
                                 <div class="mt-3 h-3 overflow-hidden rounded-full bg-slate-800">
-                                    <div class="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-400 to-fuchsia-400 transition-all duration-300" :style="`width:${progress}%`"></div>
+                                    <div data-converter-progress-bar class="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-400 to-fuchsia-400 transition-all duration-300" :style="`width:${progress}%`"></div>
                                 </div>
                             </div>
                             <div class="rounded-3xl border border-white/10 bg-slate-900/60 p-4">
@@ -307,29 +307,19 @@ $recentActivities = [
                                         <p class="text-sm font-semibold text-white">Smart preview</p>
                                         <p class="mt-1 text-xs text-slate-400">Shows a sample queued item before real uploads.</p>
                                     </div>
-                                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300" x-text="targetFormat.toUpperCase()">WEBP</span>
+                                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300" data-converter-preview-format x-text="targetFormat.toUpperCase()">WEBP</span>
                                 </div>
                                 <div class="mt-4 flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
                                     <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400/20 to-fuchsia-400/20 text-2xl">🖼</div>
                                     <div>
-                                        <p class="font-medium text-white" x-text="files[0]?.name ?? 'preview.jpg'"></p>
-                                        <p class="text-sm text-slate-400" x-text="files[0] ? Math.round(files[0].size / 1024) + ' KB' : '904 KB'"></p>
+                                        <p class="font-medium text-white" data-converter-preview-name x-text="files[0]?.name ?? 'preview.jpg'"></p>
+                                        <p class="text-sm text-slate-400" data-converter-preview-size x-text="files[0] ? Math.round(files[0].size / 1024) + ' KB' : '904 KB'"></p>
                                     </div>
                                 </div>
                             </div>
-                            <template x-for="file in files" :key="file.name">
-                                <div class="rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-sm transition hover:-translate-y-0.5 hover:border-cyan-300/30">
-                                    <div class="flex items-center justify-between gap-4">
-                                        <div>
-                                            <p class="font-medium text-white" x-text="file.name"></p>
-                                            <p class="text-slate-400" x-text="Math.round(file.size / 1024) + ' KB'"></p>
-                                        </div>
-                                        <span class="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-300" x-text="targetFormat.toUpperCase()"></span>
-                                    </div>
-                                </div>
-                            </template>
+                            <div data-converter-file-list class="space-y-3"></div>
                             <div x-show="!files.length" class="rounded-2xl border border-dashed border-white/10 p-6 text-sm text-slate-400">Selected files will appear here with progress and previews.</div>
-                            <div id="conversion-results" class="rounded-3xl border border-white/10 bg-white/5 p-5 text-sm text-slate-300">Converted files, download links, and share links will appear here after you start a conversion.</div>
+                            <div data-converter-results class="rounded-3xl border border-white/10 bg-white/5 p-5 text-sm text-slate-300">Converted files, download links, and share links will appear here after you start a conversion.</div>
                         </div>
                     </div>
                 </section>
