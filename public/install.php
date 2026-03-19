@@ -16,9 +16,10 @@
                 <li>1. Upload the repository contents so the <code>public/</code> files live inside <code>public_html/</code>.</li>
                 <li>2. Copy <code>app/config/env.example.php</code> to <code>app/config/.env.php</code> and update database/API credentials.</li>
                 <li>3. Import <code>database/schema.sql</code> in phpMyAdmin.</li>
-                <li>4. Ensure PHP 8.1+ is active and extensions for PDO, GD/Imagick, ZipArchive, and optionally FFmpeg are installed.</li>
-                <li>5. Configure a cron job: <code>php /home/USER/public_html/scripts/cleanup.php</code> every 10 minutes.</li>
-                <li>6. Enable HTTPS and verify that <code>manifest.json</code> and <code>service-worker.js</code> are publicly accessible.</li>
+                <li>4. Import <code>database/seed_demo_user.sql</code> if you want the demo login <code>123v213@gmail.com</code> / <code>mhn1234</code>.</li>
+                <li>5. Ensure PHP 8.1+ is active and extensions for PDO, GD/Imagick, ZipArchive, and optionally FFmpeg are installed.</li>
+                <li>6. Configure a cron job: <code>php /home/USER/public_html/scripts/cleanup.php</code> every 10 minutes.</li>
+                <li>7. Enable HTTPS and verify that <code>manifest.json</code> and <code>service-worker.js</code> are publicly accessible.</li>
             </ol>
         </div>
     </main>

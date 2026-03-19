@@ -2,6 +2,7 @@
 namespace App\Helpers;
 
 use App\Services\Database;
+use PDOException;
 use PDO;
 use RuntimeException;
 
@@ -27,13 +28,21 @@ class Auth
         }
 
         $pdo = Database::connection();
-        $statement = $pdo->prepare('INSERT INTO users (name, email, password_hash, plan, created_at) VALUES (:name, :email, :password_hash, :plan, NOW())');
-        $statement->execute([
-            ':name' => $name,
-            ':email' => strtolower($email),
-            ':password_hash' => password_hash($password, PASSWORD_DEFAULT),
-            ':plan' => 'starter',
-        ]);
+        try {
+            $statement = $pdo->prepare('INSERT INTO users (name, email, password_hash, plan, created_at) VALUES (:name, :email, :password_hash, :plan, NOW())');
+            $statement->execute([
+                ':name' => $name,
+                ':email' => strtolower($email),
+                ':password_hash' => password_hash($password, PASSWORD_DEFAULT),
+                ':plan' => 'starter',
+            ]);
+        } catch (PDOException $exception) {
+            if ((string) $exception->getCode() === '23000') {
+                throw new RuntimeException('This email address is already registered.');
+            }
+
+            throw $exception;
+        }
 
         $_SESSION['user'] = [
             'id' => (int) $pdo->lastInsertId(),

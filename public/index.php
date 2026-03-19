@@ -324,19 +324,44 @@ $recentActivities = [
             <?php endforeach; ?>
         </section>
 
-        <section id="auth" class="grid gap-6 lg:grid-cols-2">
+        <section id="auth" class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             <div class="glass-card p-6">
                 <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Authentication</p>
                 <h2 class="mt-2 text-3xl font-bold">Secure user system</h2>
-                <p class="mt-3 text-slate-300">Starter login/register flows, session management hooks, project history, and audit-ready tables are included.</p>
-                <form class="mt-6 space-y-4" method="post" action="auth.php">
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Csrf::token()) ?>">
-                    <input type="hidden" name="action" value="register">
-                    <input name="name" class="input-surface" placeholder="Full name" required>
-                    <input name="email" type="email" class="input-surface" placeholder="Email address" required>
-                    <input name="password" type="password" class="input-surface" placeholder="Create password" required>
-                    <button class="primary-button w-full">Create account</button>
-                </form>
+                <p class="mt-3 text-slate-300">Login and registration are now split into separate cards so you can sign in immediately using the seeded demo account or create a new user.</p>
+                <div class="mt-6 grid gap-6 lg:grid-cols-2">
+                    <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-semibold text-white">Login</h3>
+                            <span class="rounded-full bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200">Ready now</span>
+                        </div>
+                        <form class="mt-4 space-y-4" method="post" action="auth.php">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Csrf::token()) ?>">
+                            <input type="hidden" name="action" value="login">
+                            <input name="email" type="email" class="input-surface" placeholder="Email address" value="123v213@gmail.com" required>
+                            <input name="password" type="password" class="input-surface" placeholder="Password" value="mhn1234" required>
+                            <button class="primary-button w-full">Login now</button>
+                        </form>
+                        <div class="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-xs text-emerald-100">
+                            Seeded demo login: <strong>123v213@gmail.com</strong> / <strong>mhn1234</strong>
+                        </div>
+                    </div>
+
+                    <div class="rounded-3xl border border-white/10 bg-white/5 p-5">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-semibold text-white">Register</h3>
+                            <span class="rounded-full bg-fuchsia-400/10 px-3 py-1 text-xs text-fuchsia-200">New users</span>
+                        </div>
+                        <form class="mt-4 space-y-4" method="post" action="auth.php">
+                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(Csrf::token()) ?>">
+                            <input type="hidden" name="action" value="register">
+                            <input name="name" class="input-surface" placeholder="Full name" required>
+                            <input name="email" type="email" class="input-surface" placeholder="Email address" required>
+                            <input name="password" type="password" class="input-surface" placeholder="Create password" required>
+                            <button class="glass-button w-full border border-white/10">Create account</button>
+                        </form>
+                    </div>
+                </div>
             </div>
             <div class="glass-card p-6">
                 <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Platform values</p>
