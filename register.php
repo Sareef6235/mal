@@ -33,5 +33,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $flash = getFlash();
+renderHead('Register', 'Create a customer account for premium ticket support and chat access.');
 ?>
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Register</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/assets/style.css"></head><body><div class="auth-shell"><div class="auth-card card"><?php if ($flash): ?><div class="flash <?= e($flash['type']) ?>"><?= e($flash['message']) ?></div><?php endif; ?><span class="eyebrow">Create customer account</span><h1>Start secure messaging</h1><form class="stack-form" method="post"><input name="name" placeholder="Full Name" required><input name="email" type="email" placeholder="Email Address" required><input name="phone" placeholder="WhatsApp Number"><input name="password" type="password" placeholder="Password" required><button class="primary-btn" type="submit">Create Account</button></form><p class="muted">Already have an account? <a href="/login.php">Login</a></p></div></div></body></html>
+<body>
+<div class="page-shell auth-page">
+    <div class="ambient ambient-b"></div>
+    <div class="ambient ambient-c"></div>
+    <header class="topbar glass compact-topbar" aria-label="Registration header">
+        <div class="brand">
+            <div class="brand-mark">PS</div>
+            <div>
+                <strong>Premium Support Desk</strong>
+                <p>Modern account creation for premium support access</p>
+            </div>
+        </div>
+        <nav class="menu" aria-label="Registration navigation">
+            <a href="/">Home</a>
+            <a href="/login.php">Login</a>
+        </nav>
+    </header>
+
+    <main class="auth-shell auth-grid">
+        <section class="auth-hero card">
+            <span class="eyebrow">Create account</span>
+            <h1>Start secure messaging with a premium support experience</h1>
+            <p class="lead">Create your customer profile to submit tickets, track updates, and continue conversation history in a clean chat UI.</p>
+            <div class="feature-list compact-list">
+                <div class="feature-list-item">Order linked messaging</div>
+                <div class="feature-list-item">Mobile-first support workspace</div>
+                <div class="feature-list-item">Email and WhatsApp ready workflow</div>
+            </div>
+        </section>
+
+        <section class="auth-card card" aria-labelledby="register-title">
+            <?php if ($flash): ?><div class="flash <?= e($flash['type']) ?>"><?= e($flash['message']) ?></div><?php endif; ?>
+            <span class="eyebrow">Customer registration</span>
+            <h2 id="register-title">Create your account</h2>
+            <form class="stack-form" method="post" aria-label="Registration form">
+                <label class="field-label">Full Name
+                    <input name="name" placeholder="Full Name" required aria-label="Full name">
+                </label>
+                <label class="field-label">Email Address
+                    <input name="email" type="email" placeholder="Email Address" required aria-label="Email address">
+                </label>
+                <label class="field-label">WhatsApp Number
+                    <input name="phone" placeholder="WhatsApp Number" aria-label="WhatsApp number">
+                </label>
+                <label class="field-label">Password
+                    <input name="password" type="password" placeholder="Password" required aria-label="Password">
+                </label>
+                <button class="primary-btn" type="submit">Create Account</button>
+            </form>
+            <p class="muted">Already registered? <a href="/login.php">Login now</a></p>
+        </section>
+    </main>
+
+    <?php renderFooter(); ?>
+</div>
+</body>
+</html>

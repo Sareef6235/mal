@@ -34,5 +34,102 @@ $flash = getFlash();
 $notifications = db()->prepare('SELECT * FROM notifications WHERE ticket_id = :ticket_id ORDER BY created_at DESC LIMIT 8');
 $notifications->execute(['ticket_id' => $ticketId]);
 $notificationRows = $notifications->fetchAll();
+renderHead(e($ticket['subject']), 'WhatsApp-style support ticket conversation with replies, notifications, and status management.');
 ?>
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title><?= e($ticket['subject']) ?></title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/assets/style.css"></head><body><div class="chat-layout"><aside class="chat-sidebar card"><a href="<?= $user['role'] === 'admin' ? '/admin.php' : '/dashboard.php' ?>" class="secondary-btn">← Back</a><div class="ticket-meta"><h2><?= e($ticket['subject']) ?></h2><p><?= e($ticket['ticket_code']) ?></p><span class="badge <?= strtolower($ticket['status']) ?>"><?= e($ticket['status']) ?></span></div><div class="meta-list"><div><strong>Customer</strong><span><?= e($ticket['name']) ?></span></div><div><strong>Email</strong><span><?= e($ticket['email']) ?></span></div><div><strong>Order</strong><span><?= e((string) $ticket['order_reference']) ?></span></div><div><strong>Priority</strong><span><?= e($ticket['priority']) ?></span></div></div><h3>Recent notifications</h3><div class="notification-list"><?php foreach ($notificationRows as $row): ?><div class="notify-item"><strong><?= e(strtoupper($row['type'])) ?></strong><span><?= e($row['status']) ?></span><small><?= e($row['response_text'] ?: 'No response') ?></small></div><?php endforeach; ?><?php if (!$notificationRows): ?><p class="muted">No notifications logged yet.</p><?php endif; ?></div></aside><main class="chat-panel card"><?php if ($flash): ?><div class="flash <?= e($flash['type']) ?>"><?= e($flash['message']) ?></div><?php endif; ?><div class="chat-header"><div><span class="eyebrow">WhatsApp-style chat UI</span><h1><?= e($ticket['subject']) ?></h1></div><?php if ($user['role'] === 'admin'): ?><form method="post" class="status-form"><input type="hidden" name="message" value="Status updated by admin."><select name="status"><option<?= $ticket['status'] === 'Open' ? ' selected' : '' ?>>Open</option><option<?= $ticket['status'] === 'Pending' ? ' selected' : '' ?>>Pending</option><option<?= $ticket['status'] === 'Resolved' ? ' selected' : '' ?>>Resolved</option><option<?= $ticket['status'] === 'Closed' ? ' selected' : '' ?>>Closed</option></select><button class="secondary-btn" type="submit">Update</button></form><?php endif; ?></div><div class="chat-stream"><?php foreach ($ticket['messages'] as $message): ?><div class="msg <?= $message['role'] === 'admin' ? 'agent' : 'customer' ?>"><div class="msg-head"><strong><?= e($message['name']) ?></strong><span><?= e($message['created_at']) ?></span></div><p><?= nl2br(e($message['message'])) ?></p><small><?= e($message['channel']) ?></small></div><?php endforeach; ?></div><form method="post" class="composer"><textarea name="message" rows="3" placeholder="Type your message..." required></textarea><?php if ($user['role'] === 'admin'): ?><select name="status"><option<?= $ticket['status'] === 'Open' ? ' selected' : '' ?>>Open</option><option<?= $ticket['status'] === 'Pending' ? ' selected' : '' ?>>Pending</option><option<?= $ticket['status'] === 'Resolved' ? ' selected' : '' ?>>Resolved</option><option<?= $ticket['status'] === 'Closed' ? ' selected' : '' ?>>Closed</option></select><?php endif; ?><button class="primary-btn" type="submit">Send Reply</button></form></main></div></body></html>
+<body>
+<div class="page-shell app-page">
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-c"></div>
+    <header class="topbar glass" aria-label="Ticket header">
+        <div class="brand">
+            <div class="brand-mark"><?= $user['role'] === 'admin' ? 'AD' : 'PS' ?></div>
+            <div>
+                <strong><?= $user['role'] === 'admin' ? 'Admin Ticket View' : 'Customer Ticket View' ?></strong>
+                <p><?= e($ticket['ticket_code']) ?> · <?= e($ticket['subject']) ?></p>
+            </div>
+        </div>
+        <nav class="menu" aria-label="Ticket navigation">
+            <a href="<?= $user['role'] === 'admin' ? '/admin.php' : '/dashboard.php' ?>">Back</a>
+            <a href="/logout.php">Logout</a>
+        </nav>
+    </header>
+
+    <main class="chat-layout">
+        <aside class="chat-sidebar card" aria-label="Ticket details sidebar">
+            <a href="<?= $user['role'] === 'admin' ? '/admin.php' : '/dashboard.php' ?>" class="secondary-btn">← Back</a>
+            <div class="ticket-meta">
+                <h1><?= e($ticket['subject']) ?></h1>
+                <p><?= e($ticket['ticket_code']) ?></p>
+                <span class="badge <?= strtolower($ticket['status']) ?>"><?= e($ticket['status']) ?></span>
+            </div>
+            <div class="meta-list">
+                <div><strong>Customer</strong><span><?= e($ticket['name']) ?></span></div>
+                <div><strong>Email</strong><span><?= e($ticket['email']) ?></span></div>
+                <div><strong>Order</strong><span><?= e((string) $ticket['order_reference']) ?></span></div>
+                <div><strong>Priority</strong><span><?= e($ticket['priority']) ?></span></div>
+            </div>
+            <h2>Recent notifications</h2>
+            <div class="notification-list">
+                <?php foreach ($notificationRows as $row): ?>
+                    <article class="notify-item">
+                        <strong><?= e(strtoupper($row['type'])) ?></strong>
+                        <span><?= e($row['status']) ?></span>
+                        <small><?= e($row['response_text'] ?: 'No response') ?></small>
+                    </article>
+                <?php endforeach; ?>
+                <?php if (!$notificationRows): ?><p class="muted">No notifications logged yet.</p><?php endif; ?>
+            </div>
+        </aside>
+
+        <section class="chat-panel card" aria-labelledby="chat-title">
+            <?php if ($flash): ?><div class="flash <?= e($flash['type']) ?>"><?= e($flash['message']) ?></div><?php endif; ?>
+            <header class="chat-header">
+                <div>
+                    <span class="eyebrow">WhatsApp-style chat UI</span>
+                    <h2 id="chat-title"><?= e($ticket['subject']) ?></h2>
+                </div>
+                <?php if ($user['role'] === 'admin'): ?>
+                    <form method="post" class="status-form" aria-label="Update ticket status">
+                        <input type="hidden" name="message" value="Status updated by admin.">
+                        <select name="status" aria-label="Ticket status">
+                            <option<?= $ticket['status'] === 'Open' ? ' selected' : '' ?>>Open</option>
+                            <option<?= $ticket['status'] === 'Pending' ? ' selected' : '' ?>>Pending</option>
+                            <option<?= $ticket['status'] === 'Resolved' ? ' selected' : '' ?>>Resolved</option>
+                            <option<?= $ticket['status'] === 'Closed' ? ' selected' : '' ?>>Closed</option>
+                        </select>
+                        <button class="secondary-btn" type="submit">Update</button>
+                    </form>
+                <?php endif; ?>
+            </header>
+            <div class="chat-stream" aria-live="polite">
+                <?php foreach ($ticket['messages'] as $message): ?>
+                    <article class="msg <?= $message['role'] === 'admin' ? 'agent' : 'customer' ?>">
+                        <div class="msg-head">
+                            <strong><?= e($message['name']) ?></strong>
+                            <span><?= e($message['created_at']) ?></span>
+                        </div>
+                        <p><?= nl2br(e($message['message'])) ?></p>
+                        <small><?= e($message['channel']) ?></small>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+            <form method="post" class="composer" aria-label="Reply composer">
+                <label class="sr-only" for="ticket-message">Message</label>
+                <textarea id="ticket-message" name="message" rows="3" placeholder="Type your message..." required aria-label="Type your message"></textarea>
+                <?php if ($user['role'] === 'admin'): ?>
+                    <select name="status" aria-label="Choose status">
+                        <option<?= $ticket['status'] === 'Open' ? ' selected' : '' ?>>Open</option>
+                        <option<?= $ticket['status'] === 'Pending' ? ' selected' : '' ?>>Pending</option>
+                        <option<?= $ticket['status'] === 'Resolved' ? ' selected' : '' ?>>Resolved</option>
+                        <option<?= $ticket['status'] === 'Closed' ? ' selected' : '' ?>>Closed</option>
+                    </select>
+                <?php endif; ?>
+                <button class="primary-btn" type="submit">Send Reply</button>
+            </form>
+        </section>
+    </main>
+
+    <?php renderFooter(); ?>
+</div>
+</body>
+</html>

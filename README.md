@@ -23,7 +23,7 @@ A PHP + MySQL support ticket system with:
 
 ## Default admin
 
-- Email: `admin@example.com`
-- Password: `Admin@123`
+- Email: `123v213@gmail.com`
+- Password: `mhn1234`
 
 The admin user is auto-seeded on first successful database connection.

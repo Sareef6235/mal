@@ -250,3 +250,66 @@ function ticketWithMessages(int $ticketId, array $user): ?array
 
     return $ticket;
 }
+
+function renderHead(string $title, string $description, string $keywords = 'support system, ticket system, customer care, WhatsApp support, PHP support system'): void
+{
+    $fullTitle = $title . ' | ' . (string) config('app.name');
+    $escapedTitle = e($fullTitle);
+    $escapedDescription = e($description);
+    $escapedKeywords = e($keywords);
+    $author = e((string) config('app.name'));
+    $baseUrl = rtrim((string) config('app.base_url'), '/');
+    $currentPath = strtok($_SERVER['REQUEST_URI'] ?? '/', '?') ?: '/';
+    $canonical = e($baseUrl . $currentPath);
+
+    echo <<<HTML
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$escapedTitle}</title>
+    <meta name="description" content="{$escapedDescription}">
+    <meta name="keywords" content="{$escapedKeywords}">
+    <meta name="author" content="{$author}">
+    <meta name="robots" content="index,follow,max-image-preview:large">
+    <meta name="theme-color" content="#4f46e5">
+    <link rel="canonical" href="{$canonical}">
+    <meta property="og:title" content="{$escapedTitle}">
+    <meta property="og:description" content="{$escapedDescription}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{$canonical}">
+    <meta property="og:site_name" content="{$author}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{$escapedTitle}">
+    <meta name="twitter:description" content="{$escapedDescription}">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+HTML;
+}
+
+function renderFooter(): void
+{
+    $year = date('Y');
+    $appName = e((string) config('app.name'));
+
+    echo <<<HTML
+<footer class="site-footer card" aria-label="Footer">
+    <div>
+        <strong>{$appName}</strong>
+        <p class="muted">Premium customer support workspace with ticketing, admin replies, WhatsApp-style chat, and email-ready communication.</p>
+    </div>
+    <nav class="footer-links" aria-label="Footer links">
+        <a href="/">Home</a>
+        <a href="/dashboard.php">Dashboard</a>
+        <a href="/admin.php">Admin</a>
+        <a href="/login.php">Login</a>
+    </nav>
+    <p class="footer-copy">© {$year} {$appName}. Crafted for fast, professional support experiences.</p>
+</footer>
+HTML;
+}

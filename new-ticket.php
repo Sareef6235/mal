@@ -41,5 +41,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $flash = getFlash();
+renderHead('Create Ticket', 'Create a support ticket with subject, priority, category, and detailed message.');
 ?>
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Create Ticket</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/assets/style.css"></head><body><div class="auth-shell"><div class="auth-card card large"><?php if ($flash): ?><div class="flash <?= e($flash['type']) ?>"><?= e($flash['message']) ?></div><?php endif; ?><span class="eyebrow">Create support ticket</span><h1>Send new message</h1><form class="stack-form" method="post"><input name="subject" placeholder="Subject" required><div class="split-grid"><input name="order_reference" placeholder="Order Reference (optional)"><select name="priority"><option>Low</option><option selected>Normal</option><option>High</option><option>Urgent</option></select></div><input name="category" placeholder="Category" value="General Support"><textarea name="message" rows="8" placeholder="Describe your issue in detail" required></textarea><button class="primary-btn" type="submit">Create Ticket</button></form></div></div></body></html>
+<body>
+<div class="page-shell auth-page">
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+    <header class="topbar glass" aria-label="Create ticket header">
+        <div class="brand">
+            <div class="brand-mark">PS</div>
+            <div>
+                <strong>Premium Support Desk</strong>
+                <p>Submit a structured support request with order reference and priority</p>
+            </div>
+        </div>
+        <nav class="menu" aria-label="Create ticket navigation">
+            <a href="/dashboard.php">Dashboard</a>
+            <a href="/logout.php">Logout</a>
+        </nav>
+    </header>
+
+    <main class="auth-shell">
+        <section class="auth-card card large" aria-labelledby="ticket-create-title">
+            <?php if ($flash): ?><div class="flash <?= e($flash['type']) ?>"><?= e($flash['message']) ?></div><?php endif; ?>
+            <span class="eyebrow">Create support ticket</span>
+            <h1 id="ticket-create-title">Send a new message</h1>
+            <p class="muted">Use this premium form to open a ticket, connect an order, and explain your issue with full context.</p>
+            <form class="stack-form" method="post" aria-label="Create ticket form">
+                <label class="field-label">Subject
+                    <input name="subject" placeholder="Subject" required aria-label="Ticket subject">
+                </label>
+                <div class="split-grid">
+                    <label class="field-label">Order Reference
+                        <input name="order_reference" placeholder="Order Reference (optional)" aria-label="Order reference">
+                    </label>
+                    <label class="field-label">Priority
+                        <select name="priority" aria-label="Priority">
+                            <option>Low</option>
+                            <option selected>Normal</option>
+                            <option>High</option>
+                            <option>Urgent</option>
+                        </select>
+                    </label>
+                </div>
+                <label class="field-label">Category
+                    <input name="category" placeholder="Category" value="General Support" aria-label="Category">
+                </label>
+                <label class="field-label">Message
+                    <textarea name="message" rows="8" placeholder="Describe your issue in detail" required aria-label="Message"></textarea>
+                </label>
+                <button class="primary-btn" type="submit">Create Ticket</button>
+            </form>
+        </section>
+    </main>
+
+    <?php renderFooter(); ?>
+</div>
+</body>
+</html>

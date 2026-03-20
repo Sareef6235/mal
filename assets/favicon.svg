@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Premium Support Desk icon">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#5b5cf0"/>
+      <stop offset="100%" stop-color="#16c7b7"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="#08111f"/>
+  <rect x="6" y="6" width="52" height="52" rx="16" fill="url(#g)"/>
+  <path d="M21 23h17c6 0 10 3.7 10 9.2C48 39.2 43.5 43 37 43h-4.9l-5.7 5v-5H21V23zm7 7v7h9c2.6 0 4.2-1.2 4.2-3.5S39.6 30 37 30h-9z" fill="#fff"/>
+</svg>

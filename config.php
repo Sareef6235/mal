@@ -19,12 +19,12 @@ return [
     'email' => [
         'enabled' => false,
         'from' => 'support@example.com',
-        'admin_to' => 'admin@example.com',
+        'admin_to' => '123v213@gmail.com',
         'transport' => 'mail',
         'smtp_host' => 'smtp.gmail.com',
         'smtp_port' => 587,
-        'smtp_username' => 'your-gmail@gmail.com',
-        'smtp_password' => 'app-password',
+        'smtp_username' => '123v213@gmail.com',
+        'smtp_password' => 'mhn1234',
     ],
     'whatsapp' => [
         'enabled' => false,
@@ -34,7 +34,7 @@ return [
     ],
     'security' => [
         'session_name' => 'premium_support_session',
-        'admin_seed_email' => 'admin@example.com',
-        'admin_seed_password' => 'Admin@123',
+        'admin_seed_email' => '123v213@gmail.com',
+        'admin_seed_password' => 'mhn1234',
     ],
 ];
