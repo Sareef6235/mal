@@ -1,0 +1,153 @@
+:root {
+  --bg: #07111f;
+  --bg-soft: #0f1b31;
+  --panel: rgba(10, 19, 36, 0.82);
+  --panel-2: #101d34;
+  --border: rgba(148, 163, 184, 0.18);
+  --text: #ecf3ff;
+  --muted: #9fb0cb;
+  --primary: #6d5dfc;
+  --primary-2: #8b5cf6;
+  --accent: #22c55e;
+  --accent-2: #14b8a6;
+  --danger: #ef4444;
+  --shadow: 0 30px 80px rgba(15, 23, 42, 0.4);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: "Inter", "Noto Sans Malayalam", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(109, 93, 252, 0.25), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(20, 184, 166, 0.18), transparent 25%),
+    linear-gradient(135deg, #030712, #0b1220 55%, #0f172a);
+  color: var(--text);
+}
+a { color: inherit; text-decoration: none; }
+.page-shell, .dashboard-shell, .chat-layout { padding: 28px; }
+.card, .glass {
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: 24px;
+}
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 22px; position: sticky; top: 16px; z-index: 20;
+}
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand.small p, .brand p, .muted { color: var(--muted); margin: 4px 0 0; }
+.brand-mark {
+  width: 48px; height: 48px; border-radius: 16px;
+  display: grid; place-items: center; font-weight: 800;
+  background: linear-gradient(135deg, var(--primary), var(--accent-2));
+}
+.menu { display:flex; align-items:center; gap:16px; flex-wrap: wrap; }
+.menu a { color: var(--muted); transition: 0.25s ease; }
+.menu a:hover, .stack-links a:hover { color: var(--text); }
+.menu-btn, .primary-btn, .secondary-btn, button {
+  border: none; cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+.menu-btn, .primary-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 20px; border-radius: 14px; font-weight: 700;
+  color: white; background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  box-shadow: 0 18px 35px rgba(109, 93, 252, 0.35);
+}
+.primary-btn:hover, .secondary-btn:hover, .menu-btn:hover, .ticket-row:hover {
+  transform: translateY(-2px);
+}
+.secondary-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 18px; border-radius: 14px; font-weight: 700;
+  color: var(--text); background: rgba(148, 163, 184, 0.12); border: 1px solid var(--border);
+}
+.hero { display:grid; grid-template-columns: 1.15fr 0.85fr; gap: 28px; align-items: center; padding: 60px 0 32px; }
+.eyebrow {
+  display:inline-flex; margin-bottom: 14px; color:#c4b5fd; font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+}
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: clamp(2.4rem, 5vw, 4.6rem); line-height: 1.05; margin-bottom: 18px; }
+.lead { color: var(--muted); font-size: 1.05rem; max-width: 640px; }
+.hero-actions { display:flex; gap:14px; flex-wrap: wrap; margin: 24px 0; }
+.stats-row, .workflow-grid, .section-grid { display:grid; gap: 18px; }
+.stats-row { grid-template-columns: repeat(3, 1fr); }
+.stats-row div, .workflow-grid div, .info-card { padding: 18px; border-radius: 20px; background: rgba(148, 163, 184, 0.07); border: 1px solid var(--border); }
+.stats-row strong, .workflow-grid strong { display:block; font-size: 1.2rem; margin-bottom: 6px; }
+.premium-card { padding: 22px; }
+.mini-topbar { display:flex; gap:8px; margin-bottom:18px; }
+.mini-topbar span { width: 10px; height: 10px; border-radius:999px; background: rgba(255,255,255,0.4); }
+.support-widget { padding: 22px; border-radius: 22px; background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(15, 118, 110, 0.1)); }
+.ticket-pill { display:inline-block; margin-bottom:16px; padding:10px 14px; border-radius:999px; background: rgba(255,255,255,0.08); color: #a5f3fc; }
+.chat-bubble {
+  max-width: 90%; padding: 14px 16px; border-radius: 18px; margin-bottom: 12px;
+  line-height: 1.55; border: 1px solid rgba(255,255,255,0.05);
+}
+.chat-bubble.customer { background: rgba(109, 93, 252, 0.22); }
+.chat-bubble.agent { margin-left: auto; background: rgba(34, 197, 94, 0.18); }
+.widget-footer { display:flex; gap:10px; flex-wrap: wrap; margin-top: 18px; color: var(--muted); font-size: .9rem; }
+.section-grid { grid-template-columns: repeat(4, 1fr); margin: 20px 0 26px; }
+.workflow { padding: 28px; }
+.workflow-grid { grid-template-columns: repeat(4, 1fr); }
+.auth-shell { min-height: 100vh; display:grid; place-items:center; padding: 24px; }
+.auth-card { width: min(100%, 640px); padding: 32px; }
+.auth-card.large { width: min(100%, 780px); }
+.stack-form { display:grid; gap: 14px; }
+input, textarea, select {
+  width: 100%; padding: 15px 16px; border-radius: 16px; border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.72); color: var(--text); outline: none;
+}
+input:focus, textarea:focus, select:focus { border-color: rgba(109,93,252,0.7); box-shadow: 0 0 0 4px rgba(109,93,252,0.15); }
+.flash { padding: 14px 18px; border-radius: 16px; margin-bottom: 18px; }
+.flash.success { background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.35); }
+.flash.error { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); }
+.dashboard-shell, .chat-layout { display:grid; grid-template-columns: 280px 1fr; gap: 24px; min-height: 100vh; }
+.sidebar, .chat-sidebar { padding: 22px; align-self: start; position: sticky; top: 24px; }
+.stack-links { display:grid; gap: 10px; margin-top: 16px; }
+.stack-links a { padding: 12px 14px; border-radius: 14px; background: rgba(148, 163, 184, 0.06); color: var(--muted); }
+.full { width: 100%; }
+.main-panel { display:grid; gap: 18px; }
+.panel-head { display:flex; justify-content: space-between; gap: 16px; align-items: end; }
+.ticket-list { display:grid; gap: 14px; }
+.ticket-row { display:flex; justify-content: space-between; gap: 16px; padding: 20px; }
+.badge { display:inline-flex; padding: 8px 12px; border-radius: 999px; font-size: .85rem; font-weight: 700; }
+.badge.open { background: rgba(59,130,246,0.2); color:#bfdbfe; }
+.badge.pending { background: rgba(245,158,11,0.2); color:#fde68a; }
+.badge.resolved { background: rgba(34,197,94,0.2); color:#bbf7d0; }
+.badge.closed { background: rgba(148,163,184,0.18); color:#cbd5e1; }
+.align-right { text-align:right; }
+.empty { padding: 28px; color: var(--muted); }
+.split-grid { display:grid; grid-template-columns: 1fr 180px; gap: 14px; }
+.chat-sidebar .meta-list { display:grid; gap: 12px; margin: 16px 0 22px; }
+.chat-sidebar .meta-list div, .notify-item { padding: 12px 14px; border-radius: 16px; background: rgba(148,163,184,0.08); }
+.notification-list { display:grid; gap: 10px; }
+.chat-panel { display:grid; grid-template-rows: auto 1fr auto; gap: 18px; padding: 24px; min-height: calc(100vh - 56px); }
+.chat-header { display:flex; justify-content: space-between; gap: 16px; align-items: center; }
+.chat-stream {
+  display:grid; gap: 14px; padding: 10px;
+  background: linear-gradient(180deg, rgba(15,23,42,0.25), rgba(20,184,166,0.08));
+  border-radius: 24px; overflow:auto;
+}
+.msg {
+  max-width: min(82%, 720px); padding: 16px; border-radius: 20px; border: 1px solid var(--border);
+}
+.msg.customer { background: rgba(109,93,252,0.18); }
+.msg.agent { margin-left: auto; background: rgba(34,197,94,0.15); }
+.msg-head { display:flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; color: var(--muted); font-size: .86rem; }
+.composer { display:grid; grid-template-columns: 1fr 180px auto; gap: 14px; align-items: end; }
+.status-form { display:flex; gap: 10px; align-items: center; }
+@media (max-width: 1080px) {
+  .hero, .section-grid, .workflow-grid, .dashboard-shell, .chat-layout { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr; }
+  .sidebar, .chat-sidebar { position: static; }
+}
+@media (max-width: 760px) {
+  .page-shell, .dashboard-shell, .chat-layout { padding: 16px; }
+  .topbar, .menu, .panel-head, .chat-header, .ticket-row, .composer, .split-grid { grid-template-columns: 1fr; display:grid; }
+  .topbar { gap: 18px; }
+  .menu { display:grid; }
+  .ticket-row, .align-right { text-align:left; }
+  .chat-panel { min-height: auto; }
+  .msg { max-width: 100%; }
+}
