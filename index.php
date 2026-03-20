@@ -38,6 +38,9 @@ $flash = getFlash();
         </nav>
     </header>
 
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+
     <?php if ($flash): ?>
         <div class="flash <?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
     <?php endif; ?>
@@ -51,6 +54,11 @@ $flash = getFlash();
                 <a class="primary-btn" href="<?= $user ? '/new-ticket.php' : '/register.php' ?>">Create Ticket</a>
                 <a class="secondary-btn" href="/login.php">Open Chat Panel</a>
             </div>
+            <div class="trust-row">
+                <span>Live ticket tracking</span>
+                <span>Premium admin console</span>
+                <span>Responsive mobile design</span>
+            </div>
             <div class="stats-row">
                 <div><strong>MySQL</strong><span>Database-ready schema</span></div>
                 <div><strong>Chat UI</strong><span>WhatsApp-style replies</span></div>
@@ -63,6 +71,10 @@ $flash = getFlash();
             </div>
             <div class="support-widget">
                 <div class="ticket-pill">Ticket #TKT-DEMO91 · Urgent</div>
+                <div class="widget-toolbar">
+                    <span class="soft-chip">Admin online</span>
+                    <span class="soft-chip">Response SLA: 5 min</span>
+                </div>
                 <div class="chat-bubble customer">Order #ORD-2026-1102 payment updated. Please confirm delivery slot.</div>
                 <div class="chat-bubble agent">Hi Arjun 👋 Delivery is scheduled for today. Invoice + WhatsApp update sent.</div>
                 <div class="chat-bubble customer">Perfect, നന്ദി.</div>
@@ -82,6 +94,34 @@ $flash = getFlash();
         <article class="card info-card"><h3>WhatsApp Integration</h3><p>Prepared API request handler to push messages when credentials are enabled in config.</p></article>
     </section>
 
+    <section class="showcase-grid">
+        <article class="card showcase-card">
+            <span class="eyebrow">Customer journey</span>
+            <h3>Single flow from contact to resolution</h3>
+            <ul class="feature-list">
+                <li>Login-based secure access</li>
+                <li>Order reference mapped on each ticket</li>
+                <li>Reply history with timestamps</li>
+                <li>Status badges for Open / Pending / Closed</li>
+            </ul>
+        </article>
+        <article class="card showcase-card highlight-card">
+            <span class="eyebrow">Premium visuals</span>
+            <h3>Modern gradients, hover effects, clean spacing</h3>
+            <p>Every page uses the same premium theme so the landing page, forms, dashboard, and admin reply panels all feel like one polished product.</p>
+        </article>
+        <article class="card showcase-card">
+            <span class="eyebrow">Notification layer</span>
+            <h3>Ready for Gmail SMTP and WhatsApp API</h3>
+            <ul class="feature-list">
+                <li>Email notifications logged in DB</li>
+                <li>WhatsApp payload queue saved per ticket</li>
+                <li>Config-driven activation later</li>
+                <li>Perfect base for real production credentials</li>
+            </ul>
+        </article>
+    </section>
+
     <section id="workflow" class="card workflow">
         <div>
             <span class="eyebrow">How it works</span>
@@ -92,6 +132,18 @@ $flash = getFlash();
             <div><strong>02</strong><p>Create tickets with subject, category, priority, and order reference.</p></div>
             <div><strong>03</strong><p>Continue conversation in a premium responsive chat window.</p></div>
             <div><strong>04</strong><p>Admin replies, updates status, and tracks notifications.</p></div>
+        </div>
+    </section>
+
+    <section class="cta-banner card">
+        <div>
+            <span class="eyebrow">Ready to launch</span>
+            <h2>Contact page മുതൽ full support system വരെ complete setup</h2>
+            <p class="muted">Responsive header, modern menu, hover effects, premium colors, support chat, admin login, database save, and future-ready integrations are now connected in one project structure.</p>
+        </div>
+        <div class="hero-actions">
+            <a class="primary-btn" href="<?= $user ? '/dashboard.php' : '/register.php' ?>">Open Workspace</a>
+            <a class="secondary-btn" href="/admin.php">Admin Preview</a>
         </div>
     </section>
 </div>

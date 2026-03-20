@@ -11,9 +11,9 @@ return [
     'db' => [
         'host' => '127.0.0.1',
         'port' => 3306,
-        'database' => 'premium_support',
-        'username' => 'root',
-        'password' => '',
+        'database' => 'hvernued_conve',
+        'username' => 'hvernued_cpses_hvnqmd5ph8',
+        'password' => 'Zirect@1618*1##',
         'charset' => 'utf8mb4',
     ],
     'email' => [
