@@ -4,8 +4,7 @@ $user = currentUser();
 $flash = getFlash();
 renderHead(
     'Premium Support System',
-    'Premium customer support system with ticket, chat, WhatsApp and email integration.',
-    'support system, ticket system, customer care, WhatsApp support, PHP support system, admin panel'
+    'Premium customer support system with ticket, chat, WhatsApp and email integration.'
 );
 ?>
 <body>
@@ -22,19 +21,7 @@ renderHead(
                 <p>Modern customer care workspace with premium visual design</p>
             </div>
         </div>
-        <nav class="menu" aria-label="Primary navigation">
-            <a href="#features">Features</a>
-            <a href="#workflow">Workflow</a>
-            <a href="#seo-ready">Why us</a>
-            <?php if ($user): ?>
-                <a href="/dashboard.php">Dashboard</a>
-                <?php if ($user['role'] === 'admin'): ?><a href="/admin.php">Admin</a><?php endif; ?>
-                <a href="/logout.php">Logout</a>
-            <?php else: ?>
-                <a href="/login.php">Login</a>
-                <a class="menu-btn" href="/register.php">Get Started</a>
-            <?php endif; ?>
-        </nav>
+        <?php renderPrimaryMenu($user, 'home'); ?>
     </header>
 
     <main>
@@ -46,7 +33,7 @@ renderHead(
             <article class="hero-copy">
                 <span class="eyebrow">Premium SaaS support platform</span>
                 <h1 id="hero-title">Professional PHP support system with premium UI, sticky navigation, and modern customer communication.</h1>
-                <p class="lead">Built for tickets, admin replies, WhatsApp-style messaging, email updates, and linked orders — all wrapped in a modern, SEO-ready, mobile-first experience.</p>
+                <p class="lead">Built for tickets, admin replies, WhatsApp-style messaging, email updates, and linked orders — all wrapped in a modern, mobile-first experience.</p>
                 <div class="hero-actions">
                     <a class="primary-btn" href="<?= $user ? '/new-ticket.php' : '/register.php' ?>" aria-label="Create a new support ticket">Create Ticket</a>
                     <a class="secondary-btn" href="<?= $user ? '/dashboard.php' : '/login.php' ?>" aria-label="Open customer support dashboard">Open Workspace</a>
@@ -54,7 +41,7 @@ renderHead(
                 <div class="trust-row" aria-label="Highlights">
                     <span>Ticket + Chat UI</span>
                     <span>Admin secured</span>
-                    <span>Responsive + SEO ready</span>
+                    <span>Responsive premium design</span>
                 </div>
                 <div class="stats-row">
                     <div><strong>24/7</strong><span>Support-ready interface</span></div>
@@ -78,11 +65,14 @@ renderHead(
                         <span>WhatsApp queue</span>
                         <span>Admin notes</span>
                     </div>
+                    <div class="hero-actions preview-actions">
+                        <a class="primary-btn" href="/preview.php">Open Live Preview</a>
+                    </div>
                 </div>
             </aside>
         </section>
 
-        <section id="features" class="section-shell">
+        <section class="section-shell">
             <div class="section-intro">
                 <span class="eyebrow">Feature highlights</span>
                 <h2>Designed like a premium product, structured like a real support desk</h2>
@@ -93,9 +83,12 @@ renderHead(
                 <article class="card info-card"><h3>Email + WhatsApp Ready</h3><p>Notification hooks are already connected so you can activate delivery later with live SMTP and WhatsApp credentials.</p></article>
                 <article class="card info-card"><h3>Responsive Admin Control</h3><p>The interface adapts from desktop to mobile while preserving premium card layouts, hierarchy, and quick actions.</p></article>
             </div>
+            <div class="hero-actions">
+                <a class="secondary-btn" href="/features.php">View all features</a>
+            </div>
         </section>
 
-        <section id="seo-ready" class="showcase-grid">
+        <section class="showcase-grid">
             <article class="card showcase-card">
                 <span class="eyebrow">Branding</span>
                 <h3>Stripe / Notion / Linear inspired clarity</h3>
@@ -107,9 +100,9 @@ renderHead(
                 </ul>
             </article>
             <article class="card showcase-card highlight-card">
-                <span class="eyebrow">SEO optimization</span>
-                <h3>Semantic structure and meta-ready markup</h3>
-                <p>Proper heading flow, semantic sections, Open Graph tags, Twitter card tags, favicon support, and mobile theme color help this experience look polished and search-friendly.</p>
+                <span class="eyebrow">Why teams love it</span>
+                <h3>Purpose-built for premium support operations</h3>
+                <p>Clear sections, strong visual hierarchy, polished interactions, and consistent layouts make the whole support experience feel more professional for both staff and customers.</p>
             </article>
             <article class="card showcase-card">
                 <span class="eyebrow">Performance</span>
@@ -123,7 +116,7 @@ renderHead(
             </article>
         </section>
 
-        <section id="workflow" class="card workflow">
+        <section class="card workflow">
             <div class="section-intro">
                 <span class="eyebrow">Workflow</span>
                 <h2>From customer request to admin resolution</h2>
@@ -134,17 +127,20 @@ renderHead(
                 <article><strong>03</strong><p>Admin replies inside WhatsApp-style chat layout.</p></article>
                 <article><strong>04</strong><p>Status, email, and WhatsApp actions are tracked in one place.</p></article>
             </div>
+            <div class="hero-actions">
+                <a class="secondary-btn" href="/workflow.php">See full workflow</a>
+            </div>
         </section>
 
         <section class="cta-banner card" aria-label="Call to action section">
             <div>
                 <span class="eyebrow">Launch ready</span>
                 <h2>Contact page മുതൽ full support application വരെ polished premium experience</h2>
-                <p class="muted">This interface now looks like a complete SaaS product with better hierarchy, mobile responsiveness, smoother transitions, and SEO-friendly structure.</p>
+                <p class="muted">This interface now looks like a complete SaaS product with better hierarchy, mobile responsiveness, smoother transitions, and dedicated pages for every primary menu item.</p>
             </div>
             <div class="hero-actions">
                 <a class="primary-btn" href="<?= $user ? '/dashboard.php' : '/register.php' ?>">Open Workspace</a>
-                <a class="secondary-btn" href="/login.php">Admin Login</a>
+                <a class="secondary-btn" href="/preview.php">Try live preview</a>
             </div>
         </section>
     </main>

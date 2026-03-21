@@ -251,16 +251,11 @@ function ticketWithMessages(int $ticketId, array $user): ?array
     return $ticket;
 }
 
-function renderHead(string $title, string $description, string $keywords = 'support system, ticket system, customer care, WhatsApp support, PHP support system'): void
+function renderHead(string $title, string $description): void
 {
     $fullTitle = $title . ' | ' . (string) config('app.name');
     $escapedTitle = e($fullTitle);
     $escapedDescription = e($description);
-    $escapedKeywords = e($keywords);
-    $author = e((string) config('app.name'));
-    $baseUrl = rtrim((string) config('app.base_url'), '/');
-    $currentPath = strtok($_SERVER['REQUEST_URI'] ?? '/', '?') ?: '/';
-    $canonical = e($baseUrl . $currentPath);
 
     echo <<<HTML
 <!doctype html>
@@ -270,19 +265,7 @@ function renderHead(string $title, string $description, string $keywords = 'supp
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{$escapedTitle}</title>
     <meta name="description" content="{$escapedDescription}">
-    <meta name="keywords" content="{$escapedKeywords}">
-    <meta name="author" content="{$author}">
-    <meta name="robots" content="index,follow,max-image-preview:large">
     <meta name="theme-color" content="#4f46e5">
-    <link rel="canonical" href="{$canonical}">
-    <meta property="og:title" content="{$escapedTitle}">
-    <meta property="og:description" content="{$escapedDescription}">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{$canonical}">
-    <meta property="og:site_name" content="{$author}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{$escapedTitle}">
-    <meta name="twitter:description" content="{$escapedDescription}">
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -290,6 +273,30 @@ function renderHead(string $title, string $description, string $keywords = 'supp
     <link rel="stylesheet" href="/assets/style.css">
 </head>
 HTML;
+}
+
+function renderPrimaryMenu(?array $user, string $active = ''): void
+{
+    $isActive = static fn (string $key): string => $active === $key ? ' class="active"' : '';
+
+    echo '<nav class="menu" aria-label="Primary navigation">';
+    echo '<a' . $isActive('features') . ' href="/features.php">Features</a>';
+    echo '<a' . $isActive('workflow') . ' href="/workflow.php">Workflow</a>';
+    echo '<a' . $isActive('why-us') . ' href="/why-us.php">Why Us</a>';
+    echo '<a' . $isActive('preview') . ' href="/preview.php">Live Preview</a>';
+
+    if ($user) {
+        echo '<a href="/dashboard.php">Dashboard</a>';
+        if ($user['role'] === 'admin') {
+            echo '<a href="/admin.php">Admin</a>';
+        }
+        echo '<a href="/logout.php">Logout</a>';
+    } else {
+        echo '<a href="/login.php">Login</a>';
+        echo '<a class="menu-btn" href="/register.php">Get Started</a>';
+    }
+
+    echo '</nav>';
 }
 
 function renderFooter(): void
@@ -305,6 +312,10 @@ function renderFooter(): void
     </div>
     <nav class="footer-links" aria-label="Footer links">
         <a href="/">Home</a>
+        <a href="/features.php">Features</a>
+        <a href="/workflow.php">Workflow</a>
+        <a href="/why-us.php">Why Us</a>
+        <a href="/preview.php">Live Preview</a>
         <a href="/dashboard.php">Dashboard</a>
         <a href="/admin.php">Admin</a>
         <a href="/login.php">Login</a>
