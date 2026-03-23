@@ -232,6 +232,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   const userSound = document.getElementById('user-notification-sound');
   const seenSound = document.getElementById('seen-notification-sound');
   const soundModePill = document.getElementById('sound-mode-pill');
+  const sendButton = form.querySelector('button[type="submit"]');
   const cursorCore = document.getElementById('cursor-core');
   const cursorRing = document.getElementById('cursor-ring');
   let lastMessageId = 0;
@@ -241,6 +242,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   let stopTypingTimer = null;
   let websocketConnected = false;
   let hasLoadedOnce = false;
+  let isSending = false;
   let settings = { volume: 0.75, muted: false };
   const trails = [];
   const audioContext = window.AudioContext
@@ -457,21 +459,40 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   };
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (isSending) return;
     const message = input.value.trim();
     if (!message) return;
-    const response = await fetch(sendUrl, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ticket_id: ticketId, message })
-    });
-    if (!response.ok) {
-      showToast('Send failed', 'Unable to send message right now. Please retry.');
-      return;
+    isSending = true;
+    if (sendButton) sendButton.disabled = true;
+
+    try {
+      const formData = new FormData();
+      formData.append('ticket_id', String(ticketId));
+      formData.append('message', message);
+      const response = await fetch(sendUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        body: formData
+      });
+      if (!response.ok) {
+        showToast('Send failed', 'Unable to send message right now. Please retry.');
+        return;
+      }
+      input.value = '';
+      await sendState('typing', { is_typing: false });
+      await loadMessages();
+    } catch (error) {
+      showToast('Send failed', 'Network error while sending message.');
+    } finally {
+      isSending = false;
+      if (sendButton) sendButton.disabled = false;
     }
-    input.value = '';
-    await sendState('typing', { is_typing: false });
-    await loadMessages();
+  });
+  input.addEventListener('keydown', (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      form.requestSubmit();
+    }
   });
   input.addEventListener('input', handleTypingInput);
   input.addEventListener('blur', () => sendState('typing', { is_typing: false }));
