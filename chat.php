@@ -2,22 +2,31 @@
 
 declare(strict_types=1);
 
+
 require __DIR__ . '/lib.php';
+
+
+
+
+$basePath = rtrim(str_replace('\\', '/', dirname((string) ($_SERVER['SCRIPT_NAME'] ?? '/'))), '/');
+if ($basePath === '' || $basePath === '.') {
+    $basePath = '';
+}
 
 $user = requireLogin();
 $ticketId = (int) ($_GET['id'] ?? 0);
 if ($ticketId <= 0) {
     flash('error', 'Invalid ticket selected.');
-    redirect(($user['role'] ?? '') === 'admin' ? '/qwe1/admin.php' : '/qwe1/dashboard.php');
+    redirect(($user['role'] ?? '') === 'admin' ? $basePath . '/qwe1/admin.php' : $basePath . '/qwe1/dashboard.php');
 }
 
 if (function_exists('ticketWithMessages') && !ticketWithMessages($ticketId, $user)) {
     flash('error', 'Ticket not found.');
-    redirect(($user['role'] ?? '') === 'admin' ? '/qwe1/admin.php' : '/qwe1/dashboard.php');
+    redirect(($user['role'] ?? '') === 'admin' ? $basePath . '/qwe1/admin.php' : $basePath . '/qwe1/dashboard.php');
 }
 
 $viewerRole = (($user['role'] ?? '') === 'admin') ? 'admin' : 'user';
-$backUrl = $viewerRole === 'admin' ? '/qwe1/admin.php' : '/qwe1/dashboard.php';
+$backUrl = $viewerRole === 'admin' ? $basePath . '/qwe1/admin.php' : $basePath . '/dashboard.php';
 $websocketUrl = function_exists('config') ? trim((string) config('chat.websocket_url', '')) : '';
 
 renderHead('Live Chat', 'Realtime support chat with unread alerts, seen markers, popup notifications, and live typing updates.');
@@ -107,7 +116,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 @keyframes ripple{from{width:0;height:0;opacity:.7}to{width:90px;height:90px;opacity:0}}
 @media (max-width: 980px){body{overflow:auto}.chat-shell{padding:14px}.chat-main{grid-template-columns:1fr}.message-bubble{max-width:100%}.composer form{grid-template-columns:1fr}.control-cluster{justify-content:flex-start}}
 </style>
-<div class="chat-shell" data-ticket-id="<?= $ticketId ?>" data-viewer-role="<?= e($viewerRole) ?>" data-websocket-url="<?= e($websocketUrl) ?>">
+<div class="chat-shell"
+     data-ticket-id="<?= $ticketId ?>"
+     data-viewer-role="<?= e($viewerRole) ?>"
+     data-websocket-url="<?= e($websocketUrl) ?>"
+     data-feed-url="<?= e($basePath . '/qwe1/chat_feed.php') ?>"
+     data-send-url="<?= e($basePath . '/qwe1/chat_send.php') ?>"
+     data-sw-url="<?= e($basePath . '/qwe1/service-worker.js') ?>">
     <header class="chat-topbar">
         <div class="title-group">
             <span class="eyebrow">Realtime support chat</span>
@@ -121,7 +136,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
         <div class="control-cluster">
             <label class="control-pill" for="volume-control"><span class="control-label">🔥 Volume</span><input id="volume-control" type="range" min="0" max="1" step="0.05" value="0.75"></label>
             <button class="mute-btn" id="mute-toggle" type="button">🔊 Mute off</button>
-            <a class="link-btn" href="/qwe1/ticket.php?id=<?= $ticketId ?>">📨 Ticket</a>
+            <a class="link-btn" href="<?= e($basePath . '/ticket.php?id=' . $ticketId) ?>">📨 Ticket</a>
             <a class="link-btn" href="<?= e($backUrl) ?>">← Back</a>
         </div>
     </header>
@@ -182,9 +197,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 <div class="toast-wrap">
     <div class="toast" id="chat-toast"><strong id="chat-toast-title">New activity</strong><p id="chat-toast-copy">A new message arrived.</p></div>
 </div>
-<audio id="admin-notification-sound" preload="auto" src="/qwe1/assets/notification.mp3"></audio>
-<audio id="user-notification-sound" preload="auto" src="/qwe1/assets/user-notification.mp3"></audio>
-<audio id="seen-notification-sound" preload="auto" src="/qwe1/assets/seen-notification.mp3"></audio>
+<audio id="admin-notification-sound" preload="auto" src="<?= e($basePath . '/assets/notification.mp3') ?>"></audio>
+<audio id="user-notification-sound" preload="auto" src="<?= e($basePath . '/assets/user-notification.mp3') ?>"></audio>
+<audio id="seen-notification-sound" preload="auto" src="<?= e($basePath . '/assets/seen-notification.mp3') ?>"></audio>
 <div id="cursor-core"></div>
 <div id="cursor-ring"></div>
 <script>
@@ -193,9 +208,15 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   const ticketId = Number(shell?.dataset.ticketId || 0);
   const viewerRole = shell?.dataset.viewerRole || 'user';
   const websocketUrl = shell?.dataset.websocketUrl || '';
-  const stream = document.getElementById('chat-stream');
   const form = document.getElementById('chat-form');
   const input = document.getElementById('chat-input');
+  const stream = document.getElementById('chat-stream');
+  if (!shell || !stream || !form || !input) {
+    return;
+  }
+  const feedUrl = shell.dataset.feedUrl || '/qwe1/chat_feed.php';
+  const sendUrl = shell.dataset.sendUrl || '/qwe1/chat_send.php';
+  const serviceWorkerUrl = shell.dataset.swUrl || '/qwe1/service-worker.js';
   const chatTitle = document.getElementById('chat-title');
   const ticketMeta = document.getElementById('ticket-meta');
   const typingIndicator = document.getElementById('typing-indicator');
@@ -223,9 +244,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   let typingTimer = null;
   let stopTypingTimer = null;
   let websocketConnected = false;
+  let hasLoadedOnce = false;
   let settings = { volume: 0.75, muted: false };
   const trails = [];
-  const audioContext = window.AudioContext ? new AudioContext() : (window.webkitAudioContext ? new webkitAudioContext() : null);
+  const audioContext = window.AudioContext
+    ? new window.AudioContext()
+    : (window.webkitAudioContext ? new window.webkitAudioContext() : null);
 
   const escapeHtml = (value) => String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
   const getStorageKey = (key) => `live-chat-${viewerRole}-${key}`;
@@ -287,8 +311,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   };
   const sendState = async (action, extra = {}) => {
     try {
-      await fetch('/qwe1/chat_send.php', {
+      await fetch(sendUrl, {
         method: 'POST',
+        credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ticket_id: ticketId, action, ...extra })
       });
@@ -361,17 +386,41 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
     }
   };
   const refreshConnectionState = () => {
-    connectionPill.textContent = websocketConnected ? '🟢 WebSocket live' : '🟢 Silent auto refresh';
-    websocketBadge.classList.toggle('hidden', !websocketConnected);
+    if (websocketConnected) {
+      connectionPill.textContent = '🟢 WebSocket live';
+      connectionPill.className = 'status-pill online';
+      websocketBadge.classList.remove('hidden');
+      return;
+    }
+
+    websocketBadge.classList.add('hidden');
+    if (hasLoadedOnce) {
+      connectionPill.textContent = '🟢 Silent auto refresh';
+      connectionPill.className = 'status-pill online';
+    } else {
+      connectionPill.textContent = '🟠 Reconnecting';
+      connectionPill.className = 'status-pill';
+    }
   };
   const loadMessages = async () => {
     try {
-      const response = await fetch(`/qwe1/chat_feed.php?id=${ticketId}`, { cache: 'no-store', headers: { 'Accept': 'application/json' } });
-      if (!response.ok) return;
+      const response = await fetch(`${feedUrl}?id=${ticketId}`, {
+        cache: 'no-store',
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+      });
+      if (!response.ok) {
+        connectionPill.textContent = `🟠 Reconnecting (${response.status})`;
+        connectionPill.className = 'status-pill';
+        return;
+      }
       const payload = await response.json();
       await render(payload);
+      hasLoadedOnce = true;
+      refreshConnectionState();
     } catch (error) {
       connectionPill.textContent = '🟠 Reconnecting';
+      connectionPill.className = 'status-pill';
     }
   };
   const startPolling = () => {
@@ -414,11 +463,16 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
     event.preventDefault();
     const message = input.value.trim();
     if (!message) return;
-    await fetch('/qwe1/chat_send.php', {
+    const response = await fetch(sendUrl, {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ticket_id: ticketId, message })
     });
+    if (!response.ok) {
+      showToast('Send failed', 'Unable to send message right now. Please retry.');
+      return;
+    }
     input.value = '';
     await sendState('typing', { is_typing: false });
     await loadMessages();
@@ -462,6 +516,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
       oldest?.remove();
     }
   };
+  
   document.addEventListener('mousemove', moveCursor, { passive: true });
   document.addEventListener('click', (event) => {
     const ripple = document.createElement('div');
@@ -478,7 +533,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   startPolling();
   connectRealtime();
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/qwe1/service-worker.js').catch(() => {});
+    navigator.serviceWorker.register(serviceWorkerUrl).catch(() => {});
   }
 })();
 </script>
