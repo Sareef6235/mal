@@ -214,8 +214,8 @@ function compute_delivered_at_chat(array $message, string $senderRole): ?string
 
 function normalize_sender_role_chat(array $message): string
 {
-    $role = strtolower(trim((string) ($message['role'] ?? $message['sender_role'] ?? '')));
-    if ($role === 'admin') {
+    $role = strtolower(trim((string) ($message['role'] ?? $message['sender_role'] ?? $message['source'] ?? '')));
+    if (in_array($role, ['admin', 'agent', 'staff'], true)) {
         return 'admin';
     }
 
@@ -390,11 +390,17 @@ try {
         exit;
     }
 
+    $userJoin = $source['user_id_column'] ? ' LEFT JOIN users sender ON sender.id = m.`' . $source['user_id_column'] . '`' : '';
+
     $selectSenderRole = $source['sender_role_column']
         ? "m.`{$source['sender_role_column']}`"
-        : ($source['source_column'] ? "CASE WHEN COALESCE(m.`{$source['source_column']}`, 'web') = 'admin' THEN 'admin' ELSE 'user' END" : "CASE WHEN COALESCE(sender.role, 'user') = 'admin' THEN 'admin' ELSE 'user' END");
-
-    $userJoin = $source['user_id_column'] ? ' LEFT JOIN users sender ON sender.id = m.`' . $source['user_id_column'] . '`' : '';
+        : ($source['user_id_column']
+            ? ($source['source_column']
+                ? "CASE WHEN COALESCE(sender.role, CASE WHEN COALESCE(m.`{$source['source_column']}`, 'web') = 'admin' THEN 'admin' ELSE 'user' END) = 'admin' THEN 'admin' ELSE 'user' END"
+                : "CASE WHEN COALESCE(sender.role, 'user') = 'admin' THEN 'admin' ELSE 'user' END")
+            : ($source['source_column']
+                ? "CASE WHEN COALESCE(m.`{$source['source_column']}`, 'web') = 'admin' THEN 'admin' ELSE 'user' END"
+                : "'user'"));
     $senderName = $source['user_id_column'] ? 'COALESCE(sender.name, CASE WHEN ' . $selectSenderRole . ' = "admin" THEN "Admin" ELSE "Customer" END)' : 'CASE WHEN ' . $selectSenderRole . ' = "admin" THEN "Admin" ELSE "Customer" END';
 
     $extraSelects = [];
