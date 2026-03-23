@@ -247,7 +247,7 @@ function normalize_ticket_message_chat(array $message, array $ticket, string $vi
     $seenAt = compute_seen_at_chat($message, $senderRole);
     $deliveredAt = compute_delivered_at_chat($message, $senderRole);
     $sentByViewer = $senderRole === $viewerRole;
-    $seenLabel = $sentByViewer && $seenAt ? '👁️ Seen ✔✔ system' : ($sentByViewer && $deliveredAt ? 'Delivered ✔' : '');
+    $seenLabel = $sentByViewer && $seenAt ? '👁️ Seen ✔✔ system' : ($sentByViewer && $deliveredAt ? 'Delivered ✔✔' : '');
 
     return [
         'id' => (int) ($message['id'] ?? 0),
@@ -276,6 +276,7 @@ function ticket_presence_chat(PDO $pdo, int $ticketId, string $viewerRole): arra
             'typing_label' => '',
             'typing_active' => false,
             'connection_mode' => 'polling',
+            'online_users' => 1,
         ];
     }
 
@@ -301,6 +302,8 @@ function ticket_presence_chat(PDO $pdo, int $ticketId, string $viewerRole): arra
     $typingActive = $typingRole !== '' && $typingRole !== $viewerRole && $typingUpdatedAt >= (time() - 7);
     $otherOnline = (($otherPresenceAt ? strtotime((string) $otherPresenceAt) : 0) ?: 0) >= (time() - 20);
 
+    $onlineUsers = 1 + ($otherOnline ? 1 : 0);
+
     return [
         'self_online' => true,
         'other_online' => $otherOnline,
@@ -308,6 +311,7 @@ function ticket_presence_chat(PDO $pdo, int $ticketId, string $viewerRole): arra
         'typing_label' => $typingActive ? ((($typingRole === 'admin') ? 'Admin' : 'Customer') . ' is typing…') : '',
         'typing_active' => $typingActive,
         'connection_mode' => 'polling',
+        'online_users' => $onlineUsers,
     ];
 }
 

@@ -122,4 +122,46 @@ CREATE TABLE IF NOT EXISTS notification_events (
         ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
+-- -----------------------------------------------------------------------------
+-- 7) Optional retry queue + online session tracking for WhatsApp-like delivery UX.
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS chat_retry_queue (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ticket_id BIGINT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED NULL,
+    role ENUM('user','admin') NOT NULL DEFAULT 'user',
+    message_text TEXT NOT NULL,
+    retry_count INT NOT NULL DEFAULT 0,
+    status ENUM('pending','sent','failed') NOT NULL DEFAULT 'pending',
+    last_error VARCHAR(255) NULL,
+    next_retry_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_chat_retry_status (status, next_retry_at),
+    KEY idx_chat_retry_ticket (ticket_id, created_at),
+    CONSTRAINT fk_chat_retry_ticket
+        FOREIGN KEY (ticket_id) REFERENCES tickets (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS chat_presence_sessions (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    ticket_id BIGINT UNSIGNED NOT NULL,
+    user_id BIGINT UNSIGNED NULL,
+    role ENUM('user','admin') NOT NULL DEFAULT 'user',
+    session_key VARCHAR(120) NOT NULL,
+    last_seen_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_chat_presence_session (session_key),
+    KEY idx_chat_presence_ticket_role (ticket_id, role, last_seen_at),
+    CONSTRAINT fk_chat_presence_ticket
+        FOREIGN KEY (ticket_id) REFERENCES tickets (id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 COMMIT;
