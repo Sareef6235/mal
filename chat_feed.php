@@ -82,11 +82,15 @@ function viewer_role_chat(array $user): string
 
 function ticket_accessible_chat(int $ticketId, array $user): bool
 {
+    if ((($user['role'] ?? '') === 'admin')) {
+        return true;
+    }
+
     if (function_exists('ticketWithMessages')) {
         return (bool) ticketWithMessages($ticketId, $user);
     }
 
-    return (($user['role'] ?? '') === 'admin');
+    return false;
 }
 
 function extract_attachment_tokens_chat(string $message): array
@@ -354,28 +358,6 @@ try {
     update_ticket_presence_chat($pdo, $ticketId, $viewerRole);
     if ($source !== null) {
         mark_messages_seen_chat($pdo, $source, $ticketId, $viewerRole);
-    }
-
-    if (function_exists('ticketWithMessages')) {
-        $ticket = ticketWithMessages($ticketId, $user);
-        if ($ticket) {
-            $messages = [];
-            foreach ((array) ($ticket['messages'] ?? []) as $message) {
-                $messages[] = normalize_ticket_message_chat((array) $message, (array) $ticket, $viewerRole);
-            }
-
-            echo json_encode([
-                'ticket' => $ticket,
-                'messages' => $messages,
-                'viewer_role' => $viewerRole,
-                'presence' => ticket_presence_chat($pdo, $ticketId, $viewerRole),
-                'meta' => [
-                    'latest_message_id' => (int) (($messages[array_key_last($messages)]['id'] ?? 0)),
-                    'unread_count' => count(array_filter($messages, static fn (array $message): bool => $message['sender_role'] !== $viewerRole && empty($message['seen_at']))),
-                ],
-            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            exit;
-        }
     }
 
     if ($source === null) {
