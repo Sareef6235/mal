@@ -198,6 +198,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   const ticketId = Number(shell?.dataset.ticketId || 0);
   const viewerRole = shell?.dataset.viewerRole || 'user';
   const websocketUrl = shell?.dataset.websocketUrl || '';
+  if (!/^https?:$/.test(window.location.protocol)) {
+    console.warn('Chat disabled due to invalid page protocol:', window.location.protocol);
+    return;
+  }
+  const feedUrl = new URL('/qwe1/chat_feed.php', window.location.origin).toString();
+  const sendUrl = new URL('/qwe1/chat_send.php', window.location.origin).toString();
   const stream = document.getElementById('chat-stream');
   const form = document.getElementById('chat-form');
   const input = document.getElementById('chat-input');
@@ -339,7 +345,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   };
   const sendState = async (action, extra = {}) => {
     try {
-      await fetch('/qwe1/chat_send.php', {
+      await fetch(sendUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ticket_id: ticketId, action, ...extra })
@@ -423,7 +429,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   };
   const loadMessages = async () => {
     try {
-      const response = await fetch(`/qwe1/chat_feed.php?id=${ticketId}`, { cache: 'no-store', headers: { 'Accept': 'application/json' } });
+      const response = await fetch(`${feedUrl}?id=${ticketId}`, { cache: 'no-store', headers: { 'Accept': 'application/json' }, credentials: 'same-origin' });
       if (!response.ok) return;
       const payload = await response.json();
       await render(payload);
@@ -535,7 +541,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   startPolling();
   connectRealtime();
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/qwe1/service-worker.js').catch(() => {});
+    navigator.serviceWorker.register(new URL('/qwe1/service-worker.js', window.location.origin).toString()).catch(() => {});
   }
   window.addEventListener('unhandledrejection', (event) => {
     if (String(event.reason || '').includes('runtime.lastError')) {
