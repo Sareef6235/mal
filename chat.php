@@ -116,7 +116,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
             <span class="eyebrow">Realtime support chat</span>
             <strong id="chat-title">Connecting…</strong>
             <div class="chat-status">
-                <span class="status-pill online" id="connection-pill">🟢 Live</span>
+                <span class="status-pill" id="connection-pill">🟠 Reconnecting</span>
                 <span class="status-pill offline" id="presence-pill">Offline</span>
                 <span class="status-pill" id="typing-pill">No typing activity</span>
             </div>
