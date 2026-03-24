@@ -8,6 +8,15 @@
     --success: #22c55e;
 }
 * { box-sizing: border-box; }
+
+.site-nav { background:#0f172a; position: sticky; top:0; z-index: 30; }
+.nav-inner { max-width:1100px; margin:0 auto; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.brand { color:#fff; text-decoration:none; font-weight:700; }
+.menu { display:flex; gap:8px; flex-wrap:wrap; }
+.menu-link { color:#cbd5e1; text-decoration:none; padding:8px 10px; border-radius:8px; font-size:.94rem; }
+.menu-link:hover { background:#1e293b; color:#fff; }
+.menu-link.active { background:#0ea5e9; color:#fff; }
+
 body { margin:0; font-family: Inter, Arial, sans-serif; background: var(--bg); color: var(--text); }
 .container { max-width: 1100px; margin: 20px auto; padding: 0 16px 24px; }
 .topbar { display:flex; justify-content:space-between; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
