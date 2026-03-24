@@ -1,0 +1,7 @@
+document.querySelectorAll('.toast').forEach((el) => {
+  setTimeout(() => {
+    el.style.transition = 'opacity .4s';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 450);
+  }, 3200);
+});
