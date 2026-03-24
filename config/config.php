@@ -18,5 +18,6 @@ return [
     'app' => [
         'name' => 'Notification & File Upload Management System',
         'timezone' => 'UTC',
+        'base_url' => 'https://mmhnu.online/qwe3',
     ],
 ];

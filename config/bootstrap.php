@@ -8,6 +8,25 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/database.php';
 
+function app_config(): array
+{
+    static $config;
+
+    if ($config === null) {
+        $config = require __DIR__ . '/config.php';
+    }
+
+    return $config;
+}
+
+function app_url(string $path = ''): string
+{
+    $base = rtrim((string) app_config()['app']['base_url'], '/');
+    $path = ltrim($path, '/');
+
+    return $path === '' ? $base : $base . '/' . $path;
+}
+
 function e(string $value): string
 {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');

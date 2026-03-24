@@ -15,7 +15,7 @@ $activePage = 'upload';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $uploadController->store($_FILES['uploaded_file'] ?? []);
     set_flash($result['success'] ? 'success' : 'error', $result['message']);
-    redirect($result['success'] ? 'dashboard.php' : 'upload.php');
+    redirect($result['success'] ? app_url('dashboard.php') : app_url('upload.php'));
 }
 
 $recentUploads = $uploadController->recent(12);
@@ -47,7 +47,7 @@ require __DIR__ . '/views/partials/flash.php';
                         <strong><?= e($upload['file_name']); ?></strong>
                         <p><?= e($upload['file_type']); ?> • <?= e(format_bytes((int) $upload['file_size'])); ?></p>
                     </div>
-                    <a class="btn btn-light" href="download.php?id=<?= (int) $upload['id']; ?>">Download</a>
+                    <a class="btn btn-light" href="<?= e(app_url('download.php?id=' . (int) $upload['id'])); ?>">Download</a>
                 </div>
             <?php endforeach; ?>
         </div>

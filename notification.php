@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         : $notificationController->store($_POST);
 
     set_flash($result['success'] ? 'success' : 'error', $result['message']);
-    redirect($result['success'] ? 'dashboard.php' : ($isUpdate ? 'notification.php?edit=' . $id : 'notification.php'));
+    redirect($result['success'] ? app_url('dashboard.php') : ($isUpdate ? app_url('notification.php?edit=' . $id) : app_url('notification.php')));
 }
 
 require __DIR__ . '/views/partials/header.php';
@@ -46,7 +46,7 @@ require __DIR__ . '/views/partials/flash.php';
         <div class="card-actions">
             <button type="submit" class="btn"><?= $editing ? 'Update Notification' : 'Save Notification'; ?></button>
             <?php if ($editing): ?>
-                <a class="btn btn-light" href="notification.php">Cancel</a>
+                <a class="btn btn-light" href="<?= e(app_url('notification.php')); ?>">Cancel</a>
             <?php endif; ?>
         </div>
     </form>

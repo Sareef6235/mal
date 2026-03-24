@@ -16,13 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'delete_notification') {
         $result = $notificationController->destroy((int) ($_POST['id'] ?? 0));
         set_flash($result['success'] ? 'success' : 'error', $result['message']);
-        redirect('dashboard.php');
+        redirect(app_url('dashboard.php'));
     }
 
     if ($action === 'delete_upload') {
         $result = $uploadController->destroy((int) ($_POST['id'] ?? 0));
         set_flash($result['success'] ? 'success' : 'error', $result['message']);
-        redirect('dashboard.php');
+        redirect(app_url('dashboard.php'));
     }
 }
 
@@ -39,7 +39,7 @@ require __DIR__ . '/views/partials/flash.php';
     <div>
         <div class="section-header">
             <h2>Latest Notifications</h2>
-            <a class="btn" href="notification.php">+ Add New</a>
+            <a class="btn" href="<?= e(app_url('notification.php')); ?>">+ Add New</a>
         </div>
         <?php if (empty($notifications)): ?>
             <p class="empty">No notifications available yet.</p>
@@ -53,7 +53,7 @@ require __DIR__ . '/views/partials/flash.php';
                         </div>
                         <div class="message"><?= $item['message']; ?></div>
                         <div class="card-actions">
-                            <a class="btn btn-light" href="notification.php?edit=<?= (int) $item['id']; ?>">Edit</a>
+                            <a class="btn btn-light" href="<?= e(app_url('notification.php?edit=' . (int) $item['id'])); ?>">Edit</a>
                             <form method="POST" onsubmit="return confirm('Delete this notification?');">
                                 <input type="hidden" name="action" value="delete_notification">
                                 <input type="hidden" name="id" value="<?= (int) $item['id']; ?>">
@@ -69,7 +69,7 @@ require __DIR__ . '/views/partials/flash.php';
     <aside>
         <div class="section-header">
             <h2>Recent Uploads</h2>
-            <a class="btn" href="upload.php">Upload</a>
+            <a class="btn" href="<?= e(app_url('upload.php')); ?>">Upload</a>
         </div>
         <?php if (empty($recentUploads)): ?>
             <p class="empty">No files uploaded yet.</p>
@@ -83,7 +83,7 @@ require __DIR__ . '/views/partials/flash.php';
                             <small><?= e(date('Y-m-d H:i', strtotime($upload['upload_date']))); ?></small>
                         </div>
                         <div class="card-actions">
-                            <a class="btn btn-light" href="download.php?id=<?= (int) $upload['id']; ?>">Download</a>
+                            <a class="btn btn-light" href="<?= e(app_url('download.php?id=' . (int) $upload['id'])); ?>">Download</a>
                             <form method="POST" onsubmit="return confirm('Delete this file?');">
                                 <input type="hidden" name="action" value="delete_upload">
                                 <input type="hidden" name="id" value="<?= (int) $upload['id']; ?>">
