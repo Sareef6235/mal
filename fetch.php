@@ -15,11 +15,16 @@ function db(): PDO {
 
 try {
     $ticketId = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($_GET['ticket_id'] ?? 'global'));
-    $stmt = db()->prepare('SELECT COUNT(*) AS total, SUM(CASE WHEN seen = 0 THEN 1 ELSE 0 END) AS unseen FROM messages WHERE ticket_id = :ticket_id');
-    $stmt->execute([':ticket_id' => $ticketId]);
-    $row = $stmt->fetch() ?: ['total' => 0, 'unseen' => 0];
+    $sinceId = (int)($_GET['since_id'] ?? 0);
 
-    echo json_encode(['ok' => true, 'total' => (int)$row['total'], 'unseen' => (int)$row['unseen']]);
+    $pdo = db();
+    $stmt = $pdo->prepare('SELECT id, ticket_id, user_id, message, seen, created_at FROM messages WHERE ticket_id = :ticket_id AND id > :since_id ORDER BY id ASC LIMIT 200');
+    $stmt->bindValue(':ticket_id', $ticketId, PDO::PARAM_STR);
+    $stmt->bindValue(':since_id', $sinceId, PDO::PARAM_INT);
+    $stmt->execute();
+    $rows = $stmt->fetchAll();
+
+    echo json_encode(['ok' => true, 'messages' => $rows]);
 } catch (Throwable $e) {
     http_response_code(400);
     echo json_encode(['ok' => false, 'message' => $e->getMessage()]);
