@@ -82,11 +82,15 @@ function viewer_role_chat(array $user): string
 
 function ticket_accessible_chat(int $ticketId, array $user): bool
 {
+    if ((($user['role'] ?? '') === 'admin')) {
+        return true;
+    }
+
     if (function_exists('ticketWithMessages')) {
         return (bool) ticketWithMessages($ticketId, $user);
     }
 
-    return (($user['role'] ?? '') === 'admin');
+    return false;
 }
 
 function extract_attachment_tokens_chat(string $message): array
@@ -247,7 +251,7 @@ function normalize_ticket_message_chat(array $message, array $ticket, string $vi
     $seenAt = compute_seen_at_chat($message, $senderRole);
     $deliveredAt = compute_delivered_at_chat($message, $senderRole);
     $sentByViewer = $senderRole === $viewerRole;
-    $seenLabel = $sentByViewer && $seenAt ? '👁️ Seen ✔✔ system' : ($sentByViewer && $deliveredAt ? 'Delivered ✔' : '');
+    $seenLabel = $sentByViewer && $seenAt ? '👁️ Seen ✔✔ system' : ($sentByViewer && $deliveredAt ? 'Delivered ✔✔' : '');
 
     return [
         'id' => (int) ($message['id'] ?? 0),
@@ -276,6 +280,7 @@ function ticket_presence_chat(PDO $pdo, int $ticketId, string $viewerRole): arra
             'typing_label' => '',
             'typing_active' => false,
             'connection_mode' => 'polling',
+            'online_users' => 1,
         ];
     }
 
@@ -301,6 +306,8 @@ function ticket_presence_chat(PDO $pdo, int $ticketId, string $viewerRole): arra
     $typingActive = $typingRole !== '' && $typingRole !== $viewerRole && $typingUpdatedAt >= (time() - 7);
     $otherOnline = (($otherPresenceAt ? strtotime((string) $otherPresenceAt) : 0) ?: 0) >= (time() - 20);
 
+    $onlineUsers = 1 + ($otherOnline ? 1 : 0);
+
     return [
         'self_online' => true,
         'other_online' => $otherOnline,
@@ -308,6 +315,7 @@ function ticket_presence_chat(PDO $pdo, int $ticketId, string $viewerRole): arra
         'typing_label' => $typingActive ? ((($typingRole === 'admin') ? 'Admin' : 'Customer') . ' is typing…') : '',
         'typing_active' => $typingActive,
         'connection_mode' => 'polling',
+        'online_users' => $onlineUsers,
     ];
 }
 
@@ -350,28 +358,6 @@ try {
     update_ticket_presence_chat($pdo, $ticketId, $viewerRole);
     if ($source !== null) {
         mark_messages_seen_chat($pdo, $source, $ticketId, $viewerRole);
-    }
-
-    if (function_exists('ticketWithMessages')) {
-        $ticket = ticketWithMessages($ticketId, $user);
-        if ($ticket) {
-            $messages = [];
-            foreach ((array) ($ticket['messages'] ?? []) as $message) {
-                $messages[] = normalize_ticket_message_chat((array) $message, (array) $ticket, $viewerRole);
-            }
-
-            echo json_encode([
-                'ticket' => $ticket,
-                'messages' => $messages,
-                'viewer_role' => $viewerRole,
-                'presence' => ticket_presence_chat($pdo, $ticketId, $viewerRole),
-                'meta' => [
-                    'latest_message_id' => (int) (($messages[array_key_last($messages)]['id'] ?? 0)),
-                    'unread_count' => count(array_filter($messages, static fn (array $message): bool => $message['sender_role'] !== $viewerRole && empty($message['seen_at']))),
-                ],
-            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-            exit;
-        }
     }
 
     if ($source === null) {

@@ -93,6 +93,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .send-btn,.mute-btn,.link-btn{font-weight:700}
 .send-btn{border:none;background:linear-gradient(135deg,var(--accent),var(--accent-strong));color:#082f49;padding:16px 22px;cursor:pointer}
 .mute-btn.muted{opacity:.6}
+.retry-banner{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);font-size:12px;color:#fde68a}
+.retry-banner.show{display:flex}
+.retry-btn{border:none;border-radius:999px;padding:8px 12px;background:rgba(245,158,11,.28);color:#fff;font-weight:700;cursor:pointer}
 .toast-wrap{position:fixed;right:24px;bottom:24px;z-index:20;display:grid;gap:10px}
 .toast{display:none;min-width:280px;max-width:360px;padding:16px 18px;border-radius:18px;background:rgba(15,23,42,.9);border:1px solid rgba(56,189,248,.28);box-shadow:0 20px 45px rgba(2,6,23,.45)}
 .toast.show{display:grid}
@@ -113,7 +116,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
             <span class="eyebrow">Realtime support chat</span>
             <strong id="chat-title">Connecting…</strong>
             <div class="chat-status">
-                <span class="status-pill online" id="connection-pill">🟢 Live</span>
+                <span class="status-pill" id="connection-pill">🟠 Reconnecting</span>
                 <span class="status-pill offline" id="presence-pill">Offline</span>
                 <span class="status-pill" id="typing-pill">No typing activity</span>
             </div>
@@ -132,6 +135,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
                 <h2>Live system</h2>
                 <div class="live-badges">
                     <span class="live-badge" id="unread-badge">Unread: 0</span>
+                    <span class="live-badge" id="online-users-badge">Online users: 1</span>
                     <span class="live-badge hidden" id="websocket-badge">WebSocket active</span>
                     <span class="live-badge" id="viewer-badge"><?= $viewerRole === 'admin' ? 'Admin view' : 'Customer view' ?></span>
                 </div>
@@ -164,6 +168,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
             <div class="chat-stream" id="chat-stream" aria-live="polite"></div>
             <div class="typing-indicator" id="typing-indicator"></div>
             <div class="composer">
+                <div class="retry-banner" id="retry-banner"><span id="retry-copy">Message pending retry.</span><button class="retry-btn" id="retry-btn" type="button">Retry now</button></div>
                 <form id="chat-form">
                     <div class="composer-stack">
                         <textarea id="chat-input" name="message" placeholder="Type your message…"></textarea>
@@ -193,6 +198,12 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   const ticketId = Number(shell?.dataset.ticketId || 0);
   const viewerRole = shell?.dataset.viewerRole || 'user';
   const websocketUrl = shell?.dataset.websocketUrl || '';
+  if (!/^https?:$/.test(window.location.protocol)) {
+    console.warn('Chat disabled due to invalid page protocol:', window.location.protocol);
+    return;
+  }
+  const feedUrl = new URL('/qwe1/chat_feed.php', window.location.origin).toString();
+  const sendUrl = new URL('/qwe1/chat_send.php', window.location.origin).toString();
   const stream = document.getElementById('chat-stream');
   const form = document.getElementById('chat-form');
   const input = document.getElementById('chat-input');
@@ -204,6 +215,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   const connectionPill = document.getElementById('connection-pill');
   const unreadBadge = document.getElementById('unread-badge');
   const websocketBadge = document.getElementById('websocket-badge');
+  const onlineUsersBadge = document.getElementById('online-users-badge');
   const popupEnabled = document.getElementById('popup-enabled');
   const seenSummary = document.getElementById('seen-summary');
   const toast = document.getElementById('chat-toast');
@@ -215,6 +227,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   const userSound = document.getElementById('user-notification-sound');
   const seenSound = document.getElementById('seen-notification-sound');
   const soundModePill = document.getElementById('sound-mode-pill');
+  const retryBanner = document.getElementById('retry-banner');
+  const retryCopy = document.getElementById('retry-copy');
+  const retryBtn = document.getElementById('retry-btn');
   const cursorCore = document.getElementById('cursor-core');
   const cursorRing = document.getElementById('cursor-ring');
   let lastMessageId = 0;
@@ -224,6 +239,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   let stopTypingTimer = null;
   let websocketConnected = false;
   let settings = { volume: 0.75, muted: false };
+  const pendingQueue = [];
+  let sendingNow = false;
   const trails = [];
   const audioContext = window.AudioContext ? new AudioContext() : (window.webkitAudioContext ? new webkitAudioContext() : null);
 
@@ -237,6 +254,47 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
     toast.classList.add('show');
     window.clearTimeout(showToast.timer);
     showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 3600);
+  };
+  const updateRetryUi = () => {
+    if (!retryBanner || !retryCopy) return;
+    if (!pendingQueue.length) {
+      retryBanner.classList.remove('show');
+      return;
+    }
+    const failed = pendingQueue.filter((item) => item.failed).length;
+    retryCopy.textContent = failed ? `${failed} message(s) failed. Tap retry.` : `${pendingQueue.length} message(s) sending…`;
+    retryBanner.classList.add('show');
+  };
+  const queueMessage = (text) => {
+    pendingQueue.push({ id: Date.now() + Math.random(), text, failed: false, tries: 0 });
+    updateRetryUi();
+  };
+  const processQueue = async () => {
+    if (sendingNow || !pendingQueue.length) return;
+    sendingNow = true;
+    const current = pendingQueue[0];
+    current.tries += 1;
+    try {
+      const response = await fetch('/qwe1/chat_send.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticket_id: ticketId, message: current.text })
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      pendingQueue.shift();
+      updateRetryUi();
+      await sendState('typing', { is_typing: false });
+      await loadMessages();
+      if (pendingQueue.length) window.setTimeout(processQueue, 180);
+    } catch (error) {
+      current.failed = true;
+      updateRetryUi();
+      showToast('Send failed', 'Message queued. Retry will continue automatically.');
+      window.setTimeout(() => { sendingNow = false; processQueue(); }, 3500);
+      return;
+    }
+    sendingNow = false;
   };
   const loadSettings = () => {
     try {
@@ -287,7 +345,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   };
   const sendState = async (action, extra = {}) => {
     try {
-      await fetch('/qwe1/chat_send.php', {
+      await fetch(sendUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ticket_id: ticketId, action, ...extra })
@@ -331,6 +389,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
     typingIndicator.textContent = presence.typing_active ? (presence.typing_label || `${otherRoleLabel()} is typing…`) : '';
     typingIndicator.classList.toggle('show', Boolean(presence.typing_active));
     typingPill.textContent = presence.typing_active ? (presence.typing_label || `${otherRoleLabel()} is typing…`) : 'No typing activity';
+    if (onlineUsersBadge) {
+      const onlineCount = Number(presence.online_users || (presence.other_online ? 2 : 1));
+      onlineUsersBadge.textContent = `Online users: ${onlineCount}`;
+    }
     stream.innerHTML = messages.map((message) => {
       const isAdmin = message.sender_role === 'admin';
       const attachments = Array.isArray(message.attachments) && message.attachments.length
@@ -338,7 +400,8 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
         : '';
       const text = escapeHtml(message.message_text || '').replace(/\n/g,'<br>');
       const seenMarker = message.seen_label ? `<div class="seen-indicator"><span class="system-pill">${escapeHtml(message.seen_label)}</span></div>` : '';
-      return `<div class="message-row ${isAdmin ? 'admin' : 'user'}"><div class="message-bubble"><div class="message-meta"><strong>${escapeHtml(message.sender_name || (isAdmin ? 'Admin' : customerName))}</strong><span>${escapeHtml(message.created_at || '')}</span></div>${text ? `<div class="message-text">${text}</div>` : ''}${attachments}${seenMarker}<div class="message-footer">${message.sent_by_viewer ? (message.seen_at ? '✔✔' : '✔') : ''}</div></div></div>`;
+      const footerTick = !message.sent_by_viewer ? '' : (message.seen_at ? '✔✔ Seen' : (message.delivered_at ? '✔✔' : '✔'));
+      return `<div class="message-row ${isAdmin ? 'admin' : 'user'}"><div class="message-bubble"><div class="message-meta"><strong>${escapeHtml(message.sender_name || (isAdmin ? 'Admin' : customerName))}</strong><span>${escapeHtml(message.created_at || '')}</span></div>${text ? `<div class="message-text">${text}</div>` : ''}${attachments}${seenMarker}<div class="message-footer">${footerTick}</div></div></div>`;
     }).join('');
     stream.scrollTop = stream.scrollHeight;
 
@@ -366,7 +429,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   };
   const loadMessages = async () => {
     try {
-      const response = await fetch(`/qwe1/chat_feed.php?id=${ticketId}`, { cache: 'no-store', headers: { 'Accept': 'application/json' } });
+      const response = await fetch(`${feedUrl}?id=${ticketId}`, { cache: 'no-store', headers: { 'Accept': 'application/json' }, credentials: 'same-origin' });
       if (!response.ok) return;
       const payload = await response.json();
       await render(payload);
@@ -414,14 +477,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
     event.preventDefault();
     const message = input.value.trim();
     if (!message) return;
-    await fetch('/qwe1/chat_send.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ticket_id: ticketId, message })
-    });
+    queueMessage(message);
     input.value = '';
-    await sendState('typing', { is_typing: false });
-    await loadMessages();
+    processQueue();
   });
   input.addEventListener('input', handleTypingInput);
   input.addEventListener('blur', () => sendState('typing', { is_typing: false }));
@@ -434,6 +492,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
     settings.muted = !settings.muted;
     persistSettings();
     loadSettings();
+  });
+  retryBtn?.addEventListener('click', () => {
+    pendingQueue.forEach((item) => { item.failed = false; });
+    updateRetryUi();
+    processQueue();
   });
   document.addEventListener('click', async () => {
     if ('Notification' in window && Notification.permission === 'default') {
@@ -478,8 +541,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
   startPolling();
   connectRealtime();
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/qwe1/service-worker.js').catch(() => {});
+    navigator.serviceWorker.register(new URL('/qwe1/service-worker.js', window.location.origin).toString()).catch(() => {});
   }
+  window.addEventListener('unhandledrejection', (event) => {
+    if (String(event.reason || '').includes('runtime.lastError')) {
+      event.preventDefault();
+    }
+  });
 })();
 </script>
 </body>

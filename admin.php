@@ -308,15 +308,17 @@ function fetchPreviewTicket(PDO $pdo, array $tickets, ?array $messageSource): ?a
         return $preview;
     }
 
+    $userJoin = $messageSource['user_id_column'] ? ' LEFT JOIN users sender ON sender.id = m.`' . $messageSource['user_id_column'] . '`' : '';
+
     $selectSenderRole = $messageSource['sender_role_column']
         ? "m.`{$messageSource['sender_role_column']}`"
-        : ($messageSource['source_column']
-            ? "CASE WHEN COALESCE(m.`{$messageSource['source_column']}`, 'web') = 'admin' THEN 'admin' ELSE 'user' END"
-            : ($messageSource['user_id_column']
-                ? "CASE WHEN COALESCE(sender.role, 'user') = 'admin' THEN 'admin' ELSE 'user' END"
+        : ($messageSource['user_id_column']
+            ? ($messageSource['source_column']
+                ? "CASE WHEN COALESCE(sender.role, CASE WHEN COALESCE(m.`{$messageSource['source_column']}`, 'web') = 'admin' THEN 'admin' ELSE 'user' END) = 'admin' THEN 'admin' ELSE 'user' END"
+                : "CASE WHEN COALESCE(sender.role, 'user') = 'admin' THEN 'admin' ELSE 'user' END")
+            : ($messageSource['source_column']
+                ? "CASE WHEN COALESCE(m.`{$messageSource['source_column']}`, 'web') = 'admin' THEN 'admin' ELSE 'user' END"
                 : "'user'"));
-
-    $userJoin = $messageSource['user_id_column'] ? ' LEFT JOIN users sender ON sender.id = m.`' . $messageSource['user_id_column'] . '`' : '';
     $sql = "SELECT m.`{$messageSource['message_column']}` AS message_text, {$selectSenderRole} AS sender_role FROM `{$messageSource['table']}` m{$userJoin} WHERE m.`{$messageSource['ticket_id_column']}` = :ticket_id ORDER BY m.`{$messageSource['created_at_column']}` DESC, m.`{$messageSource['id_column']}` DESC LIMIT 3";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['ticket_id' => $preview['id']]);
