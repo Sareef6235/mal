@@ -1,6 +1,6 @@
 -- SQL schema for advanced realtime chat notification system
-CREATE DATABASE IF NOT EXISTS chat_app CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE chat_app;
+CREATE DATABASE IF NOT EXISTS hvernued_conve CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE hvernued_conve;
 
 CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
