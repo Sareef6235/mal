@@ -1,0 +1,8 @@
+Options -Indexes
+
+# Disable script execution in uploads directory
+<FilesMatch "\.(php|php5|phtml|phar|pl|py|jsp|asp|sh|cgi)$">
+    Require all denied
+</FilesMatch>
+
+AddType text/plain .php .php5 .phtml .phar .pl .py .jsp .asp .sh .cgi
