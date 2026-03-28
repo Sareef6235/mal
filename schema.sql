@@ -1,0 +1,33 @@
+CREATE DATABASE IF NOT EXISTS book_order_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE book_order_system;
+
+CREATE TABLE IF NOT EXISTS orders_main (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    student_name VARCHAR(150) NOT NULL,
+    total_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    total_discount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    commission DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    status ENUM('editable', 'locked') NOT NULL DEFAULT 'editable',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS orders_items (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    order_id BIGINT UNSIGNED NOT NULL,
+    book_name VARCHAR(255) NOT NULL,
+    mrp DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    rate DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    qty INT UNSIGNED NOT NULL DEFAULT 1,
+    discount_percent DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    discount_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    taxable_value DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    cgst_rate DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    cgst_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    sgst_rate DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    sgst_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    total DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_orders_items_order FOREIGN KEY (order_id)
+        REFERENCES orders_main(id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
