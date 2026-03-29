@@ -2,7 +2,19 @@
 require_once __DIR__ . '/config.php';
 require_quiz_user();
 
+$isAjax = isset($_POST['ajax']) || (isset($_SERVER['HTTP_ACCEPT']) && str_contains($_SERVER['HTTP_ACCEPT'], 'application/json'));
+
+function respond_json(array $data): void
+{
+    header('Content-Type: application/json');
+    echo json_encode($data);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    if ($isAjax) {
+        respond_json(['success' => false, 'message' => 'Invalid request method']);
+    }
     redirect('/quiz.php');
 }
 
@@ -13,6 +25,9 @@ $stmt = $pdo->query('SELECT id, correct_option, marks FROM questions ORDER BY id
 $questions = $stmt->fetchAll();
 
 if (!$questions) {
+    if ($isAjax) {
+        respond_json(['success' => false, 'message' => 'No questions found.']);
+    }
     set_flash('error', 'No questions found.');
     redirect('/quiz.php');
 }
@@ -39,10 +54,10 @@ try {
         $totalMarks += $marks;
 
         $selected = strtolower((string)($userAnswers[$questionId] ?? ''));
-        $selected = in_array($selected, ['a', 'b', 'c', 'd'], true) ? $selected : '';
+        $selected = in_array($selected, ['a', 'b', 'c', 'd'], true) ? $selected : null;
 
         $correct = strtolower((string)$question['correct_option']);
-        $isCorrect = ($selected !== '' && $selected === $correct) ? 1 : 0;
+        $isCorrect = ($selected !== null && $selected === $correct) ? 1 : 0;
 
         if ($isCorrect === 1) {
             $scoredMarks += $marks;
@@ -57,11 +72,23 @@ try {
     $pdo->commit();
 } catch (Throwable $exception) {
     $pdo->rollBack();
+    if ($isAjax) {
+        respond_json(['success' => false, 'message' => 'Could not submit quiz. Please try again.']);
+    }
     set_flash('error', 'Could not submit quiz. Please try again.');
     redirect('/quiz.php');
 }
 
 $_SESSION['total_marks'] = $totalMarks;
 $_SESSION['scored_marks'] = $scoredMarks;
+
+if ($isAjax) {
+    respond_json([
+        'success' => true,
+        'total_marks' => $totalMarks,
+        'scored_marks' => $scoredMarks,
+        'redirect' => '/result.php',
+    ]);
+}
 
 redirect('/result.php');

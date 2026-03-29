@@ -7,6 +7,7 @@ $flash = get_flash();
 $stmt = $pdo->query('SELECT id, question, option_a, option_b, option_c, option_d, marks FROM questions ORDER BY id ASC');
 $questions = $stmt->fetchAll();
 $totalQuestions = count($questions);
+$quizDurationSeconds = max($totalQuestions * 45, 60); // 45 seconds/question, minimum 1 minute
 
 if ($totalQuestions === 0) {
     set_flash('error', 'No questions available. Please ask admin to add questions.');
@@ -33,13 +34,19 @@ if ($totalQuestions === 0) {
 
     <div class="glass-card">
         <?php if ($flash): ?>
-            <div class="flash <?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
+            <div class="flash <?= e($flash['type']) ?>" data-flash-message="<?= e($flash['message']) ?>" data-flash-type="<?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
         <?php endif; ?>
 
         <h2>Welcome, <?= e((string)$_SESSION['user_name']) ?></h2>
-        <p>Total Questions: <strong><?= $totalQuestions ?></strong></p>
+        <div class="quiz-meta">
+            <p>Total Questions: <strong><?= $totalQuestions ?></strong></p>
+            <p class="timer">⏱ Time Left: <span id="quizTimer">00:00</span></p>
+            <p id="answeredCounter">0/<?= $totalQuestions ?> answered</p>
+        </div>
 
-        <form method="POST" action="/submit.php">
+        <div class="progress-wrap"><div id="progressFill" class="progress-fill"></div></div>
+
+        <form method="POST" action="/submit.php" id="quizForm" data-total="<?= $totalQuestions ?>" data-duration="<?= $quizDurationSeconds ?>">
             <?php foreach ($questions as $index => $question): ?>
                 <div class="question-card">
                     <p><strong>Question <?= $index + 1 ?>/<?= $totalQuestions ?>:</strong> <?= e($question['question']) ?></p>
@@ -53,9 +60,10 @@ if ($totalQuestions === 0) {
                     </div>
                 </div>
             <?php endforeach; ?>
-            <button type="submit" class="btn">Submit Quiz</button>
+            <button type="submit" id="submitBtn" class="btn">Submit Quiz (AJAX)</button>
         </form>
     </div>
 </div>
+<script src="/assets/app.js"></script>
 </body>
 </html>

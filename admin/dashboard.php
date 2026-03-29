@@ -52,7 +52,7 @@ $questions = $questionsStmt->fetchAll();
     </div>
 
     <?php if ($flash): ?>
-        <div class="flash <?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
+        <div class="flash <?= e($flash['type']) ?>" data-flash-message="<?= e($flash['message']) ?>" data-flash-type="<?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
     <?php endif; ?>
 
     <div class="grid">
@@ -62,10 +62,13 @@ $questions = $questionsStmt->fetchAll();
     </div>
 
     <div class="glass-card" style="margin-top:1rem;">
-        <h2>Top 10 Leaderboard</h2>
+        <h2>Top 10 Leaderboard (Live)</h2>
         <div class="table-wrap">
             <table>
+                <thead>
                 <tr><th>#</th><th>Name</th><th>Class</th><th>Score</th><th>Percent</th><th>Badge</th></tr>
+                </thead>
+                <tbody data-live-leaderboard>
                 <?php if (!$topScores): ?>
                     <tr><td colspan="6">No results available.</td></tr>
                 <?php else: foreach ($topScores as $i => $row): ?>
@@ -78,6 +81,7 @@ $questions = $questionsStmt->fetchAll();
                         <td><?= $i === 0 ? '<span class="badge">Top scorer 🔥</span>' : '-' ?></td>
                     </tr>
                 <?php endforeach; endif; ?>
+                </tbody>
             </table>
         </div>
     </div>
@@ -124,5 +128,6 @@ $questions = $questionsStmt->fetchAll();
         </div>
     </div>
 </div>
+<script src="/assets/app.js"></script>
 </body>
 </html>

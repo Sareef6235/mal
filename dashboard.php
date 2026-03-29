@@ -3,6 +3,7 @@ require_once __DIR__ . '/config.php';
 require_quiz_user();
 
 $userId = (int)$_SESSION['user_id'];
+$flash = get_flash();
 
 $myStmt = $pdo->prepare(
     'SELECT u.name, u.class, r.scored_marks, r.total_marks
@@ -42,6 +43,10 @@ $topScores = $topStmt->fetchAll();
         </nav>
     </div>
 
+    <?php if ($flash): ?>
+        <div class="flash <?= e($flash['type']) ?>" data-flash-message="<?= e($flash['message']) ?>" data-flash-type="<?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
+    <?php endif; ?>
+
     <div class="grid">
         <div class="stat-card">
             <h3>Your Name</h3>
@@ -58,20 +63,15 @@ $topScores = $topStmt->fetchAll();
     </div>
 
     <div class="glass-card" style="margin-top:1rem;">
-        <h2>Top 10 Highest Scores</h2>
+        <h2>Top 10 Highest Scores (Live)</h2>
         <div class="table-wrap">
             <table>
                 <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Class</th>
-                        <th>Score</th>
-                        <th>Percent</th>
-                        <th>Badge</th>
-                    </tr>
+                <tr>
+                    <th>#</th><th>Name</th><th>Class</th><th>Score</th><th>Percent</th><th>Badge</th>
+                </tr>
                 </thead>
-                <tbody>
+                <tbody data-live-leaderboard>
                 <?php if (!$topScores): ?>
                     <tr><td colspan="6">No results yet.</td></tr>
                 <?php else: ?>
@@ -82,13 +82,7 @@ $topScores = $topStmt->fetchAll();
                             <td><?= e($row['class']) ?></td>
                             <td><?= (int)$row['scored_marks'] ?> / <?= (int)$row['total_marks'] ?></td>
                             <td><?= number_format((float)$row['percent'], 2) ?>%</td>
-                            <td>
-                                <?php if ($idx === 0): ?>
-                                    <span class="badge">Top scorer 🔥</span>
-                                <?php else: ?>
-                                    -
-                                <?php endif; ?>
-                            </td>
+                            <td><?= $idx === 0 ? '<span class="badge">Top scorer 🔥</span>' : '-' ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -97,5 +91,6 @@ $topScores = $topStmt->fetchAll();
         </div>
     </div>
 </div>
+<script src="/assets/app.js"></script>
 </body>
 </html>

@@ -42,13 +42,19 @@ $isPassed = $percentage >= 70;
         <p><strong>Percentage:</strong> <?= number_format($percentage, 2) ?>%</p>
 
         <?php if ($isPassed): ?>
-            <h3 style="color:#86efac;">Congratulations 🎉 You scored above 70%!</h3>
+            <h3 class="typing-title" data-typing="Congratulations 🎉 You scored above 70%!" data-speed="45">Congratulations 🎉 You scored above 70%!</h3>
         <?php else: ?>
-            <h3 style="color:#fecaca;">Keep practicing! You can do better.</h3>
+            <h3>Keep practicing! You can do better.</h3>
         <?php endif; ?>
 
         <a class="btn" href="/dashboard.php">View Dashboard</a>
     </div>
 </div>
+<script src="/assets/app.js"></script>
+<script>
+  if (window.quizApp) {
+    window.quizApp.playTone(<?= $isPassed ? '900' : '350' ?>, 300);
+  }
+</script>
 </body>
 </html>

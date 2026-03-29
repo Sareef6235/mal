@@ -31,37 +31,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Online Quiz / Exam System</h1>
-            <nav class="menu">
-                <a href="/index.php">Home</a>
-                <a href="/admin/login.php">Admin Login</a>
-            </nav>
-        </div>
-
-        <div class="glass-card">
-            <?php if ($flash): ?>
-                <div class="flash <?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
-            <?php endif; ?>
-
-            <h2>Start Your Quiz</h2>
-            <p>Enter your details to begin. Questions are loaded dynamically from MySQL database.</p>
-
-            <form method="POST" action="/index.php">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="class">Class</label>
-                    <input type="text" id="class" name="class" placeholder="Enter your class" required>
-                </div>
-
-                <button type="submit" class="btn">Start Quiz</button>
-            </form>
-        </div>
+<div class="container">
+    <div class="header">
+        <h1 class="typing-title" data-typing="Online Quiz / Exam System" data-speed="40">Online Quiz / Exam System</h1>
+        <nav class="menu">
+            <a href="/index.php">Home</a>
+            <a href="/admin/login.php">Admin Login</a>
+        </nav>
     </div>
+
+    <div class="glass-card">
+        <?php if ($flash): ?>
+            <div class="flash <?= e($flash['type']) ?>" data-flash-message="<?= e($flash['message']) ?>" data-flash-type="<?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
+        <?php endif; ?>
+
+        <h2>Start Your Quiz</h2>
+        <p>Enter your details to begin. Questions are loaded dynamically from MySQL database.</p>
+
+        <form method="POST" action="/index.php">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="class">Class</label>
+                <input type="text" id="class" name="class" placeholder="Enter your class" required>
+            </div>
+
+            <button type="submit" class="btn">Start Quiz</button>
+        </form>
+    </div>
+</div>
+<script src="/assets/app.js"></script>
 </body>
 </html>
