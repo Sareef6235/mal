@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icons/icon-192.svg" />
+  <title>Dashboard | SaaS Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          boxShadow: { soft: '0 20px 45px -25px rgba(2, 6, 23, 0.55)' },
+          colors: { brand: { 500: '#2563eb', 600: '#1d4ed8' } }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="h-full text-slate-800 dark:text-slate-100">
+  <div class="min-h-screen flex">
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 md:w-64 -translate-x-full md:translate-x-0 transition-transform duration-300 glass shadow-soft p-4">
+      <div class="flex items-center justify-between">
+        <h1 class="text-xl font-bold">SaaS Panel</h1>
+        <button id="closeSidebar" class="md:hidden p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">✕</button>
+      </div>
+      <nav class="mt-6 space-y-2">
+        <a href="#" class="sidebar-link active block rounded-xl px-3 py-2 font-medium">Dashboard</a>
+        <a href="#itemsSection" class="sidebar-link block rounded-xl px-3 py-2 hover:bg-slate-200/70 dark:hover:bg-slate-700/70">Plans & Tasks</a>
+        <a href="#usersSection" id="usersNav" class="sidebar-link hidden block rounded-xl px-3 py-2 hover:bg-slate-200/70 dark:hover:bg-slate-700/70">Users</a>
+      </nav>
+    </aside>
+
+    <div class="flex-1 flex flex-col md:ml-0">
+      <header class="sticky top-0 z-30 glass border-b border-white/30 dark:border-slate-700/60 px-4 py-3 md:px-6 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <button id="openSidebar" class="md:hidden p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">☰</button>
+          <h2 class="font-semibold">Dashboard</h2>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="themeToggle" class="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">🌙</button>
+          <div class="relative">
+            <button id="profileButton" class="flex items-center gap-2 rounded-xl px-3 py-2 hover:bg-slate-200/70 dark:hover:bg-slate-700/60">
+              <span id="profileName" class="text-sm font-semibold"></span>
+              <span>▾</span>
+            </button>
+            <div id="profileMenu" class="hidden absolute right-0 mt-2 w-40 rounded-xl glass shadow-soft p-2">
+              <button id="logoutBtn" class="w-full text-left rounded-lg px-3 py-2 hover:bg-slate-200 dark:hover:bg-slate-700">Logout</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="p-4 md:p-6 space-y-6 pb-24 md:pb-6">
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="statsGrid"></section>
+
+        <section class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <div class="xl:col-span-2 glass rounded-2xl p-4 shadow-soft">
+            <h3 class="font-semibold mb-3">Monthly Progress</h3>
+            <canvas id="progressChart" height="110"></canvas>
+          </div>
+          <div class="glass rounded-2xl p-4 shadow-soft">
+            <h3 class="font-semibold mb-3">Recent Activity</h3>
+            <ul id="activityList" class="space-y-3 text-sm"></ul>
+          </div>
+        </section>
+
+        <section id="itemsSection" class="glass rounded-2xl p-4 shadow-soft space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <h3 class="font-semibold text-lg">Plans / Tasks</h3>
+            <div class="flex gap-2">
+              <button id="exportPdfBtn" class="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-sm hover:bg-slate-200 dark:hover:bg-slate-700">Export PDF</button>
+              <button id="printBtn" class="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-sm hover:bg-slate-200 dark:hover:bg-slate-700">Print</button>
+              <button id="openItemModal" class="rounded-lg bg-brand-500 hover:bg-brand-600 px-3 py-2 text-sm text-white">+ Add</button>
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-3 gap-3">
+            <input id="searchInput" placeholder="Search..." class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2" />
+            <select id="categoryFilter" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2"></select>
+            <select id="statusFilter" class="rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2">
+              <option value="">All status</option>
+              <option value="pending">Pending</option>
+              <option value="in_progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+
+          <div class="overflow-auto">
+            <table class="w-full text-sm" id="itemsTable">
+              <thead>
+                <tr class="text-left text-slate-500">
+                  <th class="py-2">Order</th><th>Title</th><th>Category</th><th>Status</th><th>Due Date</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="itemsTbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="usersSection" class="glass rounded-2xl p-4 shadow-soft space-y-4 hidden">
+          <div class="flex items-center justify-between">
+            <h3 class="font-semibold text-lg">User Management</h3>
+            <button id="openUserModal" class="rounded-lg bg-brand-500 hover:bg-brand-600 px-3 py-2 text-sm text-white">+ New User</button>
+          </div>
+          <div class="overflow-auto">
+            <table class="w-full text-sm">
+              <thead><tr class="text-left text-slate-500"><th>Name</th><th>Email</th><th>Role</th><th>Action</th></tr></thead>
+              <tbody id="usersTbody"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <nav class="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-40 glass border-t border-white/40 dark:border-slate-700/70 px-3 py-2">
+    <div class="grid grid-cols-3 gap-2 text-xs text-center">
+      <a href="#" class="rounded-lg py-2 hover:bg-slate-200 dark:hover:bg-slate-700">Home</a>
+      <a href="#itemsSection" class="rounded-lg py-2 hover:bg-slate-200 dark:hover:bg-slate-700">Tasks</a>
+      <a href="#usersSection" class="rounded-lg py-2 hover:bg-slate-200 dark:hover:bg-slate-700">Users</a>
+    </div>
+  </nav>
+
+  <div id="itemModal" class="hidden fixed inset-0 z-50 bg-slate-900/45 p-4">
+    <div class="max-w-lg mx-auto mt-20 glass rounded-2xl p-5 space-y-4">
+      <h4 class="font-semibold">Add / Edit Item</h4>
+      <form id="itemForm" class="space-y-3">
+        <input type="hidden" id="itemId" />
+        <input id="itemTitle" required placeholder="Title" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2" />
+        <select id="itemCategory" required class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2"></select>
+        <select id="itemStatus" required class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2">
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="done">Done</option>
+        </select>
+        <input id="itemDueDate" type="date" required class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2" />
+        <div class="flex justify-end gap-2">
+          <button type="button" data-close-modal="itemModal" class="rounded-lg border px-3 py-2">Cancel</button>
+          <button class="rounded-lg bg-brand-500 hover:bg-brand-600 text-white px-3 py-2">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="userModal" class="hidden fixed inset-0 z-50 bg-slate-900/45 p-4">
+    <div class="max-w-lg mx-auto mt-20 glass rounded-2xl p-5 space-y-4">
+      <h4 class="font-semibold">Create User</h4>
+      <form id="userForm" class="space-y-3">
+        <input id="userName" required placeholder="Name" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2" />
+        <input id="userEmail" required type="email" placeholder="Email" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2" />
+        <input id="userPassword" required type="password" placeholder="Password" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2" />
+        <select id="userRole" class="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-900/60 px-3 py-2"><option value="user">User</option><option value="admin">Admin</option></select>
+        <div class="flex justify-end gap-2">
+          <button type="button" data-close-modal="userModal" class="rounded-lg border px-3 py-2">Cancel</button>
+          <button class="rounded-lg bg-brand-500 hover:bg-brand-600 text-white px-3 py-2">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="confirmDialog" class="hidden fixed inset-0 z-50 bg-slate-900/45 flex items-center justify-center p-4">
+    <div class="glass rounded-2xl p-5 w-full max-w-sm space-y-4">
+      <h4 class="font-semibold">Confirm</h4>
+      <p id="confirmText" class="text-sm text-slate-600 dark:text-slate-300"></p>
+      <div class="flex justify-end gap-2">
+        <button id="confirmCancel" class="rounded-lg border px-3 py-2">Cancel</button>
+        <button id="confirmOk" class="rounded-lg bg-red-600 text-white px-3 py-2">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-3"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
