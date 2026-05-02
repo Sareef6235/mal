@@ -1,0 +1,16 @@
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+}
+body { background: linear-gradient(120deg, #0f172a, #1d4ed8); min-height: 100vh; color: var(--text); }
+.light body, .theme-light { background: #f1f5f9; color: #0f172a; }
+.glass { background: rgba(30,41,59,.85); backdrop-filter: blur(8px); border: 1px solid rgba(148,163,184,.2); }
+.card-stat { border-radius: 1rem; }
+.form-control, .form-select { background: #0b1220; color: #e2e8f0; border: 1px solid #334155; }
+.table { color: #e2e8f0; }
+.navbar-brand { font-weight: 700; }
+.badge-verified { background:#10b981; }
+.badge-pending { background:#f59e0b; }
+@media (max-width: 768px){ .container { padding: 12px; } }
