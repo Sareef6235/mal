@@ -1,0 +1,17 @@
+{
+  "name": "AstraEdu Command Center",
+  "short_name": "AstraEdu",
+  "description": "Secure education, finance, quiz verification, reports, and admin management platform.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Dashboard", "url": "./index.html#dashboard" },
+    { "name": "FAQ", "url": "./faq.html" }
+  ]
+}
