@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A secure futuristic Islamic education management platform for planning, finance, quizzes, Telegram verification, reports, students, and Ustads." />
+    <title>NoorOps | Secure Islamic Education Management</title>
+    <preconnect href="https://fonts.googleapis.com" />
+    <preconnect href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Malayalam:wght@400;500;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="preloader" class="preloader" aria-label="Loading secure interface">
+      <div class="loader-card">
+        <div class="skeleton skeleton-orb"></div>
+        <div class="skeleton skeleton-line wide"></div>
+        <div class="skeleton skeleton-line"></div>
+      </div>
+    </div>
+
+    <div class="aurora-bg" aria-hidden="true"></div>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+    <div class="mouse-glow" aria-hidden="true"></div>
+    <div class="watermark" aria-hidden="true">NOOROPS SECURE • نور</div>
+
+    <header class="navbar" id="navbar">
+      <a href="#home" class="brand" aria-label="NoorOps home">
+        <span class="brand-icon"><i class="bi bi-shield-lock-fill"></i></span>
+        <span>Noor<span>Ops</span></span>
+      </a>
+      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
+        <a href="#home" class="active">Home</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#features">Features</a>
+        <a href="#faq">FAQ</a>
+        <a href="#terms">Terms & Conditions</a>
+        <a href="#privacy">Privacy Policy</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="icon-btn" id="soundToggle" aria-label="Toggle interface sounds"><i class="bi bi-volume-up"></i></button>
+        <button class="theme-switcher" id="themeSwitcher" aria-label="Switch theme"><span></span></button>
+        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero section" id="home">
+        <div class="hero-copy reveal">
+          <span class="eyebrow"><i class="bi bi-stars"></i> Enterprise-grade madrasa operations</span>
+          <h1>Secure Islamic education management with <span class="gradient-text typing-text">cyber glass precision.</span></h1>
+          <p class="hero-subtitle">Manage monthly plans, receipts, quizzes, Telegram verification, students, Ustads, print-ready reports, and smart admin analytics from one premium protected workspace.</p>
+          <div class="cta-row">
+            <a class="btn magnetic primary" href="#contact"><i class="bi bi-rocket-takeoff"></i> Get Started</a>
+            <a class="btn magnetic ghost" href="#dashboard"><i class="bi bi-grid-1x2"></i> View Dashboard</a>
+            <button class="btn magnetic telegram" data-open-modal="otpModal"><i class="bi bi-telegram"></i> Connect Telegram</button>
+          </div>
+          <div class="counter-grid" aria-label="Platform highlights">
+            <div><strong data-count="99.9">0</strong><span>% uptime</span></div>
+            <div><strong data-count="12000">0</strong><span>receipts</span></div>
+            <div><strong data-count="650">0</strong><span>learners</span></div>
+          </div>
+        </div>
+        <div class="hero-visual reveal delay-1">
+          <div class="lottie-orbit">
+            <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_jcikwtux.json" background="transparent" speed="0.85" loop autoplay aria-label="Animated security lock"></lottie-player>
+          </div>
+          <div class="floating-card card-plan"><i class="bi bi-calendar2-check"></i><strong>Monthly Plan</strong><span>96% completed</span></div>
+          <div class="floating-card card-receipt"><i class="bi bi-receipt"></i><strong>Finance</strong><span>₹84,500 received</span></div>
+          <div class="floating-card card-quiz"><i class="bi bi-trophy"></i><strong>Leaderboard</strong><span>Rank sync live</span></div>
+        </div>
+      </section>
+
+      <section class="features section" id="features">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Premium feature matrix</span>
+          <h2>Everything your institution needs in one secure control layer.</h2>
+          <p>Designed for Malayalam-first Islamic education teams that need speed, accountability, privacy, and beautiful daily workflows.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card reveal"><i class="bi bi-fingerprint"></i><h3>Secure Login System</h3><p>Adaptive access flows with session intelligence and guarded admin surfaces.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-calendar3"></i><h3>Smart Monthly Planning</h3><p>Plan classes, assessments, milestones, holidays, and review cycles.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-wallet2"></i><h3>Receipt Management</h3><p>Track dues, paid receipts, refunds, exports, and status badges.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-telegram"></i><h3>Telegram OTP Verification</h3><p>Verify sensitive actions with secure Telegram-based approval prompts.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-award"></i><h3>Quiz & Leaderboard</h3><p>Run secure quizzes with anti-copy UX and performance rankings.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-filetype-pdf"></i><h3>PDF & Print Export</h3><p>Generate A4-ready Malayalam reports with headers, footers, and tables.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-graph-up-arrow"></i><h3>Analytics Dashboard</h3><p>Monitor learning, revenue, attendance, and compliance at a glance.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-mortarboard"></i><h3>Student Management</h3><p>Rich profiles, payments, quiz history, batches, and guardian contacts.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-person-workspace"></i><h3>Ustad Management</h3><p>Manage teachers, subjects, permissions, schedules, and progress reviews.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-clock-history"></i><h3>Auto Session Security</h3><p>Timeout warnings, auto logout states, and inactive-tab privacy blur.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-droplet-half"></i><h3>Watermark Protection</h3><p>Visible ownership overlays for sensitive reports, quizzes, and dashboards.</p></article>
+          <article class="feature-card reveal"><i class="bi bi-phone"></i><h3>Mobile PWA Support</h3><p>Installable, touch-friendly views with bottom navigation and sheet modals.</p></article>
+        </div>
+      </section>
+
+      <section class="dashboard-section section" id="dashboard">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Live admin preview</span>
+          <h2>A realistic command center for finance, education, and verification.</h2>
+        </div>
+        <div class="dashboard-shell reveal">
+          <aside class="glass-sidebar">
+            <div class="search-box"><i class="bi bi-search"></i><input placeholder="Smart search" aria-label="Smart search" /></div>
+            <a class="active"><i class="bi bi-speedometer2"></i> Overview</a><a><i class="bi bi-people"></i> Students</a><a><i class="bi bi-receipt-cutoff"></i> Receipts</a><a><i class="bi bi-shield-check"></i> Security</a>
+          </aside>
+          <div class="dashboard-main">
+            <div class="stats-row">
+              <div class="stat-card"><span>Total fees</span><strong>₹2.4L</strong><small class="success">+18.2%</small></div>
+              <div class="stat-card"><span>Active students</span><strong>648</strong><small class="success">+42</small></div>
+              <div class="stat-card"><span>Pending receipts</span><strong>36</strong><small class="warning">review</small></div>
+              <div class="stat-card"><span>OTP approvals</span><strong>1,240</strong><small class="success">secure</small></div>
+            </div>
+            <div class="widget-grid">
+              <div class="widget chart-widget"><div class="widget-head"><h3>Finance pulse</h3><button class="tiny-btn" id="exportPdf"><i class="bi bi-filetype-pdf"></i> Export</button></div><canvas id="financeChart"></canvas></div>
+              <div class="widget"><h3>Plan progress</h3><div class="progress-item"><span>Hifz Review</span><b>82%</b><div><span style="width:82%"></span></div></div><div class="progress-item"><span>Fiqh Quiz</span><b>68%</b><div><span style="width:68%"></span></div></div><div class="progress-item"><span>Fees Collection</span><b>91%</b><div><span style="width:91%"></span></div></div></div>
+              <div class="widget table-widget"><h3>Receipt status</h3><table><thead><tr><th>Name</th><th>Plan</th><th>Status</th></tr></thead><tbody><tr><td>Amina</td><td>Premium</td><td><span class="badge paid">Paid</span></td></tr><tr><td>Yusuf</td><td>Monthly</td><td><span class="badge due">Due</span></td></tr><tr><td>Fathima</td><td>Quarterly</td><td><span class="badge review">Review</span></td></tr></tbody></table></div>
+              <div class="widget feed-widget"><h3>Activity feed</h3><p><i class="bi bi-check-circle"></i> Telegram OTP verified for PDF export.</p><p><i class="bi bi-trophy"></i> Leaderboard recalculated.</p><p><i class="bi bi-printer"></i> Monthly receipt batch printed.</p></div>
+            </div>
+          </div>
+          <div class="notification-panel"><i class="bi bi-bell"></i><strong>Security pulse</strong><span>All devices healthy</span></div>
+          <button class="fab dashboard-fab" data-open-modal="printModal"><i class="bi bi-printer"></i></button>
+        </div>
+      </section>
+
+      <section class="security section" id="security">
+        <div class="security-card reveal">
+          <div>
+            <span class="eyebrow">Zero-trust inspired security UX</span>
+            <h2>Protection patterns your users can see and understand.</h2>
+            <p>Auto session timeout, device protection, copy restriction alerts, screenshot warnings, inactive-tab blur, floating watermark, secure quiz mode, and Telegram verification are represented with premium security UI states.</p>
+            <div class="security-actions"><button class="btn primary" data-open-modal="securityModal">Open Security Warning</button><button class="btn ghost" data-open-modal="sessionModal">Session Expired UI</button></div>
+          </div>
+          <div class="shield-stack">
+            <lottie-player src="https://assets10.lottiefiles.com/packages/lf20_qp1q7mct.json" background="transparent" speed="1" loop autoplay aria-label="Animated shield"></lottie-player>
+            <ul><li>Encrypted export approval</li><li>Blur on tab switch</li><li>Screenshot risk warning</li><li>Secure quiz lockdown</li></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="faq section" id="faq">
+        <div class="section-heading reveal"><span class="eyebrow">FAQ</span><h2>Answers before onboarding.</h2></div>
+        <div class="accordion reveal">
+          <details open><summary>How secure is the system?</summary><p>The UI models layered protection with OTP prompts, session warnings, copy restriction notices, watermark overlays, and device-health panels.</p></details>
+          <details><summary>Can data be exported?</summary><p>Yes. The design includes secure PDF export, print preview, professional receipt tables, and A4-optimized print styling.</p></details>
+          <details><summary>Is Telegram required?</summary><p>Telegram is presented as the recommended verification channel for sensitive actions, with an OTP modal for approvals.</p></details>
+          <details><summary>Does it support Malayalam?</summary><p>Yes. Typography includes Noto Sans Malayalam and print styles are tuned for Malayalam document rendering.</p></details>
+          <details><summary>Can admins print reports?</summary><p>Admins can use the print preview modal and print/PDF actions designed into the dashboard preview.</p></details>
+          <details><summary>Does it work as PWA?</summary><p>The responsive UI includes mobile bottom navigation, touch-sized controls, sticky actions, and app-like modal sheets.</p></details>
+        </div>
+      </section>
+
+      <section class="legal section" id="terms">
+        <aside class="legal-nav"><a href="#terms-use">Usage</a><a href="#terms-finance">Finance</a><a href="#terms-security">Security</a></aside>
+        <article class="legal-doc reveal"><span class="eyebrow">Terms & Conditions</span><h2>Professional operating terms</h2><div id="terms-use"><h3>Accepted usage</h3><p>Administrators are responsible for maintaining accurate student, Ustad, quiz, and receipt records inside their institution workspace.</p></div><div id="terms-finance"><h3>Finance records</h3><p>Receipt dashboards, monthly plans, and export tools are interface aids and should be reviewed before formal submission.</p></div><div id="terms-security"><h3>Security obligations</h3><p>Users must protect credentials, respect verification prompts, and avoid sharing protected reports outside authorized channels.</p></div></article>
+      </section>
+
+      <section class="legal section" id="privacy">
+        <aside class="legal-nav"><a href="#privacy-data">Data</a><a href="#privacy-telegram">Telegram</a><a href="#privacy-rights">Rights</a></aside>
+        <article class="legal-doc reveal"><span class="eyebrow">Privacy Policy</span><h2>Privacy-first platform experience</h2><div id="privacy-data"><h3>Data protection</h3><p>Student, payment, file upload, and quiz information should be handled with least-privilege access and visible security status indicators.</p></div><div id="privacy-telegram"><h3>Telegram verification safety</h3><p>OTP prompts are designed to approve sensitive actions without exposing private financial or student data inside chat previews.</p></div><div id="privacy-rights"><h3>User rights</h3><p>Institutions should provide clear pathways to review, correct, export, and remove user records where policy permits.</p></div></article>
+      </section>
+
+      <section class="contact section" id="contact">
+        <div class="contact-card reveal">
+          <div><span class="eyebrow">Contact</span><h2>Launch your premium secure madrasa workspace.</h2><p class="malayalam">വിദ്യാർത്ഥി മാനേജ്മെന്റ്, റസീറ്റ്, ക്വിസ്, സുരക്ഷിത റിപ്പോർട്ടുകൾ — എല്ലാം ഒരിടത്ത്.</p><div class="social-row"><a><i class="bi bi-telegram"></i> Telegram</a><a><i class="bi bi-whatsapp"></i> WhatsApp</a><a><i class="bi bi-envelope"></i> Email</a></div><div class="map-placeholder"><i class="bi bi-geo-alt"></i> Secure service map placeholder</div></div>
+          <form class="glass-form" id="contactForm">
+            <label><input required placeholder=" " /><span>Institution name</span></label>
+            <label><input type="email" required placeholder=" " /><span>Email address</span></label>
+            <label><textarea required placeholder=" "></textarea><span>Tell us your requirements</span></label>
+            <button class="btn primary" type="submit"><i class="bi bi-send"></i> Send encrypted request</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Mobile bottom navigation"><a href="#home"><i class="bi bi-house"></i></a><a href="#dashboard"><i class="bi bi-grid"></i></a><a href="#features"><i class="bi bi-stars"></i></a><button data-open-modal="otpModal"><i class="bi bi-shield-lock"></i></button></nav>
+
+    <button class="support-fab fab" data-open-modal="supportModal" aria-label="Open support"><i class="bi bi-chat-dots"></i></button>
+
+    <div class="modal" id="otpModal" role="dialog" aria-modal="true" aria-labelledby="otpTitle"><div class="modal-card"><button class="close-modal" aria-label="Close modal">×</button><h2 id="otpTitle">Telegram OTP Verification</h2><p>Enter the secure code sent to your Telegram admin channel.</p><div class="otp-inputs"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"></div><button class="btn primary">Verify device</button></div></div>
+    <div class="modal" id="securityModal" role="dialog" aria-modal="true"><div class="modal-card danger"><button class="close-modal" aria-label="Close modal">×</button><h2>Copy Restriction Alert</h2><p>This page is protected. Copy, screenshot, and inactive-tab actions can trigger admin review.</p><button class="btn ghost close-modal">I understand</button></div></div>
+    <div class="modal" id="sessionModal" role="dialog" aria-modal="true"><div class="modal-card"><button class="close-modal" aria-label="Close modal">×</button><h2>Session Expired</h2><p>Your protected admin session closed automatically after inactivity.</p><button class="btn primary">Login securely</button></div></div>
+    <div class="modal" id="printModal" role="dialog" aria-modal="true"><div class="modal-card print-preview"><button class="close-modal" aria-label="Close modal">×</button><h2>Print Preview</h2><table><tr><th>Receipt</th><th>Student</th><th>Amount</th></tr><tr><td>#NR-2048</td><td>Fathima</td><td>₹2,400</td></tr></table><button class="btn primary" onclick="window.print()">Print A4 report</button></div></div>
+    <div class="modal" id="supportModal" role="dialog" aria-modal="true"><div class="modal-card"><button class="close-modal" aria-label="Close modal">×</button><h2>Premium Support</h2><p>Our onboarding team can help configure plans, receipts, roles, and Telegram verification.</p><button class="btn telegram">Open Telegram</button></div></div>
+
+    <div class="toast" id="toast"><i class="bi bi-check-circle"></i><span>Success toast notification</span></div>
+
+    <footer class="footer">
+      <div class="glow-divider"></div>
+      <div class="footer-grid"><div><a class="brand"><span class="brand-icon"><i class="bi bi-shield-lock-fill"></i></span><span>Noor<span>Ops</span></span></a><p>Secure Islamic education management for modern institutions.</p></div><div><h3>Quick links</h3><a href="#dashboard">Dashboard</a><a href="#terms">Terms</a><a href="#privacy">Privacy</a></div><div><h3>Security badges</h3><span class="badge paid">OTP Ready</span><span class="badge review">PDF Guard</span><span class="badge due">Watermarked</span></div></div><p class="copyright">© 2026 NoorOps. Premium secure education UI concept.</p>
+    </footer>
+
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <script src="script.js" defer></script>
+  </body>
+</html>
