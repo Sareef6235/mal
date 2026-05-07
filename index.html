@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#020617">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="AstraEdu">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>AstraEdu Command Center | Secure Education Management Platform</title>
+  <meta name="description" content="Ultra-premium education, finance, quiz security, receipt and admin management platform UI.">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" defer></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
+  <script src="assets/app.js" defer></script>
+</head>
+<body class="theme-dark page-enter" data-page="home">
+  <div class="secure-watermark" aria-hidden="true">AstraEdu Secure Workspace • Verified Device</div>
+  <div class="ambient-orb orb-one" aria-hidden="true"></div>
+  <div class="ambient-orb orb-two" aria-hidden="true"></div>
+  <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+  <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+    <a class="brand" href="index.html" aria-label="AstraEdu home">
+      <span class="brand-mark">AE</span>
+      <span><strong>AstraEdu</strong><small>Command Center</small></span>
+    </a>
+    <nav class="side-nav">
+      <a class="active" href="#home">Dashboard Home</a>
+      <a href="#features">Platform Modules</a>
+      <a href="#dashboard">Live Preview</a>
+      <a href="#security">Security Center</a>
+      <a href="faq.html">FAQ</a>
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+    </nav>
+    <div class="session-card glass-card">
+      <span class="status-dot"></span>
+      <strong>Secure session</strong>
+      <p>Auto logout warning in <span id="sessionCountdown">05:00</span></p>
+      <button class="btn btn-soft ripple" data-modal="secureSessionModal">Review Session</button>
+    </div>
+  </aside>
+
+  <header class="topbar glass-card">
+    <button class="icon-btn hamburger ripple" id="menuToggle" aria-label="Open menu">☰</button>
+    <div class="topbar-search"><span>⌘</span><input id="globalSearch" type="search" placeholder="Live search receipts, plans, reports..."></div>
+    <div class="topbar-actions">
+      <button class="icon-btn ripple" id="installBtn" hidden>Install</button>
+      <button class="icon-btn ripple" id="themeToggle" aria-label="Switch theme">☾</button>
+      <button class="btn btn-primary ripple" data-modal="loginModal">Secure Login</button>
+    </div>
+  </header>
+
+  <main class="main-shell" id="home">
+    <section class="hero section-pad">
+      <div class="hero-copy reveal">
+        <div class="eyebrow"><span class="pulse-dot"></span> Enterprise education OS with zero-trust UX</div>
+        <h1>Securely run every plan, receipt, quiz, report, and admin workflow from one cinematic command center.</h1>
+        <p class="hero-subtitle">A futuristic responsive SaaS interface for secure login, monthly plan management, Telegram verification, finance dashboards, print-ready reporting, PWA workflows, review lockdown, and trash restore operations.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg ripple" href="#features">Get Started</a>
+          <button class="btn btn-ghost btn-lg ripple" data-modal="loginModal">Login</button>
+          <a class="btn btn-soft btn-lg ripple" href="#dashboard">View Dashboard</a>
+        </div>
+        <div class="trust-row">
+          <span>ISO-ready UI</span><span>Role based access</span><span>Offline PWA</span><span>Encrypted sessions</span>
+        </div>
+      </div>
+      <div class="hero-visual glass-card tilt-card reveal" data-tilt>
+        <div class="gradient-border"></div>
+        <div class="hero-card-head"><span>Security mesh</span><strong>Live</strong></div>
+        <div id="lockLottie" class="lottie-lock" aria-label="Animated security lock"></div>
+        <lottie-player class="fallback-lottie" src="https://assets4.lottiefiles.com/packages/lf20_touohxv0.json" background="transparent" speed="1" loop autoplay></lottie-player>
+        <div class="security-ring"><span>98%</span><small>Risk shield</small></div>
+        <div class="floating-badge badge-cyan">Telegram OTP verified</div>
+        <div class="floating-badge badge-green">PWA offline ready</div>
+      </div>
+    </section>
+
+    <section class="section-pad module-strip reveal" aria-label="Platform highlights">
+      <div class="metric-card glass-card"><small>Monthly revenue</small><strong data-count="842500">0</strong><span>+18.7%</span></div>
+      <div class="metric-card glass-card"><small>Plans managed</small><strong data-count="1280">0</strong><span>99.9% sync</span></div>
+      <div class="metric-card glass-card"><small>Verified quizzes</small><strong data-count="9364">0</strong><span>Secure mode</span></div>
+      <div class="metric-card glass-card"><small>Restored records</small><strong data-count="214">0</strong><span>Audit logged</span></div>
+    </section>
+
+    <section class="section-pad" id="features">
+      <div class="section-heading reveal"><span>Premium Modules</span><h2>Everything your education/admin platform needs, rebuilt as a billion-dollar SaaS surface.</h2></div>
+      <div class="feature-grid">
+        <article class="feature-card glass-card reveal" data-tilt><span>🔐</span><h3>Secure Login</h3><p>Zero-trust entry, OTP flows, device checks, session timers, and access denied popups.</p></article>
+        <article class="feature-card glass-card reveal" data-tilt><span>🤖</span><h3>Telegram Verification</h3><p>Bot connection journeys with guided OTP confirmation and verification audit trails.</p></article>
+        <article class="feature-card glass-card reveal" data-tilt><span>🧾</span><h3>Receipt Management</h3><p>Receipt previews, approval queues, PDF export, print flows, and searchable finance rows.</p></article>
+        <article class="feature-card glass-card reveal" data-tilt><span>📅</span><h3>Monthly Plan System</h3><p>Malayalam-ready plan tables, class filters, drag sorting, and print-optimized reports.</p></article>
+        <article class="feature-card glass-card reveal" data-tilt><span>🛡️</span><h3>Quiz Security</h3><p>Focus lost warnings, secure watermarks, timer rings, review lockdown, and auto-close audio.</p></article>
+        <article class="feature-card glass-card reveal" data-tilt><span>📊</span><h3>Analytics Dashboard</h3><p>Chart.js visuals, live KPIs, activity feeds, status funnels, and exportable insights.</p></article>
+        <article class="feature-card glass-card reveal" data-tilt><span>📑</span><h3>Smart Reports</h3><p>Filterable reports, sticky tables, pagination, responsive card rows, and print previews.</p></article>
+        <article class="feature-card glass-card reveal" data-tilt><span>⬇️</span><h3>PDF Export</h3><p>jsPDF and html2canvas powered document exports with branded receipt layouts.</p></article>
+        <article class="feature-card glass-card reveal" data-tilt><span>♻️</span><h3>Trash Restore</h3><p>Recover deleted plans and receipts with permanent delete confirmations and audit context.</p></article>
+        <article class="feature-card glass-card reveal" data-tilt><span>👥</span><h3>Role Based Access</h3><p>Admin, teacher, finance, reviewer, and student-friendly permission surfaces.</p></article>
+      </div>
+    </section>
+
+    <section class="section-pad dashboard-preview" id="dashboard">
+      <div class="section-heading reveal"><span>Live Dashboard Preview</span><h2>Analytics, finance, security logs, and plan operations in a single responsive workspace.</h2></div>
+      <div class="dashboard-grid">
+        <section class="glass-card preview-panel wide reveal">
+          <div class="panel-head"><h3>Revenue & verification analytics</h3><button class="btn btn-soft ripple" id="exportPdfBtn">Export PDF</button></div>
+          <canvas id="analyticsChart" height="120"></canvas>
+        </section>
+        <aside class="glass-card preview-panel reveal">
+          <div class="panel-head"><h3>Activity Feed</h3><span class="badge badge-live">Live</span></div>
+          <div class="activity-feed" id="activityFeed"></div>
+        </aside>
+        <section class="glass-card preview-panel table-panel wide reveal">
+          <div class="panel-head"><h3>Monthly plan & receipt operations</h3><div class="filter-group"><input class="input" id="tableSearch" placeholder="Search table"><select class="input" id="statusFilter"><option value="">All status</option><option>Approved</option><option>Pending</option><option>Restored</option></select></div></div>
+          <div class="table-wrap">
+            <table class="premium-table" id="opsTable">
+              <thead><tr><th>ID</th><th>Module</th><th>Owner</th><th>Class</th><th>Status</th><th>Progress</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr><td>#1021</td><td>Receipt</td><td>Finance Admin</td><td>Class 8</td><td><span class="badge success">Approved</span></td><td><span class="progress"><i style="width:92%"></i></span></td><td><button class="icon-btn ripple" data-modal="receiptModal">View</button></td></tr>
+                <tr><td>#1022</td><td>Monthly Plan</td><td>Ustad Ameen</td><td>Class 5</td><td><span class="badge warning">Pending</span></td><td><span class="progress"><i style="width:64%"></i></span></td><td><button class="icon-btn ripple" data-modal="printModal">Print</button></td></tr>
+                <tr><td>#1023</td><td>Trash Restore</td><td>Super Admin</td><td>Class 11</td><td><span class="badge cyan">Restored</span></td><td><span class="progress"><i style="width:100%"></i></span></td><td><button class="icon-btn ripple" data-modal="deleteModal">Audit</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <aside class="glass-card preview-panel reveal" id="security">
+          <div class="panel-head"><h3>Security Logs</h3><span class="badge danger">Locked</span></div>
+          <div class="security-log"><p>OTP verified by Telegram bot</p><p>Device fingerprint accepted</p><p>Focus-loss monitor enabled</p><p>Auto logout warning armed</p></div>
+          <button class="btn btn-primary ripple" data-modal="otpModal">Open OTP Modal</button>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section-pad faq-home" id="faq">
+      <div class="section-heading reveal"><span>FAQ</span><h2>Fast answers for administrators, finance teams, and secure quiz reviewers.</h2></div>
+      <div class="accordion reveal" data-accordion>
+        <details open><summary>How secure is the system?</summary><p>The UI includes secure session modals, focus-loss blur, OTP verification, role access badges, device restrictions, activity logging, and access-denied flows.</p></details>
+        <details><summary>Can receipts be exported?</summary><p>Yes. Receipt previews support print actions and PDF export powered by jsPDF and html2canvas integration points.</p></details>
+        <details><summary>Is Telegram verification required?</summary><p>The interface supports Telegram verification as a premium security option for high-risk quiz or admin workflows.</p></details>
+        <details><summary>Does it support mobile?</summary><p>Yes. The sidebar collapses, tables become mobile cards, touch targets are enlarged, and bottom navigation is shown on phones.</p></details>
+        <details><summary>Is offline PWA supported?</summary><p>Yes. The manifest and service worker provide install prompts, app metadata, theme color, and an offline fallback shell.</p></details>
+      </div>
+      <a class="btn btn-soft ripple" href="faq.html">Open full FAQ page</a>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Mobile navigation">
+    <a href="#home">⌂<span>Home</span></a><a href="#features">✦<span>Modules</span></a><a href="#dashboard">▦<span>Dash</span></a><a href="faq.html">?<span>FAQ</span></a>
+  </nav>
+  <button class="fab ripple" data-modal="loginModal" aria-label="Open secure login">+</button>
+  <div id="toastHost" class="toast-host" aria-live="polite"></div>
+
+  <div class="modal-backdrop" id="loginModal" role="dialog" aria-modal="true" aria-hidden="true"><div class="modal-card glass-card"><button class="modal-close" data-close>×</button><h2>Secure Login</h2><p>Authenticate into AstraEdu Command Center.</p><label class="field"><span>Username</span><input class="input" placeholder="admin@example.com"></label><label class="field"><span>Password</span><input class="input" type="password" placeholder="••••••••"></label><button class="btn btn-primary ripple" data-success="Secure login verified">Sign In</button></div></div>
+  <div class="modal-backdrop" id="otpModal" role="dialog" aria-modal="true" aria-hidden="true"><div class="modal-card glass-card"><button class="modal-close" data-close>×</button><h2>Telegram OTP Verification</h2><p>Enter the six-digit code delivered by the verified Telegram bot.</p><div class="otp-grid"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"></div><button class="btn btn-primary ripple" data-success="OTP accepted">Verify OTP</button></div></div>
+  <div class="modal-backdrop" id="secureSessionModal" role="dialog" aria-modal="true" aria-hidden="true"><div class="modal-card glass-card"><button class="modal-close" data-close>×</button><h2>Auto Logout Warning</h2><div class="timer-ring" style="--p:72"><span>72%</span></div><p>Your secure session is being monitored. Continue working to refresh the timer.</p><button class="btn btn-primary ripple" data-success="Session extended">Extend Session</button></div></div>
+  <div class="modal-backdrop" id="deleteModal" role="dialog" aria-modal="true" aria-hidden="true"><div class="modal-card glass-card danger-modal"><button class="modal-close" data-close>×</button><h2>Delete Confirmation</h2><p>This action moves the record to Trash Restore Management with a full audit log.</p><button class="btn btn-danger ripple" data-success="Record moved to trash">Confirm Delete</button></div></div>
+  <div class="modal-backdrop" id="printModal" role="dialog" aria-modal="true" aria-hidden="true"><div class="modal-card glass-card modal-wide"><button class="modal-close" data-close>×</button><h2>Print Preview</h2><div class="print-sheet"><h3>Monthly Plan Report</h3><p>Class 5 • Muharram • Ustad Ameen</p><div class="sheet-line"></div><div class="sheet-line short"></div></div><button class="btn btn-primary ripple" onclick="window.print()">Print Now</button></div></div>
+  <div class="modal-backdrop" id="receiptModal" role="dialog" aria-modal="true" aria-hidden="true"><div class="modal-card glass-card modal-wide"><button class="modal-close" data-close>×</button><h2>Receipt Preview</h2><div class="receipt-preview"><strong>Receipt #1021</strong><span>₹ 12,400</span><p>Approved payment for Class 8 monthly fees.</p></div><button class="btn btn-primary ripple" data-success="Receipt exported">Export PDF</button></div></div>
+  <div class="modal-backdrop" id="accessDeniedModal" role="dialog" aria-modal="true" aria-hidden="true"><div class="modal-card glass-card danger-modal"><button class="modal-close" data-close>×</button><h2>Access Denied</h2><p>Your role does not have permission to open this restricted security workspace.</p></div></div>
+  <div class="focus-warning" id="focusWarning"><div class="glass-card"><h2>Focus Lost</h2><p>Secure workspace blurred until this tab is active again.</p></div></div>
+</body>
+</html>
