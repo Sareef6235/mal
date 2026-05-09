@@ -1,0 +1,6 @@
+# Defense-in-depth: uploaded study materials should be downloaded or previewed,
+# never executed as server-side scripts.
+Options -ExecCGI
+RemoveHandler .php .phtml .phar .cgi .pl .asp .aspx .jsp
+RemoveType .php .phtml .phar .cgi .pl .asp .aspx .jsp
+php_flag engine off
