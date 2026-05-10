@@ -1,0 +1,10 @@
+{
+  "name": "MAL Nexus Profile Dashboard",
+  "short_name": "MAL Nexus",
+  "start_url": "profile.php",
+  "display": "standalone",
+  "background_color": "#070b16",
+  "theme_color": "#4f46e5",
+  "description": "Premium futuristic SaaS user profile dashboard.",
+  "icons": []
+}
