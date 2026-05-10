@@ -1,0 +1,9 @@
+<?php $thumb = $material['thumbnail_path'] ?: ($material['file_type'] === 'image' ? $material['file_path'] : null); ?>
+<article class="material-card glass p-3 reveal">
+    <div class="preview-tile mb-3"><?php if ($thumb): ?><img src="<?= e($thumb) ?>" alt="<?= e($material['title']) ?> preview"><?php else: ?><i class="bi <?= icon_for_type($material['file_type']) ?> file-icon"></i><?php endif; ?></div>
+    <div class="d-flex align-items-center gap-2 flex-wrap mb-3"><span class="badge-soft" style="border-color:<?= e($material['subject_color']) ?>66"><?= e($material['subject_name']) ?></span><span class="badge-soft"><?= e($material['class_name']) ?></span><?php if ($material['is_featured']): ?><span class="badge bg-warning text-dark rounded-pill">Featured</span><?php endif; ?></div>
+    <h5 class="fw-bold mb-2"><?= e($material['title']) ?></h5>
+    <p class="text-muted-premium small mb-3"><?= e(mb_strimwidth((string)$material['description'], 0, 110, '...') ?: 'Premium study material ready for preview and download.') ?></p>
+    <div class="d-flex justify-content-between text-muted-premium small mb-3"><span><i class="bi bi-eye"></i> <?= number_format((int)$material['views_count']) ?></span><span><i class="bi bi-download"></i> <?= number_format((int)$material['downloads_count']) ?></span><span><?= date('M j', strtotime($material['created_at'])) ?></span></div>
+    <div class="d-flex gap-2 flex-wrap"><a class="btn btn-sm btn-premium" href="view.php?id=<?= (int)$material['id'] ?>"><i class="bi bi-eye"></i> View</a><a class="btn btn-sm btn-ghost" href="download.php?id=<?= (int)$material['id'] ?>"><i class="bi bi-download"></i></a><button class="btn btn-sm btn-ghost" data-favorite="<?= (int)$material['id'] ?>"><i class="bi bi-star"></i></button><button class="btn btn-sm btn-ghost" data-share="<?= (int)$material['id'] ?>" data-title="<?= e($material['title']) ?>"><i class="bi bi-share"></i></button></div>
+</article>
