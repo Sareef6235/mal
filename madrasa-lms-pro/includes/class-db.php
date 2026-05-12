@@ -1,0 +1,26 @@
+<?php
+/** Database schema and data access. */
+if ( ! defined( 'ABSPATH' ) ) { exit; }
+
+final class MLP_DB {
+	public static function create_tables(): void {
+		global $wpdb;
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		$charset = $wpdb->get_charset_collate();
+		$tables = array();
+		$tables[] = "CREATE TABLE " . mlp_table( 'students' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,user_id BIGINT UNSIGNED NULL,student_no VARCHAR(64) NOT NULL,name VARCHAR(191) NOT NULL,email VARCHAR(191) NULL,phone VARCHAR(40) NULL,class_name VARCHAR(100) NULL,status VARCHAR(30) DEFAULT 'active',created_at DATETIME NOT NULL,updated_at DATETIME NOT NULL,PRIMARY KEY  (id),UNIQUE KEY student_no (student_no),KEY user_id (user_id),KEY status (status)) $charset;";
+		$tables[] = "CREATE TABLE " . mlp_table( 'teachers' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,user_id BIGINT UNSIGNED NULL,teacher_no VARCHAR(64) NOT NULL,name VARCHAR(191) NOT NULL,email VARCHAR(191) NULL,phone VARCHAR(40) NULL,subjects TEXT NULL,status VARCHAR(30) DEFAULT 'active',created_at DATETIME NOT NULL,updated_at DATETIME NOT NULL,PRIMARY KEY (id),UNIQUE KEY teacher_no (teacher_no),KEY user_id (user_id)) $charset;";
+		$tables[] = "CREATE TABLE " . mlp_table( 'subjects' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,name VARCHAR(191) NOT NULL,description TEXT NULL,created_at DATETIME NOT NULL,PRIMARY KEY (id),KEY name (name)) $charset;";
+		$tables[] = "CREATE TABLE " . mlp_table( 'courses' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,title VARCHAR(191) NOT NULL,description LONGTEXT NULL,category VARCHAR(100) NULL,teacher_id BIGINT UNSIGNED NULL,thumbnail_id BIGINT UNSIGNED NULL,status VARCHAR(30) DEFAULT 'draft',created_at DATETIME NOT NULL,updated_at DATETIME NOT NULL,PRIMARY KEY (id),KEY teacher_id (teacher_id),KEY status (status)) $charset;";
+		$tables[] = "CREATE TABLE " . mlp_table( 'lessons' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,course_id BIGINT UNSIGNED NOT NULL,title VARCHAR(191) NOT NULL,content LONGTEXT NULL,video_id BIGINT UNSIGNED NULL,pdf_id BIGINT UNSIGNED NULL,sort_order INT DEFAULT 0,created_at DATETIME NOT NULL,PRIMARY KEY (id),KEY course_id (course_id)) $charset;";
+		$tables[] = "CREATE TABLE " . mlp_table( 'attendance' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,student_id BIGINT UNSIGNED NOT NULL,teacher_id BIGINT UNSIGNED NULL,attendance_date DATE NOT NULL,status VARCHAR(20) NOT NULL,notes TEXT NULL,created_by BIGINT UNSIGNED NOT NULL,created_at DATETIME NOT NULL,PRIMARY KEY (id),UNIQUE KEY student_date (student_id,attendance_date),KEY teacher_date (teacher_id,attendance_date),KEY status (status)) $charset;";
+		$tables[] = "CREATE TABLE " . mlp_table( 'exams' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,title VARCHAR(191) NOT NULL,course_id BIGINT UNSIGNED NULL,subject_id BIGINT UNSIGNED NULL,exam_date DATE NOT NULL,total_marks DECIMAL(10,2) NOT NULL DEFAULT 100,created_at DATETIME NOT NULL,PRIMARY KEY (id),KEY exam_date (exam_date),KEY course_id (course_id)) $charset;";
+		$tables[] = "CREATE TABLE " . mlp_table( 'results' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,exam_id BIGINT UNSIGNED NOT NULL,student_id BIGINT UNSIGNED NOT NULL,marks DECIMAL(10,2) NOT NULL DEFAULT 0,grade VARCHAR(10) NULL,published TINYINT(1) DEFAULT 0,created_at DATETIME NOT NULL,PRIMARY KEY (id),UNIQUE KEY exam_student (exam_id,student_id),KEY published (published)) $charset;";
+		$tables[] = "CREATE TABLE " . mlp_table( 'certificates' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,student_id BIGINT UNSIGNED NOT NULL,course_id BIGINT UNSIGNED NULL,certificate_no VARCHAR(100) NOT NULL,verification_hash VARCHAR(191) NOT NULL,issued_at DATETIME NOT NULL,PRIMARY KEY (id),UNIQUE KEY certificate_no (certificate_no),KEY student_id (student_id)) $charset;";
+		$tables[] = "CREATE TABLE " . mlp_table( 'monthly_plans' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,plan_month VARCHAR(20) NOT NULL,teacher_id BIGINT UNSIGNED NULL,class_name VARCHAR(100) NOT NULL,week_no INT NOT NULL,total_period INT NOT NULL DEFAULT 0,subject VARCHAR(191) NOT NULL,lesson_name VARCHAR(191) NOT NULL,lesson_details TEXT NULL,activities TEXT NULL,smart_class_date DATE NULL,exam_date DATE NULL,created_at DATETIME NOT NULL,updated_at DATETIME NOT NULL,PRIMARY KEY (id),KEY plan_month (plan_month),KEY teacher_id (teacher_id),KEY class_name (class_name)) $charset;";
+		$tables[] = "CREATE TABLE " . mlp_table( 'notifications' ) . " (id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,user_id BIGINT UNSIGNED NULL,title VARCHAR(191) NOT NULL,message TEXT NOT NULL,channel VARCHAR(40) DEFAULT 'email',status VARCHAR(30) DEFAULT 'pending',created_at DATETIME NOT NULL,PRIMARY KEY (id),KEY user_status (user_id,status),KEY channel (channel)) $charset;";
+		foreach ( $tables as $sql ) { dbDelta( $sql ); }
+	}
+	public static function count( string $table ): int { global $wpdb; return (int) $wpdb->get_var( "SELECT COUNT(*) FROM " . esc_sql( mlp_table( $table ) ) ); }
+	public static function rows( string $table, int $limit = 20, int $offset = 0 ): array { global $wpdb; $sql = $wpdb->prepare( 'SELECT * FROM ' . esc_sql( mlp_table( $table ) ) . ' ORDER BY id DESC LIMIT %d OFFSET %d', $limit, $offset ); return $wpdb->get_results( $sql, ARRAY_A ) ?: array(); }
+}

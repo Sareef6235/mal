@@ -1,0 +1,2 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
+<div class="mlp-frontend-card"><h2><?php esc_html_e( 'Monthly Plan', 'madrasa-lms-pro' ); ?></h2><table><tbody><?php foreach ( $rows as $row ) : ?><tr><td><?php echo esc_html( $row['plan_month'] ); ?></td><td><?php echo esc_html( $row['class_name'] ); ?></td><td><?php echo esc_html( $row['subject'] ); ?></td><td><?php echo esc_html( $row['lesson_name'] ); ?></td></tr><?php endforeach; ?></tbody></table></div>
