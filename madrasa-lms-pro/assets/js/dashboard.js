@@ -1,0 +1,1 @@
+(function(){'use strict';var canvas=document.getElementById('mlpChart');if(canvas){var ctx=canvas.getContext('2d');ctx.fillStyle='#198754';ctx.fillRect(20,40,80,80);ctx.fillRect(130,20,80,100);ctx.fillRect(240,70,80,50);}})();

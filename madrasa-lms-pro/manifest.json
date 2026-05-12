@@ -1,0 +1,10 @@
+{
+  "name": "Madrasa",
+  "short_name": "Madrasa",
+  "description": "Madrasa LMS and management dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#198754",
+  "icons": []
+}

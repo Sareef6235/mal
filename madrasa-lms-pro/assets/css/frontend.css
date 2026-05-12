@@ -1,0 +1,1 @@
+.mlp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}.mlp-frontend-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.06);padding:1.25rem;margin:1rem 0}.mlp-certificate{text-align:center;border:8px double #198754;padding:3rem}
