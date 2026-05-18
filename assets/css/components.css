@@ -1,0 +1,9 @@
+/* Compact production component layer for Ultimate Exam System Pro. */
+.uesp-mega-menu { display: grid; grid-template-columns: repeat(3, minmax(160px, 1fr)); gap: 12px; min-width: 640px; }
+.uesp-mega-tile { padding: 16px; border-radius: 16px; background: rgba(109, 93, 252, .08); }
+.uesp-rank-gold { background: linear-gradient(135deg, #f59e0b, #facc15); color: #111827; }
+.uesp-ai-suggestion { border-left: 4px solid var(--uesp-secondary); }
+.uesp-membership-card { position: relative; overflow: hidden; }
+.uesp-membership-card::before { content: ''; position: absolute; inset: -40% -20% auto auto; width: 160px; height: 160px; border-radius: 50%; background: rgba(0, 212, 255, .18); }
+.uesp-rtl-ready { direction: rtl; }
+.rtl .uesp-header-inner, .rtl .uesp-hero-grid { direction: rtl; }
