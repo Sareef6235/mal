@@ -77,3 +77,21 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;b
 [dir="rtl"] .floating-nav{flex-direction:row-reverse}
 [dir="rtl"] .side-menu{left:auto;right:0;transform:translateX(105%)}
 [dir="rtl"] .side-menu.is-open{transform:translateX(0)}
+
+.mhm-modal-root{position:fixed;inset:0;pointer-events:none;z-index:140}
+.mhm-modal-overlay{position:fixed;inset:0;background:rgba(3,10,9,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity .32s ease}
+.mhm-modal-root.is-open{pointer-events:auto}.mhm-modal-root.is-open .mhm-modal-overlay{opacity:1}
+.mhm-modal{position:fixed;left:50%;top:52%;transform:translate(-50%,-50%) scale(.96);width:min(94vw,560px);border-radius:24px;padding:1rem;opacity:0;visibility:hidden;transition:opacity .3s ease,transform .36s cubic-bezier(.22,1,.36,1),visibility .3s;max-height:min(84vh,740px);overflow:auto}
+.mhm-modal.is-active{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+.mhm-modal-header{display:flex;align-items:center;gap:.8rem}.mhm-modal-header h3{margin:0;flex:1}
+.mhm-modal-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(140deg,var(--gold-400),var(--emerald-400));color:#03231a;animation:iconPulse 1.8s ease-in-out infinite}
+@keyframes iconPulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px) scale(1.03)}}
+.mhm-modal-body{padding:.9rem 0}.mhm-progress{height:8px;border-radius:999px;background:rgba(255,255,255,.14);overflow:hidden}.mhm-progress span{display:block;height:100%;background:linear-gradient(90deg,var(--emerald-500),var(--gold-500));animation:progressGlow 2.2s ease-in-out infinite}
+@keyframes progressGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.25)}}
+.mhm-modal-footer{display:flex;gap:.6rem;flex-wrap:wrap}
+.mhm-modal-glow{position:absolute;inset:-20% -20% auto auto;width:180px;height:180px;background:radial-gradient(circle,rgba(217,179,106,.42),transparent 65%);pointer-events:none}
+
+@media (max-width:767px){
+  .mhm-modal{width:100vw;left:0;right:0;bottom:0;top:auto;transform:translateY(110%);border-radius:22px 22px 0 0;max-height:88vh}
+  .mhm-modal.is-active{transform:translateY(0)}
+}

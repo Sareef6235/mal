@@ -10,6 +10,10 @@ require_once MHM_QA_PATH . '/inc/ajax/handlers.php';
 require_once MHM_QA_PATH . '/inc/api/routes.php';
 require_once MHM_QA_PATH . '/inc/admin/dashboard.php';
 
+add_action('wp_footer', function () {
+    get_template_part('template-parts/premium-popups');
+}, 25);
+
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
     add_theme_support('post-thumbnails');

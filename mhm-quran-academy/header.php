@@ -18,7 +18,7 @@
   <div class="floating-nav glass">
     <button class="btn btn-premium btn-ripple" data-toggle-menu>☰</button>
     <a class="brand" href="<?php echo esc_url(home_url('/')); ?>"><span class="brand-mark">م</span> MHM Quran Academy</a>
-    <button class="btn btn-premium btn-ripple" data-open-modal><?php esc_html_e('Assistant', 'mhm-quran-academy'); ?></button>
+    <button class="btn btn-premium btn-ripple" data-modal-open="login"><?php esc_html_e('Assistant', 'mhm-quran-academy'); ?></button>
   </div>
 </header>
 <div class="modal" id="premiumModal"><div class="modal-card glass"><h3>AI Quran Assistant</h3><p>Ask tajweed, tafsir and memorization questions instantly.</p><button class="btn btn-premium btn-ripple" data-close-modal>Close</button></div></div>
