@@ -43,3 +43,35 @@ function mhm_get_surah_playlist() {
   $rows = $wpdb->get_results($wpdb->prepare("SELECT a.id AS ayah_id,a.ayah_number,q.audio_url,q.duration,q.reciter FROM {$wpdb->prefix}quran_ayahs a LEFT JOIN {$wpdb->prefix}quran_audio q ON q.ayah_id=a.id AND q.reciter=%s WHERE a.surah_id=%d ORDER BY a.ayah_number", $reciter, $surah_id), ARRAY_A);
   wp_send_json_success($rows);
 }
+
+
+add_action('wp_ajax_mhm_admin_activity', 'mhm_admin_activity');
+function mhm_admin_activity() {
+  check_ajax_referer('mhm_admin_nonce', 'nonce');
+  global $wpdb;
+  $rows = $wpdb->get_results("SELECT user_id,ayah_id,created_at FROM {$wpdb->prefix}quran_bookmarks ORDER BY id DESC LIMIT 8", ARRAY_A);
+  $out = [];
+  foreach ($rows as $r) { $out[] = sprintf('User %d bookmarked Ayah %d at %s', (int)$r['user_id'], (int)$r['ayah_id'], esc_html((string)$r['created_at'])); }
+  wp_send_json_success($out);
+}
+
+add_action('wp_ajax_mhm_admin_audio_upload', 'mhm_admin_audio_upload');
+function mhm_admin_audio_upload() {
+  check_ajax_referer('mhm_admin_nonce', 'nonce');
+  if (!current_user_can('manage_options')) { wp_send_json_error(['message'=>'Unauthorized'],403); }
+  if (empty($_FILES['audio_files'])) { wp_send_json_error(['message'=>'No files'],400); }
+  require_once ABSPATH . 'wp-admin/includes/file.php';
+  $uploaded = 0;
+  foreach ($_FILES['audio_files']['name'] as $i => $name) {
+    $file = [
+      'name' => $_FILES['audio_files']['name'][$i],
+      'type' => $_FILES['audio_files']['type'][$i],
+      'tmp_name' => $_FILES['audio_files']['tmp_name'][$i],
+      'error' => $_FILES['audio_files']['error'][$i],
+      'size' => $_FILES['audio_files']['size'][$i],
+    ];
+    $move = wp_handle_upload($file, ['test_form' => false]);
+    if (!isset($move['error'])) { $uploaded++; }
+  }
+  wp_send_json_success(['uploaded' => $uploaded]);
+}

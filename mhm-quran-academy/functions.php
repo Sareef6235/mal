@@ -60,3 +60,7 @@ require_once MHM_QA_PATH . '/tajweed-shortcodes.php';
 require_once MHM_QA_PATH . '/tajweed-admin.php';
 require_once MHM_QA_PATH . '/audio-api.php';
 require_once MHM_QA_PATH . '/audio-shortcodes.php';
+require_once MHM_QA_PATH . '/inc/admin/admin-menu.php';
+require_once MHM_QA_PATH . '/inc/admin/admin-dashboard.php';
+require_once MHM_QA_PATH . '/inc/admin/admin-settings.php';
+require_once MHM_QA_PATH . '/inc/admin/analytics.php';
