@@ -32,3 +32,14 @@ function mhm_tajweed_quiz() {
   foreach ($rows as &$r) { $r['options'] = json_decode((string) $r['options'], true) ?: []; }
   wp_send_json_success($rows);
 }
+
+add_action('wp_ajax_mhm_get_surah_playlist', 'mhm_get_surah_playlist');
+add_action('wp_ajax_nopriv_mhm_get_surah_playlist', 'mhm_get_surah_playlist');
+function mhm_get_surah_playlist() {
+  check_ajax_referer('mhm_qa_nonce', 'nonce');
+  global $wpdb;
+  $surah_id = absint($_POST['surah_id'] ?? 1);
+  $reciter = sanitize_text_field($_POST['reciter'] ?? 'Alafasy');
+  $rows = $wpdb->get_results($wpdb->prepare("SELECT a.id AS ayah_id,a.ayah_number,q.audio_url,q.duration,q.reciter FROM {$wpdb->prefix}quran_ayahs a LEFT JOIN {$wpdb->prefix}quran_audio q ON q.ayah_id=a.id AND q.reciter=%s WHERE a.surah_id=%d ORDER BY a.ayah_number", $reciter, $surah_id), ARRAY_A);
+  wp_send_json_success($rows);
+}
