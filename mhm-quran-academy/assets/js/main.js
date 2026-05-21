@@ -182,5 +182,8 @@
     });
   }
 
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/wp-content/themes/mhm-quran-academy/pwa/sw.js');
+  let deferredPrompt=null;
+  window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;document.body.classList.add('pwa-ready');});
+  document.addEventListener('click',async (e)=>{const b=e.target.closest('[data-install-pwa]');if(!b||!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/wp-content/themes/mhm-quran-academy/pwa/service-worker.js');
 })();

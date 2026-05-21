@@ -36,6 +36,7 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_script('lottie', 'https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js', [], null, true);
     wp_enqueue_script('mhm-main', MHM_QA_URL . '/assets/js/main.js', ['jquery', 'gsap', 'lottie'], MHM_QA_VER, true);
     wp_enqueue_script('mhm-audio-engine', MHM_QA_URL . '/assets/js/audio-engine.js', [], MHM_QA_VER, true);
+    wp_enqueue_script('mhm-mobile', MHM_QA_URL . '/assets/js/mobile.js', [], MHM_QA_VER, true);
     wp_enqueue_style('mhm-tajweed-style', MHM_QA_URL . '/tajweed-style.css', ['mhm-main'], MHM_QA_VER);
     wp_localize_script('mhm-main', 'mhmQA', [
       'ajaxUrl' => admin_url('admin-ajax.php'),
