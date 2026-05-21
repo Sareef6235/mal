@@ -9,9 +9,16 @@
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
-<header class="site-header glass layout">
-  <div class="nav-grid">
-    <a class="brand" href="<?php echo esc_url(home_url('/')); ?>">MHM Quran Academy</a>
-    <?php wp_nav_menu(['theme_location' => 'primary', 'container' => false]); ?>
+<div class="particles" aria-hidden="true"></div>
+<aside class="side-menu glass" id="sideMenu" aria-hidden="true">
+  <h3><?php esc_html_e('Academy Menu', 'mhm-quran-academy'); ?></h3>
+  <?php wp_nav_menu(['theme_location' => 'primary', 'container' => false]); ?>
+</aside>
+<header class="site-header layout">
+  <div class="floating-nav glass">
+    <button class="btn btn-premium btn-ripple" data-toggle-menu>☰</button>
+    <a class="brand" href="<?php echo esc_url(home_url('/')); ?>"><span class="brand-mark">م</span> MHM Quran Academy</a>
+    <button class="btn btn-premium btn-ripple" data-open-modal><?php esc_html_e('Assistant', 'mhm-quran-academy'); ?></button>
   </div>
 </header>
+<div class="modal" id="premiumModal"><div class="modal-card glass"><h3>AI Quran Assistant</h3><p>Ask tajweed, tafsir and memorization questions instantly.</p><button class="btn btn-premium btn-ripple" data-close-modal>Close</button></div></div>

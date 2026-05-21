@@ -27,9 +27,10 @@ add_action('after_setup_theme', function () {
 
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('mhm-style', get_stylesheet_uri(), [], MHM_QA_VER);
-    wp_enqueue_style('mhm-main', MHM_QA_URL . '/assets/css/main.css', [], MHM_QA_VER);
+    wp_enqueue_style('mhm-main', MHM_QA_URL . '/assets/css/main.css', ['mhm-style'], MHM_QA_VER);
     wp_enqueue_script('gsap', 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js', [], null, true);
-    wp_enqueue_script('mhm-main', MHM_QA_URL . '/assets/js/main.js', ['jquery', 'gsap'], MHM_QA_VER, true);
+    wp_enqueue_script('lottie', 'https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js', [], null, true);
+    wp_enqueue_script('mhm-main', MHM_QA_URL . '/assets/js/main.js', ['jquery', 'gsap', 'lottie'], MHM_QA_VER, true);
     wp_localize_script('mhm-main', 'mhmQA', [
       'ajaxUrl' => admin_url('admin-ajax.php'),
       'nonce' => wp_create_nonce('mhm_qa_nonce')
