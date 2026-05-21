@@ -49,3 +49,7 @@ add_action('init', function () {
       'supports' => ['title', 'editor', 'thumbnail', 'excerpt']
     ]);
 });
+
+require_once MHM_QA_PATH . '/quran-functions.php';
+require_once MHM_QA_PATH . '/quran-api.php';
+require_once MHM_QA_PATH . '/quran-shortcodes.php';

@@ -123,5 +123,27 @@
     if (json.success && json.data?.audio_url) { audio.src = json.data.audio_url; localStorage.setItem('mhm_last_ayah', btn.dataset.ayahId); await audio.play(); }
   });
 
+  
+
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('.js-bookmark-ayah');
+    if (!b) return;
+    const data = new FormData();
+    data.append('action', 'mhm_bookmark_ayah');
+    data.append('nonce', mhmQA.nonce);
+    data.append('ayah_id', b.dataset.ayahId);
+    const res = await fetch(mhmQA.ajaxUrl, { method:'POST', body:data });
+    const json = await res.json();
+    if (json.success) b.textContent = 'Bookmarked ✓';
+  });
+
+  const surahSearch = document.getElementById('mhm-quran-search');
+  surahSearch?.addEventListener('input', () => {
+    const q = surahSearch.value.toLowerCase().trim();
+    document.querySelectorAll('#mhm-surah-archive > a').forEach((el) => {
+      el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/wp-content/themes/mhm-quran-academy/pwa/sw.js');
 })();
