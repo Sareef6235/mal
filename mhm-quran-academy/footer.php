@@ -2,12 +2,12 @@
   <p>&copy; <?php echo esc_html(date('Y')); ?> MHM Quran Academy</p>
 </footer>
 <button class="fab" aria-label="Quick play" data-modal-open="audio">✦</button>
-<nav class="bottom-nav glass">
-  <a href="<?php echo esc_url(home_url('/')); ?>" class="is-active">Home</a>
-  <a href="<?php echo esc_url(home_url('/quran-reader')); ?>">Reader</a>
-  <a href="<?php echo esc_url(home_url('/tajweed-academy')); ?>">Tajweed</a>
-  <a href="<?php echo esc_url(home_url('/kids-learning')); ?>">Kids</a>
-  <a href="<?php echo esc_url(home_url('/audio-library')); ?>">Audio</a>
+<nav class="bottom-nav glass" aria-label="Mobile Navigation">
+  <a href="<?php echo esc_url(home_url('/')); ?>" class="is-active">🏠<span>Home</span></a>
+  <a href="<?php echo esc_url(home_url('/quran-reader')); ?>">📖<span>Quran</span></a>
+  <a href="<?php echo esc_url(home_url('/tajweed-academy')); ?>">✨<span>Tajweed</span></a>
+  <a href="<?php echo esc_url(home_url('/audio-library')); ?>">🎧<span>Audio</span></a>
+  <a href="#" data-modal-open="login">👤<span>Dashboard</span></a>
 </nav>
 <?php wp_footer(); ?>
 </body></html>

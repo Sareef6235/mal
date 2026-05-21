@@ -95,3 +95,34 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.35;b
   .mhm-modal{width:100vw;left:0;right:0;bottom:0;top:auto;transform:translateY(110%);border-radius:22px 22px 0 0;max-height:88vh}
   .mhm-modal.is-active{transform:translateY(0)}
 }
+
+.top-menu{display:none;gap:.3rem;align-items:center;flex-wrap:wrap}
+.top-menu a{color:var(--text-100);text-decoration:none;padding:.55rem .7rem;border-radius:11px;transition:.25s;position:relative}
+.top-menu a:hover,.top-menu a.is-active{background:rgba(255,255,255,.13);box-shadow:0 8px 22px rgba(217,179,106,.18);color:var(--gold-400)}
+.nav-actions{display:flex;gap:.4rem}
+.hamburger{width:44px;height:44px;background:rgba(255,255,255,.12);display:grid;place-content:center;gap:4px;border-radius:12px}
+.hamburger span{display:block;width:18px;height:2px;background:#fff;transition:.25s}
+.hamburger.is-open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.hamburger.is-open span:nth-child(2){opacity:0}.hamburger.is-open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+
+.mega-menu{display:none;margin-top:.6rem;padding:1rem;border-radius:16px;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.mega-menu h4{margin:.2rem 0 .6rem;color:var(--gold-400)}
+.mega-menu a{display:block;color:var(--text-300);text-decoration:none;padding:.3rem 0}
+.mega-menu a:hover{color:#fff;transform:translateX(2px)}
+
+.drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.drawer-nav{display:grid;gap:.45rem}.drawer-nav a{padding:.7rem;border-radius:12px;color:var(--text-100);text-decoration:none;background:rgba(255,255,255,.05)}
+.drawer-nav a:hover{background:rgba(255,255,255,.14);color:var(--gold-400)}
+
+.bottom-nav a{display:grid;justify-items:center;gap:.2rem;font-size:.8rem}
+.bottom-nav a span{font-size:.72rem}
+
+body.mhm-theme-light{--bg-900:#edf3f2;--bg-800:#f4faf9;--bg-700:#ffffff;--text-100:#0a201a;--text-300:#45685e;--glass:rgba(255,255,255,.7);--glass-border:rgba(10,32,26,.1)}
+body.mhm-theme-light .hamburger span{background:#15392f}
+
+@media (min-width:1100px){
+  .top-menu{display:flex}
+  .hamburger{display:none}
+  .mega-menu{display:grid}
+  .bottom-nav{display:none}
+}

@@ -87,8 +87,26 @@
     });
   });
 
+
+  const hamburger = $('.hamburger');
   const sideMenu = $('#sideMenu');
-  $('[data-toggle-menu]')?.addEventListener('click', () => sideMenu?.classList.toggle('is-open'));
+  $('[data-toggle-menu]')?.addEventListener('click', () => {
+    sideMenu?.classList.toggle('is-open');
+    hamburger?.classList.toggle('is-open');
+  });
+
+  const themeBtn = $('[data-toggle-theme]');
+  const setTheme = (t) => {
+    document.body.classList.remove('mhm-theme-dark','mhm-theme-light');
+    document.body.classList.add(t);
+    localStorage.setItem('mhm_theme', t);
+  };
+  setTheme(localStorage.getItem('mhm_theme') || 'mhm-theme-dark');
+  themeBtn?.addEventListener('click', () => {
+    const next = document.body.classList.contains('mhm-theme-dark') ? 'mhm-theme-light' : 'mhm-theme-dark';
+    setTheme(next);
+  });
+
 
   const audio = new Audio();
   audio.addEventListener('timeupdate', () => {
