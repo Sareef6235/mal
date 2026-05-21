@@ -126,3 +126,11 @@ body.mhm-theme-light .hamburger span{background:#15392f}
   .mega-menu{display:grid}
   .bottom-nav{display:none}
 }
+
+.tajweed-lesson-card{border-top:4px solid var(--rule-color,#19c997)}
+.kids-pill{display:inline-block;padding:.35rem .65rem;border-radius:999px;background:linear-gradient(120deg,#ffd166,#9bf6ff);color:#212121;font-weight:700;margin:.4rem 0}
+.tajweed-hit{background:rgba(255,211,105,.35);padding:.05rem .18rem;border-radius:6px;position:relative;cursor:help}
+.tajweed-hit:hover::after{content:attr(data-tooltip);position:absolute;bottom:120%;right:0;background:#0b1815;color:#fff;padding:.35rem .5rem;border-radius:8px;white-space:nowrap;font-size:.75rem;z-index:5}
+[data-tajweed-quiz] .quiz-opt{display:block;width:100%;text-align:left;margin:.35rem 0;padding:.6rem;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:inherit}
+[data-tajweed-quiz] .quiz-opt.correct{background:rgba(56,213,123,.25)}
+[data-tajweed-quiz] .quiz-opt.wrong{background:rgba(255,86,86,.25)}

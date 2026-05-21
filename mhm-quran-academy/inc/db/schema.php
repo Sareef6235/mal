@@ -15,6 +15,10 @@ add_action('after_switch_theme', function () {
     $sql[] = "CREATE TABLE {$wpdb->prefix}quran_bookmarks (id BIGINT PRIMARY KEY AUTO_INCREMENT, user_id BIGINT, ayah_id BIGINT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP) $charset;";
     $sql[] = "CREATE TABLE {$wpdb->prefix}quran_progress (id BIGINT PRIMARY KEY AUTO_INCREMENT, user_id BIGINT, surah_id SMALLINT, ayah_number SMALLINT, streak_days INT DEFAULT 0, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) $charset;";
     $sql[] = "CREATE TABLE {$wpdb->prefix}quran_notes (id BIGINT PRIMARY KEY AUTO_INCREMENT, user_id BIGINT, ayah_id BIGINT, note LONGTEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP) $charset;";
+
+    $sql[] = "CREATE TABLE {$wpdb->prefix}quran_tajweed_rules (id BIGINT PRIMARY KEY AUTO_INCREMENT, rule_key VARCHAR(50) UNIQUE, title VARCHAR(190), description TEXT, color_hex VARCHAR(10), difficulty VARCHAR(20), kids_tip TEXT, pronunciation_guide TEXT, audio_url TEXT, sort_order INT DEFAULT 0) $charset;";
+    $sql[] = "CREATE TABLE {$wpdb->prefix}quran_tajweed_examples (id BIGINT PRIMARY KEY AUTO_INCREMENT, rule_id BIGINT, ayah_id BIGINT NULL, sample_text LONGTEXT, explanation TEXT, start_pos SMALLINT, end_pos SMALLINT, audio_url TEXT, KEY rule_idx (rule_id)) $charset;";
+    $sql[] = "CREATE TABLE {$wpdb->prefix}quran_tajweed_quiz (id BIGINT PRIMARY KEY AUTO_INCREMENT, question TEXT, options LONGTEXT, correct_index TINYINT, rule_key VARCHAR(50), difficulty VARCHAR(20), created_at DATETIME DEFAULT CURRENT_TIMESTAMP) $charset;";
     $sql[] = "CREATE TABLE {$wpdb->prefix}quran_quizzes (id BIGINT PRIMARY KEY AUTO_INCREMENT, title VARCHAR(190), quiz_data LONGTEXT, level VARCHAR(30), created_at DATETIME DEFAULT CURRENT_TIMESTAMP) $charset;";
 
     foreach ($sql as $statement) { dbDelta($statement); }

@@ -145,5 +145,42 @@
     });
   });
 
+  
+
+  const quizRoot = document.querySelector('[data-tajweed-quiz]');
+  if (quizRoot) {
+    let q = []; let i = -1; let score = 0;
+    const body = quizRoot.querySelector('.quiz-body');
+    const nextBtn = quizRoot.querySelector('.js-tajweed-next');
+
+    const renderQ = () => {
+      if (!body) return;
+      if (i >= q.length) {
+        body.innerHTML = `<p><strong>Quiz Complete:</strong> ${score}/${q.length}</p>`;
+        nextBtn.textContent = 'Restart';
+        i = -1; q = []; score = 0;
+        return;
+      }
+      const item = q[i];
+      body.innerHTML = `<p>${item.question}</p>` + (item.options || []).map((opt, idx) => `<button class="quiz-opt" data-i="${idx}">${opt}</button>`).join('');
+      body.querySelectorAll('.quiz-opt').forEach((btn) => btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.i || -1);
+        body.querySelectorAll('.quiz-opt').forEach((b, bi) => b.classList.add(bi === item.correct_index ? 'correct' : (bi===idx ? 'wrong' : '')));
+        if (idx === item.correct_index) score++;
+      }, { once: true }));
+    };
+
+    nextBtn?.addEventListener('click', async () => {
+      if (q.length === 0) {
+        const data = new FormData();
+        data.append('action','mhm_tajweed_quiz'); data.append('nonce', mhmQA.nonce);
+        data.append('count', quizRoot.dataset.count || '5');
+        const res = await fetch(mhmQA.ajaxUrl,{method:'POST',body:data}); const json = await res.json();
+        q = json.success ? json.data : []; i = 0; nextBtn.textContent = 'Next'; renderQ(); return;
+      }
+      i++; renderQ();
+    });
+  }
+
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/wp-content/themes/mhm-quran-academy/pwa/sw.js');
 })();

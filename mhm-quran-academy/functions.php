@@ -53,3 +53,5 @@ add_action('init', function () {
 require_once MHM_QA_PATH . '/quran-functions.php';
 require_once MHM_QA_PATH . '/quran-api.php';
 require_once MHM_QA_PATH . '/quran-shortcodes.php';
+require_once MHM_QA_PATH . '/tajweed-shortcodes.php';
+require_once MHM_QA_PATH . '/tajweed-admin.php';
