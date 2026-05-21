@@ -1,0 +1,3 @@
+.particles-bg{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(circle at 10% 20%,rgba(17,185,132,.25),transparent 20%),radial-gradient(circle at 80% 0%,rgba(216,180,106,.18),transparent 25%)}
+.tajweed-rule-ghunnah{color:#9be7ff}.tajweed-rule-madd{color:#ffd166}.tajweed-rule-ikhfa{color:#caffbf}.tajweed-rule-qalqala{color:#ffadad}
+.kids-badge{display:inline-block;padding:.4rem .7rem;border-radius:99px;background:linear-gradient(45deg,#ffd166,#fcbf49);color:#2d2200;font-weight:700}
