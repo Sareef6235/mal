@@ -1,0 +1,1 @@
+<!doctype html><html><body><h1>Tajweed Lessons</h1><ul><li>Ghunnah nasal sound</li><li>Madd elongation</li><li>Ikhfa conceal</li><li>Idgham merge</li><li>Qalqalah bounce</li><li>Noon Sakin</li><li>Meem Sakin</li></ul></body></html>

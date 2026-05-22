@@ -1,0 +1,1 @@
+<?php global $wpdb; $q=$wpdb->get_results("SELECT id,title,quiz_json FROM {$wpdb->prefix}quran_quizzes ORDER BY id DESC LIMIT 10",ARRAY_A); ?><!doctype html><html><body><h1>Tajweed Quiz</h1><?php foreach($q as $x): ?><article><h3><?php echo esc_html($x['title']); ?></h3><pre><?php echo esc_html((string)$x['quiz_json']); ?></pre></article><?php endforeach; ?></body></html>

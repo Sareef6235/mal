@@ -19,6 +19,10 @@ require_once MHM_QC_PATH . 'api/class-qc-rest.php';
 require_once MHM_QC_PATH . 'includes/class-qc-ajax.php';
 require_once MHM_QC_PATH . 'shortcodes/class-qc-shortcodes.php';
 require_once MHM_QC_PATH . 'admin/class-qc-admin.php';
+require_once MHM_QC_PATH . 'includes/class-qc-pages.php';
+require_once MHM_QC_PATH . 'audio/audio-api.php';
+require_once MHM_QC_PATH . 'quiz/quiz-admin.php';
+require_once MHM_QC_PATH . 'quiz/quiz-shortcodes.php';
 
 register_activation_hook(__FILE__, ['QC_DB','install']);
 register_activation_hook(__FILE__, ['QC_Seeder','seed_surahs']);
@@ -27,6 +31,8 @@ add_action('plugins_loaded', function(){
   QC_Security::init();
   QC_Migrations::init();
   QC_REST::init();
+  QC_Audio_API::init();
+  QC_Pages::init();
   QC_AJAX::init();
   QC_Shortcodes::init();
   QC_Admin::init();

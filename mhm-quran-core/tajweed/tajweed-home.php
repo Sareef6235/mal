@@ -1,0 +1,1 @@
+<?php global $wpdb; $rules=$wpdb->get_results("SELECT DISTINCT rule_type FROM {$wpdb->prefix}quran_tajweed ORDER BY rule_type",ARRAY_A); ?><!doctype html><html><body><h1>Tajweed Home</h1><?php foreach($rules as $r): ?><a href="/tajweed-rules?rule=<?php echo urlencode((string)$r['rule_type']); ?>"><?php echo esc_html($r['rule_type']); ?></a><br><?php endforeach; ?></body></html>
