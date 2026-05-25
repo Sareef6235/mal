@@ -1,0 +1,3 @@
+.qc-reader,.qc-surah,.qc-audio,.qc-tajweed,.qc-kids,.qc-daily,.qc-progress{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:12px;margin:10px 0}
+.qc-btn{background:linear-gradient(120deg,#f3d79f,#53e7b8);border:0;border-radius:999px;padding:.55rem .9rem;font-weight:700}
+.qc-progress .bar{height:8px;background:rgba(255,255,255,.15);border-radius:999px;overflow:hidden}.qc-progress .bar i{display:block;height:100%;background:linear-gradient(90deg,#53e7b8,#f3d79f)}

@@ -1,0 +1,1 @@
+<?php global $wpdb; $rec=$wpdb->get_results("SELECT id,name,bitrate FROM {$wpdb->prefix}quran_reciters",ARRAY_A); ?><!doctype html><html><body><h1>Reciter Switcher</h1><ul><?php foreach($rec as $r): ?><li><?php echo esc_html($r['name'].' '.$r['bitrate'].'kbps'); ?></li><?php endforeach; ?></ul></body></html>

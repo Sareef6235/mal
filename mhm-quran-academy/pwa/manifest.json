@@ -1,0 +1,13 @@
+{
+  "name": "MHM Quran Academy",
+  "short_name": "MHM Quran",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06120f",
+  "theme_color": "#11b984",
+  "orientation": "portrait-primary",
+  "icons": [
+    {"src":"/wp-content/themes/mhm-quran-academy/assets/img/icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"/wp-content/themes/mhm-quran-academy/assets/img/icon-512.png","sizes":"512x512","type":"image/png"}
+  ]
+}
