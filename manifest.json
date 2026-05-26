@@ -1,0 +1,13 @@
+{
+  "name": "Monthly Fee Dashboard",
+  "short_name": "FeeDash",
+  "start_url": "/monthly_fee_report.php",
+  "display": "standalone",
+  "background_color": "#070b16",
+  "theme_color": "#0a1020",
+  "description": "Premium monthly fee report PWA",
+  "icons": [
+    {"src":"icons/icon-192.svg","sizes":"192x192","type":"image/svg+xml","purpose":"any maskable"},
+    {"src":"icons/icon-512.svg","sizes":"512x512","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
