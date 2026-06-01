@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Enterprise OCR import center for Madrasa Management System PDFs and images.">
+  <title>Madrasa ERP | PDF & Image OCR Import Center</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link href="assets/css/styles.css" rel="stylesheet">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+      <div class="sidebar-brand">
+        <div class="brand-mark" aria-hidden="true"><i class="fa-solid fa-mosque"></i></div>
+        <div class="brand-copy">
+          <strong>NoorMadrasa</strong>
+          <span>Education ERP</span>
+        </div>
+        <button class="icon-btn sidebar-close d-lg-none" type="button" data-sidebar-close aria-label="Close menu">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-user-graduate"></i><span>Students</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-chalkboard-user"></i><span>Classes</span></a>
+        <a href="#" class="nav-item active"><i class="fa-solid fa-file-import"></i><span>OCR Import</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-book-quran"></i><span>Lessons</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-calendar-days"></i><span>Timetable</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-shield-halved"></i><span>Admin</span></a>
+      </nav>
+      <div class="sidebar-footer glass-card">
+        <span class="status-dot"></span>
+        <div>
+          <strong>OCR Service</strong>
+          <small>Healthy · 99.98% uptime</small>
+        </div>
+      </div>
+    </aside>
+
+    <div class="mobile-backdrop" id="mobileBackdrop" data-sidebar-close></div>
+
+    <main class="content">
+      <header class="topbar glass-card">
+        <button class="icon-btn d-lg-none" type="button" id="menuToggle" aria-label="Open menu">
+          <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+        <div class="search-pill" role="search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="search" aria-label="Search dashboard" placeholder="Search imports, regex rules, files...">
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn" type="button" id="themeToggle" aria-label="Toggle dark mode"><i class="fa-solid fa-moon"></i></button>
+          <button class="btn btn-premium" type="button" data-modal-target="settingsModal"><i class="fa-solid fa-sliders me-2"></i>Settings</button>
+        </div>
+      </header>
+
+      <section class="hero-section reveal">
+        <div class="hero-copy">
+          <span class="eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> Intelligent Import Workspace</span>
+          <h1>PDF & Image OCR Import Center</h1>
+          <p>Upload class plans, lesson schedules, exam records, and handwritten JPG/PNG scans. Review extracted text, tune regex rules live, validate parsed rows, and import with confidence.</p>
+          <div class="hero-actions">
+            <a class="btn btn-premium ripple" href="#uploadSection"><i class="fa-solid fa-cloud-arrow-up me-2"></i>Start Upload</a>
+            <button class="btn btn-soft ripple" type="button" data-modal-target="settingsModal"><i class="fa-solid fa-gear me-2"></i>Configure OCR</button>
+          </div>
+        </div>
+        <div class="hero-orb" aria-hidden="true"><i class="fa-solid fa-kaaba"></i></div>
+      </section>
+
+      <section class="stats-grid reveal" aria-label="Upload statistics">
+        <article class="stat-card glass-card"><span class="stat-icon teal"><i class="fa-solid fa-folder-open"></i></span><div><p>Total Imports</p><strong>1,284</strong><small>+18% this month</small></div></article>
+        <article class="stat-card glass-card"><span class="stat-icon success"><i class="fa-solid fa-circle-check"></i></span><div><p>Success Imports</p><strong>1,119</strong><small>Validated rows</small></div></article>
+        <article class="stat-card glass-card"><span class="stat-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></span><div><p>Failed Imports</p><strong>42</strong><small>Needs review</small></div></article>
+        <article class="stat-card glass-card"><span class="stat-icon warning"><i class="fa-solid fa-hourglass-half"></i></span><div><p>Pending Review</p><strong>123</strong><small>Draft queue</small></div></article>
+      </section>
+
+      <section class="dashboard-grid two-col" id="uploadSection">
+        <article class="panel glass-card reveal">
+          <div class="section-heading">
+            <div><span class="eyebrow">Upload</span><h2>File Upload Section</h2></div>
+            <span class="badge rounded-pill text-bg-light premium-badge">PDF · JPG · JPEG · PNG</span>
+          </div>
+          <div class="upload-zone" id="uploadZone" tabindex="0" role="button" aria-label="Upload PDF or image file">
+            <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" hidden>
+            <div class="upload-illustration"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <h3>Drag & drop files here</h3>
+            <p>or click to browse your device. Maximum recommended size: 25 MB.</p>
+            <button class="btn btn-premium ripple" type="button">Choose File</button>
+          </div>
+          <div class="file-preview empty-state" id="filePreview">
+            <i class="fa-regular fa-file-lines"></i>
+            <p>No file selected yet. Upload a document to preview OCR extraction.</p>
+          </div>
+        </article>
+
+        <article class="panel glass-card reveal">
+          <div class="section-heading">
+            <div><span class="eyebrow">AI Pipeline</span><h2>Processing Status</h2></div>
+          </div>
+          <div class="pipeline-list">
+            <div class="pipeline-step done"><i class="fa-solid fa-check"></i><span>File validation</span></div>
+            <div class="pipeline-step active"><i class="fa-solid fa-spinner"></i><span>OCR / PDF parser extraction</span></div>
+            <div class="pipeline-step"><i class="fa-solid fa-code"></i><span>Regex rule matching</span></div>
+            <div class="pipeline-step"><i class="fa-solid fa-table"></i><span>Data validation</span></div>
+          </div>
+          <div class="skeleton-stack" aria-hidden="true"><span></span><span></span><span></span></div>
+        </article>
+      </section>
+
+      <section class="panel glass-card reveal">
+        <div class="section-heading">
+          <div><span class="eyebrow">Preview</span><h2>OCR Extraction Preview</h2></div>
+          <div class="toolbar"><button class="btn btn-soft btn-sm" type="button" id="copyText"><i class="fa-regular fa-copy me-1"></i>Copy</button><button class="btn btn-soft btn-sm" type="button" id="clearText"><i class="fa-solid fa-eraser me-1"></i>Clear</button><button class="btn btn-soft btn-sm" type="button" id="fullscreenText"><i class="fa-solid fa-expand me-1"></i>Fullscreen</button></div>
+        </div>
+        <div class="preview-grid">
+          <div class="document-preview" id="documentPreview"><i class="fa-regular fa-file-pdf"></i><p>Uploaded PDF/image preview appears here.</p></div>
+          <div class="text-preview">
+            <label for="extractedText" class="form-label">Extracted Text Viewer</label>
+            <textarea id="extractedText" class="form-control premium-control" rows="13">Month: Ramadan
+Class: Hifz Level 3
+Week: 2
+Total Period: 6
+Subject: Quran Recitation
+Lesson Name: Surah Al-Mulk Revision
+Lesson Details: Tajweed practice with makharij review
+Activities: Pair recitation, teacher correction
+Smart Date: 2026-03-11
+Exam Date: 2026-03-18</textarea>
+            <div class="text-metrics"><span id="charCount">0 characters</span><span id="lineCount">0 lines</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel glass-card reveal" id="regexCenter">
+        <div class="section-heading">
+          <div><span class="eyebrow">Rules Engine</span><h2>Regex Management Center</h2></div>
+          <button class="btn btn-premium ripple" type="button" id="createRegex"><i class="fa-solid fa-plus me-2"></i>Create Regex</button>
+        </div>
+        <div class="regex-layout">
+          <div class="regex-list-card">
+            <div class="filter-row"><div class="input-icon"><i class="fa-solid fa-search"></i><input id="regexSearch" class="form-control premium-control" type="search" placeholder="Search regex rules"></div></div>
+            <div class="regex-list" id="regexList" aria-live="polite"></div>
+          </div>
+          <div class="regex-editor">
+            <div class="form-grid">
+              <div><label class="form-label" for="regexName">Regex Name</label><input id="regexName" class="form-control premium-control" value="Lesson Plan Parser"></div>
+              <div><label class="form-label" for="regexStatus">Status</label><select id="regexStatus" class="form-select premium-control"><option>Active</option><option>Inactive</option></select></div>
+              <div class="full"><label class="form-label" for="regexPattern">Regex Pattern</label><textarea id="regexPattern" class="form-control premium-control code-area" rows="3">(Month|Class|Week|Total Period|Subject|Lesson Name|Lesson Details|Activities|Smart Date|Exam Date):\s*(.+)</textarea></div>
+              <div class="full"><label class="form-label" for="regexDescription">Description</label><input id="regexDescription" class="form-control premium-control" value="Extracts lesson planning fields from structured OCR text."></div>
+            </div>
+            <div class="regex-actions"><button class="btn btn-soft btn-sm" type="button" id="editRegex"><i class="fa-solid fa-pen me-1"></i>Edit</button><button class="btn btn-soft btn-sm" type="button" id="cloneRegex"><i class="fa-regular fa-clone me-1"></i>Clone</button><button class="btn btn-soft btn-sm" type="button" id="toggleRegex"><i class="fa-solid fa-toggle-on me-1"></i>Enable/Disable</button><button class="btn btn-danger-soft btn-sm" type="button" id="deleteRegex"><i class="fa-regular fa-trash-can me-1"></i>Delete</button></div>
+            <div class="sandbox">
+              <h3><i class="fa-solid fa-flask-vial me-2"></i>Regex Testing Sandbox</h3>
+              <div class="sandbox-grid">
+                <div><label class="form-label" for="sandboxText">Input Text Area</label><textarea id="sandboxText" class="form-control premium-control" rows="7">Month: Ramadan
+Class: Hifz Level 3
+Week: 2
+Subject: Quran Recitation
+Lesson Name: Surah Al-Mulk Revision</textarea></div>
+                <div><label class="form-label" for="sandboxPattern">Regex Pattern Area</label><textarea id="sandboxPattern" class="form-control premium-control code-area" rows="7">(Month|Class|Week|Subject|Lesson Name):\s*(.+)</textarea></div>
+              </div>
+              <div class="sandbox-actions"><button class="btn btn-premium btn-sm ripple" type="button" id="testRegex">Test Regex</button><button class="btn btn-soft btn-sm" type="button" id="saveRegex">Save Regex</button><button class="btn btn-soft btn-sm" type="button" id="resetRegex">Reset Regex</button></div>
+              <div class="match-panel" id="matchPanel"><div class="match-summary"><strong>Live Match Result Panel</strong><span id="matchCount">0 matches</span></div><div id="highlightedMatches" class="highlighted-output">Run a test to highlight matches.</div><div id="captureGroups" class="capture-groups"></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel glass-card reveal">
+        <div class="section-heading">
+          <div><span class="eyebrow">Validate</span><h2>Data Preview Table</h2></div>
+          <div class="toolbar"><button class="btn btn-soft btn-sm" id="addRow" type="button"><i class="fa-solid fa-plus me-1"></i>Add Row</button><button class="btn btn-soft btn-sm" type="button"><i class="fa-solid fa-layer-group me-1"></i>Bulk Actions</button></div>
+        </div>
+        <div class="table-tools"><input id="tableSearch" class="form-control premium-control" type="search" placeholder="Search parsed rows"><span class="small text-muted">Sortable columns · editable cells · pagination ready</span></div>
+        <div class="table-responsive premium-table-wrap">
+          <table class="table premium-table align-middle" id="previewTable">
+            <thead><tr><th data-sort="month">Month</th><th>Class</th><th>Week</th><th>Total Period</th><th>Subject</th><th>Lesson Name</th><th>Lesson Details</th><th>Activities</th><th>Smart Date</th><th>Exam Date</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="pagination-row"><span>Showing 1-4 of 18 rows</span><nav aria-label="Data preview pagination"><ul class="pagination pagination-sm mb-0"><li class="page-item disabled"><a class="page-link" href="#">Prev</a></li><li class="page-item active"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="#">2</a></li><li class="page-item"><a class="page-link" href="#">Next</a></li></ul></nav></div>
+      </section>
+
+      <section class="dashboard-grid three-col">
+        <article class="panel glass-card reveal import-confirmation">
+          <div class="section-heading"><div><span class="eyebrow">Confirm</span><h2>Import Confirmation</h2></div></div>
+          <div class="confirm-metrics"><div><strong>18</strong><span>Rows Found</span></div><div><strong>16</strong><span>Rows Ready</span></div><div><strong>2</strong><span>Validation Errors</span></div></div>
+          <div class="button-stack"><button class="btn btn-premium ripple" type="button"><i class="fa-solid fa-file-import me-2"></i>Import All</button><button class="btn btn-soft" type="button">Save Draft</button><button class="btn btn-danger-soft" type="button">Cancel</button></div>
+        </article>
+        <article class="panel glass-card reveal history-panel">
+          <div class="section-heading"><div><span class="eyebrow">Audit</span><h2>Import History</h2></div></div>
+          <div class="history-list" id="historyList"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <div class="premium-modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+    <div class="modal-backdrop-blur" data-modal-close></div>
+    <div class="modal-card glass-card" role="document">
+      <div class="modal-header-premium"><div><span class="eyebrow">Configuration</span><h2 id="settingsTitle">Import Center Settings</h2></div><button class="icon-btn" type="button" data-modal-close aria-label="Close settings"><i class="fa-solid fa-xmark"></i></button></div>
+      <ul class="nav nav-pills premium-tabs" id="settingsTabs" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#generalTab" type="button">General</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#ocrTab" type="button">OCR Settings</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#regexTab" type="button">Regex Settings</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#importTab" type="button">Import Settings</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#advancedTab" type="button">Advanced</button></li>
+      </ul>
+      <div class="tab-content modal-body-premium">
+        <div class="tab-pane fade show active" id="generalTab"><div class="settings-grid"><label>Workspace Name<input class="form-control premium-control" value="Madrasa OCR Center"></label><label>Default Language<select class="form-select premium-control"><option>English + Arabic</option><option>English</option><option>Arabic</option></select></label></div></div>
+        <div class="tab-pane fade" id="ocrTab"><div class="settings-grid"><label>OCR Engine<select class="form-select premium-control"><option>Tesseract OCR</option><option>Cloud Vision</option><option>Azure Read</option></select></label><label>Confidence Level<input class="form-range" type="range" min="50" max="100" value="86"></label><label class="switch-row"><input type="checkbox" checked> Auto Cleanup Text</label><label class="switch-row"><input type="checkbox" checked> Remove Extra Spaces</label><label class="switch-row"><input type="checkbox" checked> Auto Detect Tables</label></div></div>
+        <div class="tab-pane fade" id="regexTab"><div class="settings-grid"><label>Default Regex<select class="form-select premium-control"><option>Lesson Plan Parser</option><option>Exam Schedule Parser</option></select></label><label>Fallback Regex<input class="form-control premium-control" value="Generic key-value parser"></label><label class="switch-row"><input type="checkbox" checked> Multi Regex Processing</label></div></div>
+        <div class="tab-pane fade" id="importTab"><div class="settings-grid"><label class="switch-row"><input type="checkbox"> Auto Import</label><label class="switch-row"><input type="checkbox" checked> Preview Before Import</label><label class="switch-row"><input type="checkbox" checked> Duplicate Detection</label></div></div>
+        <div class="tab-pane fade" id="advancedTab"><div class="settings-grid"><label>Webhook URL<input class="form-control premium-control" placeholder="https://example.com/import-webhook"></label><label>Retention Policy<select class="form-select premium-control"><option>Keep files for 90 days</option><option>Keep files for 30 days</option></select></label></div></div>
+      </div>
+      <div class="modal-footer-premium"><button class="btn btn-soft" type="button" data-modal-close>Cancel</button><button class="btn btn-premium ripple" type="button" data-modal-close>Save Settings</button></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
