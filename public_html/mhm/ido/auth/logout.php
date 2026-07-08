@@ -1,0 +1,1 @@
+<?php require_once __DIR__.'/../includes/auth.php'; secure_session(); audit('logout','users',$_SESSION['user']['id']??null); $_SESSION=[]; session_destroy(); header('Location: '.APP_BASE.'/auth/login.php?logout=1');

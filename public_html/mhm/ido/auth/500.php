@@ -1,0 +1,1 @@
+<?php require_once __DIR__.'/../includes/layout.php'; page_header('500'); ?><main class="auth-shell"><div class="glass-card p-5 text-center"><h1>500</h1><p>Something went wrong. Please try again later.</p></div></main><?php page_footer(); ?>
