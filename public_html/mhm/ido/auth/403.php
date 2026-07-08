@@ -1,0 +1,1 @@
+<?php require_once __DIR__.'/../includes/layout.php'; page_header('403'); ?><main class="auth-shell"><div class="glass-card p-5 text-center"><h1>403</h1><p>You are not authorized to access this page.</p><a href="<?=APP_BASE?>/auth/profile.php" class="btn btn-premium">Go home</a></div></main><?php page_footer(); ?>

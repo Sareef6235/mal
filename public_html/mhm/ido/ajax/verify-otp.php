@@ -1,0 +1,1 @@
+<?php require_once __DIR__.'/../includes/otp.php'; header('Content-Type: application/json'); secure_session(); verify_csrf(); $ok=verify_otp_code($_POST['email']??'',$_POST['purpose']??'email_verify',$_POST['otp']??''); echo json_encode(['ok'=>$ok]);

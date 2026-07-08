@@ -1,0 +1,1 @@
+<?php require_once __DIR__.'/../includes/user.php'; header('Content-Type: application/json'); $e=trim($_GET['email']??''); echo json_encode(['available'=>filter_var($e,FILTER_VALIDATE_EMAIL) && !find_user_by_email($e)]);

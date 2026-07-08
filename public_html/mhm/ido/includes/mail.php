@@ -1,0 +1,6 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__.'/config.php';
+function render_email(string $title, string $body): string { return '<!doctype html><html><body style="font-family:Inter,Arial;background:#f5f7fb;padding:30px"><div style="max-width:620px;margin:auto;background:white;border-radius:20px;padding:28px;box-shadow:0 20px 60px #dbe3f0"><h2 style="color:#2636d9">'.htmlspecialchars($title).'</h2><div style="font-size:16px;line-height:1.6;color:#172033">'.$body.'</div><p style="color:#718096;font-size:12px">'.APP_NAME.' automated security email.</p></div></body></html>'; }
+function send_html_mail(string $to, string $subject, string $html): bool { $headers="MIME-Version: 1.0\r\nContent-type:text/html;charset=UTF-8\r\nFrom: ".MAIL_FROM_NAME." <".MAIL_FROM.">\r\n"; return mail($to,$subject,$html,$headers); }
+function send_otp_email(string $email, string $otp, string $purpose): bool { $title=$purpose==='password_reset'?'Password reset OTP':'Verify your email'; $html=render_email($title, '<p>Your secure one-time password is:</p><div style="font-size:34px;letter-spacing:8px;font-weight:800">'.$otp.'</div><p>This code expires in 10 minutes.</p>'); return send_html_mail($email,$title,$html); }

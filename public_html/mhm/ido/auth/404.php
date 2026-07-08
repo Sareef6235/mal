@@ -1,0 +1,1 @@
+<?php require_once __DIR__.'/../includes/layout.php'; page_header('404'); ?><main class="auth-shell"><div class="glass-card p-5 text-center"><h1>404</h1><p>The page you requested was not found.</p></div></main><?php page_footer(); ?>

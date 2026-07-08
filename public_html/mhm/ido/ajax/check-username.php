@@ -1,0 +1,1 @@
+<?php require_once __DIR__.'/../includes/user.php'; header('Content-Type: application/json'); $u=trim($_GET['username']??''); echo json_encode(['available'=>$u!=='' && valid_username($u) && !find_user_by_username($u)]);
