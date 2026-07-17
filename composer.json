@@ -1,0 +1,11 @@
+{
+  "name": "acme/document-automation",
+  "description": "Secure PHPWord mail merge module for attendance data.",
+  "require": {
+    "php": "^8.2",
+    "phpoffice/phpword": "^1.2"
+  },
+  "autoload": {
+    "psr-4": { "DocumentAutomation\\": "src/" }
+  }
+}
